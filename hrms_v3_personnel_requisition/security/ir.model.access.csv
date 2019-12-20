@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hrms_v3_personnel_requisition_hrms_v3_personnel_requisition,hrms_v3_personnel_requisition.hrms_v3_personnel_requisition,model_hrms_v3_personnel_requisition_hrms_v3_personnel_requisition,,1,0,0,0
