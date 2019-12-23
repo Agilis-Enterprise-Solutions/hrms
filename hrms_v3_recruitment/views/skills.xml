@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Skills action window -->
+        <record model="ir.actions.act_window" id="hrmsv3_skills.action_window">
+            <field name="name">hrms_v3_skills_action_window</field>
+            <field name="res_model">hrms_v3_recruitment.hrms_v3_personnel_requisition</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+        <record model="ir.ui.view" id="hrms_v3_skills_qualification_list">
+            <field name="name">hrms_v3_skills_qualification_list</field>
+            <field name="model">hrmsv3.skills</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="skill_name"/>
+                    <field name="skill_type"/>
+                    <field name="skill_level"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="hrms_v3_skills_qualification_form">
+            <field name="name">hrms_v3_skills_qualification_form</field>
+            <field name="model">hrmsv3.skills</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="skill_name"/>
+                    <field name="skill_type_id"/>
+                    <field name="skill_description"/>
+                    <field name="skill_level_ids">
+                        <tree string="Skill Levels">
+                            <field name="skill_level"/>
+                            <field name="skill_level_description"/>
+                        </tree>
+                    </field>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
