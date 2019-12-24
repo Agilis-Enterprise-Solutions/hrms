@@ -21,6 +21,18 @@ class JobPosting(models.Model):
         store=True
     )
 
+    skill_name = fields.Char(string="Skill Name",
+                             related='personnel_requisition_id.skills_ids.skill_name',
+                             readonly=True,
+                             store=True
+
+                             )
+    skill_description = fields.Text(string="Skill Description",
+                                    related='personnel_requisition_id.skills_ids.skill_description',
+                                    readonly=True,
+                                    store=True
+                                    )
+
     skill_type = fields.Char(
         string="Skill Type",
         related='personnel_requisition_id.skills_ids.skill_type_id.skill_type',
@@ -36,13 +48,12 @@ class JobPosting(models.Model):
             ('advanced', 'Advanced'),
             ('expert', 'Expert'),
         ],
-        related='personnel_requisition_id.skill_level',
-        readonly=True,
-        store=True
+        related='personnel_requisition_id.skills_ids.skill_level_ids.skill_level',
+                store=True
     )
     skill_level_description = fields.Char(
         string="Skill Level Description",
-        related="personnel_requisition_id.skill_level_description")
+        related="personnel_requisition_id.skills_ids.skill_level_ids.skill_level_description")
 
     job_qualification = fields.Text(string="Qualification",
                                     related='personnel_requisition_id.job_qualification',

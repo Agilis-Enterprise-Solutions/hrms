@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record model="ir.ui.view" id="hr.view_hr_job_form_inherit">
+        <record model="ir.ui.view" id="view_hr_job_form_inherit">
             <field name="name">Job Form Inherit</field>
             <field name="model">hr.job</field>
             <field name="inherit_id" ref="hr.view_hr_job_form"/>
@@ -10,8 +10,20 @@
                     <field name="proposed_salary"/>
                 </xpath>
 
-                <xpath expr="//field[@name='kasir_id']" position="replace">
-                    <field name="kasir_id" required="1"/>
+                <xpath expr="//sheet/div[3]" position="replace">
+                    <notebook name="job_desc_skills">
+                        <page string="Job Description">
+                            
+                            <field name="description"/>
+                        </page>
+                        <page string="Skills and Qualification">
+                            <tree create="true" delete="true" edit="true" editable="bottom">
+                                <field name="skill_name"/>
+                                <field name="skill_description"/>
+                            </tree>
+                            <field name="job_qualification" required="1"/>
+                        </page>
+                    </notebook>
                 </xpath>
             </field>
         </record>

@@ -1,0 +1,142 @@
+<odoo>
+  <data>
+
+    <record model="ir.actions.act_window" id="hrmsv3_personnel_requisition_action_window">
+
+      <field name="name">Personnel Requisition</field>
+      <field name="res_model">hrmsv3.personnel_requisition</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="view_mode">tree,form</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          Create your Job Requisition!
+        </p>
+      </field>
+    </record>
+
+
+    <!-- explicit list view definition -->
+
+    <!-- Personnel Requisition List View  -->
+    <record model="ir.ui.view" id="hrms_v3_personnel_requisition_list">
+      <field name="name">hrms_v3_personnel_requisition_list</field>
+      <field name="model">hrmsv3.personnel_requisition</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="company_id"/>
+          <field name="job_position_id"/>
+          <field name="department_id"/>
+          <field name="job_location_id"/>
+          <field name="responsible_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <!-- Personnel Requisition Form View -->
+    <record model="ir.ui.view" id="hrms_v3_personnel_requisition_form">
+      <field name="name">hrms_v3_personnel_requisition_form</field>
+      <field name="model">hrmsv3.personnel_requisition</field>
+      <field name="arch" type="xml">
+        <form string="Job Requisition">
+          <sheet>
+            <div class="oe_title">
+              <h1>
+                Job Requisition
+              </h1>
+            </div>
+            <div class="oe_title">
+              <h2>
+                <field name="job_req_id_seq"/>
+              </h2>
+            </div>
+            <group>
+              <group>
+                <field name="company_id"/>
+                <field name="job_position_id"/>
+                <field name="department_id"/>
+                <field name="job_location_id"/>
+                <field name="website_id"/>
+                <field name="responsible_id"/>
+                <field name="email_alias"/>
+                <field name="expected_new_employee"/>
+              </group>
+              <group>
+                <field name="proposed_salary"/>
+                <field name="replacement_for_id_check_box" class="oe_inline"/>
+                <field name="replacement_for_id" class="oe_inline" attrs="{'invisible': [('replacement_for_id_check_box','=', False)]}"/>
+              </group>
+            </group>
+            <notebook>
+              <page string="Job Description">
+                <field name="job_description"/>
+              </page>
+              <page string="Skills And Qualification">
+                <field name="skills_ids"/>
+                <label for="job_qualification">Qualification</label>
+                <field name="job_qualification"/>
+              </page>
+            </notebook>
+          </sheet>
+
+
+          <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers" />
+            <field name="activity_ids" widget="mail_activity"/>
+            <field name="message_ids" widget="mail_thread" />
+          </div>
+
+        </form>
+      </field>
+    </record>
+
+
+
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="hrms_v3_personnel_requisition.action_server">
+      <field name="name">hrms_v3_personnel_requisition server</field>
+      <field name="model_id" ref="model_hrms_v3_personnel_requisition_hrms_v3_personnel_requisition"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="hrms_v3_personnel_requisition" id="hrms_v3_personnel_requisition.menu_root"/>
+    -->
+    <!-- menu categories -->
+
+    <menuitem name="Job Requisition" sequence="1" id="hrms_v3_personnel_requisition_menu" parent="hr_recruitment.menu_hr_recruitment_root" action="hrmsv3_personnel_requisition_action_window" />
+
+    <!-- actions -->
+
+    <!-- actions opening views on models -->
+
+    <!-- <record model="ir.actions.act_window" id="hrms_v3_personnel_requisition_action_window">
+
+      <field name="name">hrms_v3_personnel_requisition_action_window</field>
+      <field name="res_model">hrmsv3.personnel_requisition</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="view_mode">tree,form</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          Create your Job Requisition!
+        </p>
+      </field>
+    </record>
+     -->
+
+    <!--
+    <menuitem name="List" id="hrms_v3_personnel_requisition.menu_1_list" parent="hrms_v3_personnel_requisition.menu_1" action="hrms_v3_personnel_requisition.action_window"/>
+    <menuitem name="Server to list" id="hrms_v3_personnel_requisition" parent="hrms_v3_personnel_requisition.menu_2" action="hrms_v3_personnel_requisition.action_server"/>
+    -->
+  </data>
+</odoo>

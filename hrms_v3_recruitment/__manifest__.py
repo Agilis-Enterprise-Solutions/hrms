@@ -21,13 +21,16 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','hr_recruitment','contacts'],
+    'depends': ['base','hr','hr_recruitment','contacts',],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/views.xml',
-        'views/templates.xml',
+        'security/ir.model.access.csv',
+        'views/job_posting.xml',
+        'data/sequence.xml',
+        'views/personnel_requisition.xml',
+        'views/skills.xml',
+
     ],
     # only loaded in demonstration mode
     'demo': [

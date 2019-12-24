@@ -22,17 +22,22 @@ class PersonnelRequisition(models.Model):
                                  index=True,
                                  default=lambda self: _('New'))
 
-    company_id = fields.Char(string="Company")
-    job_position_id = fields.Char(string="Job Position")
-    department_id = fields.Char(string="Department")
-    job_location_id = fields.Char(string="Job Location")
-    website_id = fields.Char(string="Website")
-    skills_ids = fields.One2many('hrmsv3.skills', 'personnel_requisition_id', string="Skills")
+    company_id = fields.Many2one('res.company', string="Company")
+    job_position_id = fields.Many2one('hr.job', string="Job Position")
+    department_id = fields.Many2one('hr.department', string="Department")
+    job_location_id = fields.Many2one('res.company', string="Job Location")
+    website_id = fields.Char(string="Website",
+                             related='company_id.website',
+                             readonly=True,
+                             store=True
+                             )
+    skills_ids = fields.One2many(
+        'hrmsv3.skills', 'personnel_requisition_id', string="Skills")
 
-    responsible_id = fields.Many2Many('res.users',  string="Responsible")
+    responsible_id = fields.Many2one('res.users',  string="Responsible")
     email_alias = fields.Char(string="Email Alias")
     job_description = fields.Text(string="Job Description")
-    job_qualification = fields.Text(string="Qualification")
+    job_qualification = fields.Text(string="Job Qualification")
     number_of_applicants = fields.Char(
         string="Number of Applicants",
         readonly=True
@@ -42,17 +47,27 @@ class PersonnelRequisition(models.Model):
                                       )
     expected_new_employee = fields.Char(string="Expected New Employee",
                                         required=True,
-                                        readonly=True
                                         )
     proposed_salary = fields.Float(string="Proposed Salary")
-    replacement_for_id = fields.Char('hr.employee', string="Responsible")
+    replacement_for_id = fields.Many2one(
+        'hr.employee', string="Replacement For")
     replacement_for_id_check_box = fields.Boolean(
-        string='Replacement for ID Checkbox')
+        string='Replacement')
+
+    @api.model
+    def create(self, vals):
+        if vals.get('job_req_id_seq', _('New')) == ('New'):
+            vals['job_req_id_seq'] = self.env['ir.sequence'].next_by_code(
+                'job.requisition.sequence') or _('New')
+        result = super().create(vals)
+        return result
 
 
 class Skills(models.Model):
     _name = 'hrmsv3.skills'
     _rec_name = 'skill_name'
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
+
     personnel_requisition_id = fields.Many2one(
         'hrmsv3.personnel_requisition',
         string="Personnel Requisition ID"
@@ -63,7 +78,7 @@ class Skills(models.Model):
     skill_type_id = fields.Many2one('hrmsv3.skills_type', string="Skill Type")
     skill_description = fields.Text(string="Skill Description")
     skill_level_ids = fields.One2many(
-        'hrmsv3.skills_level', 'skill_id', string="Skill Levels")
+        'hrmsv3.skills_level', 'skill_id', string="Skill Level")
 
 
 class SkillsType(models.Model):
@@ -77,8 +92,9 @@ class SkillsLevel(models.Model):
     _rec_name = 'skill_level'
 
     skill_id = fields.Many2one('hrmsv3.skills', string="Skill Name")
+    skill_name = fields.Char(string="Skill Name")
     skill_level = fields.Selection(
-        string='skill_level',
+        string='Skill Level',
         selection=[
             ('beginner', 'Beginner'),
             ('novice', 'Novice'),
@@ -88,4 +104,3 @@ class SkillsLevel(models.Model):
         ]
     )
     skill_level_description = fields.Char(string="Skill Level Description")
-
