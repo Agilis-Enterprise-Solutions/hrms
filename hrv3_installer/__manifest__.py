@@ -1,8 +1,9 @@
 {
-    'author':  'Raymund Martinez',
+    'author':  'Raymund Martinez, Ralf Cabarogias, John Ardosa – Agilis Enterprise Solutions Inc.',
     'depends': [
         'base',
-        'hr'
+        'hr',
+        'hrms_v3_recruitment'
     ],
     'name': "HRv3 Installer Module",
     'description': '''Installs the necessary modules for HRv3''',
