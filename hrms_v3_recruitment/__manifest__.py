@@ -30,6 +30,7 @@
         'data/sequence.xml',
         'views/personnel_requisition.xml',
         'views/skills.xml',
+        'views/candidate_sourcing.xml',
 
     ],
     # only loaded in demonstration mode

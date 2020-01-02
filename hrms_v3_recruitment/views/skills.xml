@@ -8,6 +8,12 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+        <record model="ir.actions.act_window" id="hrmsv3_skill_name_action_window">
+            <field name="name">Skills Name</field>
+            <field name="res_model">hrmsv3.skills_name</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
         <record model="ir.actions.act_window" id="hrmsv3_skill_level_action_window">
             <field name="name">Skills Type</field>
             <field name="res_model">hrmsv3.skills_level</field>

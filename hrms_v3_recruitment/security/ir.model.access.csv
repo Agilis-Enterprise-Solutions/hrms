@@ -1,5 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_recruitment_requisition,access.hrmsv3.personnel_requisition,model_hrmsv3_personnel_requisition,,1,1,1,1
 access_recruitment_skills,access.hrmsv3.skills,model_hrmsv3_skills,,1,1,1,1
+access_recruitment_skills_name,access.hrmsv3.skills_name,model_hrmsv3_skills_name,,1,1,1,1
 access_recruitment_skills_type,access.hrmsv3.skills_type,model_hrmsv3_skills_type,,1,1,1,1
 access_recruitment_skills_level,access.hrmsv3.skills_level,model_hrmsv3_skills_level,,1,1,1,1

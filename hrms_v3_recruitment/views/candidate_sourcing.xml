@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="crm_case_form_view_job_inherit">
+            <field name="name">Jobs -Recruitment Form Inherit</field>
+            <field name="model">hr.applicant</field>
+            <field name="inherit_id" ref="hr_recruitment.crm_case_form_view_job"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='create_employee_from_applicant']" position="after">
+                    <button string="Create Job Offer" name="create_job_offer" type="object"></button>
+                </xpath>
+                <xpath expr="//div[@name='button_box']/button[@name='action_get_attachment_tree_view']" position="after">
+                    <button name="action_get_assessment_tree_view" class="oe_stat_button" icon="fa-book" type="object"/>
+                </xpath>
+                <xpath expr="//field[@name='department_id']" position="after">
+                    <field name="skills_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                </xpath>
+                <xpath expr="//group[1]" position="after">
+                    <notebook>
+                        <page string="Character Reference">
+
+                        </page>
+                        <page string="Skills">
+
+                        </page>
+                        <page string="Education">
+
+                        </page>
+                        <page string="Work History">
+
+                        </page>
+                    </notebook>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
