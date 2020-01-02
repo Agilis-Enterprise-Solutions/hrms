@@ -48,7 +48,6 @@ class PersonnelRequisition(models.Model):
                              )
     skills_ids = fields.Many2many(
         'hrmsv3.skills',
-        # 'personnel_requisition_id',
         string="Skills")
 
     responsible_id = fields.Many2one('res.users',  string="Responsible")
@@ -123,13 +122,9 @@ class PersonnelRequisition(models.Model):
                 rec.write({
                     'user_id': user_id,
                     'no_of_recruitment': expected_new_employee,
-                    # 'skills_ids.id': skills_ids or False,
                     'job_qualification': job_qualification,
-                    # 'state': 'recruit',
                     'proposed_salary': proposed_salary
                 })
-
-            _logger.info(f'Skills IDs\n\n\n{skills_ids}\n\n\n{rec.skills_ids}')
 
         return True
         # {
@@ -181,17 +176,6 @@ class SkillsLevel(models.Model):
     _rec_name = 'skill_level'
 
     skill_id = fields.Many2one('hrmsv3.skills', string="Skill Name")
-    # skill_name = fields.Char(string="Skill Name")
-    # skill_level = fields.Selection(
-    #     string='Skill Level',
-    #     selection=[
-    #         ('beginner', 'Beginner'),
-    #         ('novice', 'Novice'),
-    #         ('adept', 'Adept'),
-    #         ('advanced', 'Advanced'),
-    #         ('expert', 'Expert'),
-    #     ]
-    # )
 
     skill_level = fields.Char(string="Skill Level")
     skill_level_description = fields.Char(string="Skill Level Description")
