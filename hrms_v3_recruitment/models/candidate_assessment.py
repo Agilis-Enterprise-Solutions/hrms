@@ -1,13 +1,5 @@
 # -*- coding: utf-8 -*-
-
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError
-from datetime import date, datetime, timedelta
-import logging
-import itertools
-import calendar
-from odoo.exceptions import ValidationError
-from num2words import num2words
+from odoo import models, fields
 
 
 class Assessment(models.Model):
@@ -43,4 +35,3 @@ class Assessment(models.Model):
             ('failed', 'Failed')]
     )
     checked_by_id = fields.Many2one('hr.employee')
-    
