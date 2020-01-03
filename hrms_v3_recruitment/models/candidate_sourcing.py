@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
+from datetime import date, datetime
+import itertools
+import calendar
 from odoo.exceptions import ValidationError
-from datetime import date
 import re
 import logging
 
@@ -17,21 +21,17 @@ class Applicant(models.Model):
 
     blacklisted = fields.Boolean(string="Blacklisted")
 
-    character_reference = fields.One2many('hr.character.reference',
-                                          'character_id',
-                                          string="Character References")
+    character_reference = fields.One2many('hr.character.reference', 'character_id',
+                                   string="Character References")
 
-    candiddate_skills = fields.One2many('hr.candidate.skill',
-                                        'candidate_skill_id',
-                                        string="Candidate Skill")
+    candiddate_skills = fields.One2many('hr.candidate.skill', 'candidate_skill_id',
+                                   string="Candidate Skill")
 
-    candiddate_education = fields.One2many('hr.candidate.education',
-                                           'education_id',
-                                           string="Candidate Education")
+    candiddate_education = fields.One2many('hr.candidate.education', 'education_id',
+                                   string="Candidate Education")
 
-    candiddate_work_history = fields.One2many('hr.candidate.work.history',
-                                              'work_history_id',
-                                              string="Candidate Work History")
+    candiddate_work_history = fields.One2many('hr.candidate.work.history', 'work_history_id',
+                                   string="Candidate Work History")
 
     @api.multi
     def create_job_offer(self):
@@ -74,14 +74,15 @@ class CharacterReference(models.Model):
 
     character_id = fields.Many2one('hr.applicant')
     character_name = fields.Char("Name", required=True)
-    character_email = fields.Char("Email", required=True)
+    character_email= fields.Char("Email", required=True)
     character_number = fields.Char("Mobile Number", required=True, size=11)
     character_credentials = fields.Char("Credentials", required=True)
+
 
     @api.constrains('character_email')
     def _check_email(self):
         emailPattern = re.compile(r'[\w.-]+@[\w-]+[.]+[\w.-]')
-        if self.character_email and not emailPattern.match(self.character_email):
+        if self.character_email and (bool(emailPattern.match(self.character_email)) == False):
             raise ValidationError("Email is in Incorrect format \n e.g. example@company.com")
 
 
@@ -91,9 +92,8 @@ class CandidateSkill(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     candidate_skill_id = fields.Many2one('hr.applicant')
-    candidate_skill = fields.Many2one('hr.candidate.skill.type', "Skill Name",
-                                      required=True)
-    candidate_skill_desc = fields.Text("Description", required=True)
+    candidate_skill = fields.Many2one('hr.candidate.skill.type', "Skill Name", required=True)
+    candidate_skill_desc= fields.Text("Description", required=True)
 
 
 class CandidateSkillType(models.Model):
@@ -111,8 +111,7 @@ class CandidateWorkHistory(models.Model):
 
     work_history_id = fields.Many2one('hr.applicant')
     company_name = fields.Char("Company Name", required=True)
-    line_of_business = fields.Many2one('hr.candidate.work.history.company',
-                                       "Line Of Business")
+    line_of_business = fields.Many2one('hr.candidate.work.history.company', "Line Of Business")
     position = fields.Many2one('hr.candidate.work.history.position', "Position")
     address = fields.Char("Address")
     start_date = fields.Date("Date of Start", required=True)
@@ -131,6 +130,7 @@ class CandidateWorkHistory(models.Model):
             rec.years = years_services + " , " + month_services
 
 
+
 class CandidateCompanyLine(models.Model):
     _name = "hr.candidate.work.history.company"
     _rec_name = "line_of_business"
@@ -146,15 +146,13 @@ class CandidateCompanyPosition(models.Model):
 
     position = fields.Char("Position", required=True)
 
-
 class CandidateEducation(models.Model):
     _name = "hr.candidate.education"
     _rec_name = "type_id"
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     education_id = fields.Many2one('hr.applicant')
-    type_id = fields.Many2one('hr.recruitment.degree', "Level of Education",
-                              required=True)
+    type_id = fields.Many2one('hr.recruitment.degree', "Level of Education", required=True)
     course = fields.Many2one('hr.candidate.education.strand', "Course/Strand")
     standard = fields.Char("Standard")
     year = fields.Integer("Year")
@@ -177,13 +175,10 @@ class CandidateBlacklisted(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     applicant_name = fields.Char("Applicant Name", required=True)
-    date_blocked = fields.Date("Date Blocked", required=True,
-                               default=date.today())
-    job_position = fields.Many2one('hr.job',"Job Position Applied",
-                                   required=True)
-    recruitment_stage = fields.Many2one('hr.recruitment.stage',
-                                        "Recruitment Stage", required=True)
-    responsible = fields.Many2one('res.users', "Responsible", required=True)
+    date_blocked = fields.Date("Date Blocked", required=True, default=date.today())
+    job_position = fields.Many2one('hr.job',"Job Position Applied", required=True)
+    recruitment_stage = fields.Many2one('hr.recruitment.stage',"Recruitment Stage", required=True)
+    responsible = fields.Many2one('res.users',"Responsible", required=True)
     reason = fields.Text("Reason", required=True, default="N/A")
     number_of_days = fields.Char("Number of Days", default="0")
 
@@ -204,7 +199,4 @@ class CandidateBlacklisted(models.Model):
     def reset_applicant(self):
         """ Reinsert the applicant into the recruitment pipe in the first stage"""
         default_stage_id = self._default_stage_id()
-        self.write({
-            'active': True,
-            'stage_id': default_stage_id
-        })
+        self.write({'active': True, 'stage_id': default_stage_id})
