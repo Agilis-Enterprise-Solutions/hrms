@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError
-from datetime import date, datetime, timedelta
 import logging
-import itertools
-import calendar
-from odoo.exceptions import ValidationError
-from num2words import num2words
 _logger = logging.getLogger("_name_")
 
 
