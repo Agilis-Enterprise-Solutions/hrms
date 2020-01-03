@@ -1,13 +1,5 @@
 # -*- coding: utf-8 -*-
-
-from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError
-from datetime import date, datetime, timedelta
-import logging
-import itertools
-import calendar
-from odoo.exceptions import ValidationError
-from num2words import num2words
+from odoo import models, fields, api
 
 
 class JobPosting(models.Model):
@@ -20,7 +12,7 @@ class JobPosting(models.Model):
         readonly=True,
         store=True
     )
-    
+
     skills_ids = fields.Many2many(
         'hrmsv3.skills',
         # 'personnel_requisition_id',
@@ -47,7 +39,7 @@ class JobPosting(models.Model):
     #     readonly=True,
     #     store=True
     # )
-    
+
     # skill_level = fields.Selection(
     #     string='skill_level',
     #     selection=[
