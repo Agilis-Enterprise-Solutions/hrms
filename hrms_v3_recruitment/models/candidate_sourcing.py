@@ -49,11 +49,11 @@ class Applicant(models.Model):
             'view_mode': 'form',
             'res_model': 'candidate_refuse.wizard',
             'target': 'new',
-        }
+            }
 
     @api.multi
     def toggle_active(self):
-        """Inverse the value of the field ``active`` on the records in ``self``."""
+        """ Inverse the value of the field ``active`` on the records in ``self``. """
         for record in self:
             if not self.blacklisted:
                 record.active = not record.active
@@ -64,7 +64,7 @@ class Applicant(models.Model):
                     'view_mode': 'form',
                     'res_model': 'blocked.candidate.wizard',
                     'target': 'new',
-                }
+                    }
 
 
 class CharacterReference(models.Model):
@@ -122,8 +122,7 @@ class CandidateWorkHistory(models.Model):
     @api.depends('start_date','end_date')
     def get_year_services(self):
         for rec in self:
-            years_services = str(int(int((rec.end_date - rec.start_date).days)
-                                     / 365)) + " Years"
+            years_services = str(int(int((rec.end_date - rec.start_date).days) / 365)) + " Years"
             month = int(int((rec.end_date - rec.start_date).days) * 0.0328767)
             if month > 12:
                 month_services = str(month % 12) + " Months"
