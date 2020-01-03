@@ -66,6 +66,20 @@ class Applicant(models.Model):
                     'target': 'new',
                     }
 
+    @api.multi
+    def reset_applicant(self):
+        for record in self:
+            if not self.blacklisted:
+                record.active = not record.active
+            else:
+                return {
+                    'type': 'ir.actions.act_window',
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'blocked.candidate.wizard',
+                    'target': 'new',
+                    }
+
 
 class CharacterReference(models.Model):
     _name = "hr.character.reference"
@@ -182,21 +196,22 @@ class CandidateBlacklisted(models.Model):
     reason = fields.Text("Reason", required=True, default="N/A")
     number_of_days = fields.Char("Number of Days", default="0")
 
-    @api.multi
-    def _default_stage_id(self):
-        if self._context.get('default_job_id'):
-            ids = self.env['hr.recruitment.stage'].search([
-                '|',
-                ('job_id', '=', False),
-                ('job_id', '=', self._context['default_job_id']),
-                ('fold', '=', False)
-            ], order='sequence asc', limit=1).ids
-            if ids:
-                return ids[0]
-        return False
-
-    @api.multi
     def reset_applicant(self):
-        """ Reinsert the applicant into the recruitment pipe in the first stage"""
-        default_stage_id = self._default_stage_id()
-        self.write({'active': True, 'stage_id': default_stage_id})
+        department = self.env['hr.applicant'].search([('partner_name', '=', self.applicant_name),
+                                                      ('active', '=', False),
+                                                      ('job_id', '=', self.job_position.id)
+                                                      ])
+        if department:
+            department.write({'blacklisted': False,
+                              'active': True,
+                              'kanban_state': "normal"})
+        self.unlink()
+        
+        return {
+            'res_model': 'hr.applicant',
+            'view_type': 'kanban',
+            'view_mode': 'kanban',
+            'view_id': False,
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+            }
