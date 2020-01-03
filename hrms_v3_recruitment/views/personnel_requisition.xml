@@ -43,11 +43,11 @@
             <button name="approve_jobreq_form" string="Approve" class="oe_highlight" states="for_approval" type="object"/>
             <button name="action_hr_job_form" string="Update Job Post" class="oe_highlight" states="approved" type="object" />
 
-            <!-- context="{'default_id': job_position_id, 
-                    'default_user_id': responsible_id, 
-                    'default_job_qualification': job_qualification, 
-                    'default_no_of_recruitment' : expected_new_employee, 
-                    'default_skills_ids' : skills_ids, 
+            <!-- context="{'default_id': job_position_id,
+                    'default_user_id': responsible_id,
+                    'default_job_qualification': job_qualification,
+                    'default_no_of_recruitment' : expected_new_employee,
+                    'default_skills_ids' : skills_ids,
                     'default_state':'recruit'}"  -->
             <button name="cancel_jobreq_form" string="Cancel" class="oe_highlight" states="for_approval" type="object"/>
             <field name="state" widget="statusbar" statusbar_visible="draft,for_approval,approved,canceled"/>

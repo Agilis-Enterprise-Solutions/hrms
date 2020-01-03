@@ -7,7 +7,7 @@
 
     'description': """
         This application tackles the recruitment/job requisition side of HR/Recruitment
-        Its main components are: Personnel Requisition, Job Posting, Candidate Sourcing, Candidate 
+        Its main components are: Personnel Requisition, Job Posting, Candidate Sourcing, Candidate
         Assessment, Shortlist and Job Offer, and Induction.
     """,
 
@@ -31,6 +31,7 @@
         'views/personnel_requisition.xml',
         'views/skills.xml',
         'views/candidate_sourcing.xml',
+        'wizard/refuse_applicant.xml',
 
     ],
     # only loaded in demonstration mode
