@@ -63,3 +63,9 @@ class BlockedCandidateWizard(models.TransientModel):
                 'res_model': 'hr.candidate.blacklisted',
                 'view_id': False,
         }
+
+
+class DuplicateCandidateWizard(models.TransientModel):
+    _name = "duplicate.candidate.wizard"
+
+    duplicate = fields.Char(default="Application Not saved. Application has duplicate entry, please review other application")

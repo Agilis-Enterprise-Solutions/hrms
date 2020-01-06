@@ -81,6 +81,31 @@ class Applicant(models.Model):
                     }
 
 
+    @api.constrains('partner_name')
+    def _duplicate_application(self):
+        if self.partner_name and self.job_id:
+            duplicate_archived = self.env['hr.applicant'].search([('partner_name', '=', self.partner_name),
+                                                          ('active', '=', False),
+                                                          ('job_id', '=', self.job_id.id),
+                                                          ('id', '!=' , self.id)
+                                                          ])
+            duplicate_active = self.env['hr.applicant'].search([('partner_name', '=', self.partner_name),
+                                                                ('active', '=', True),
+                                                                ('job_id', '=', self.job_id.id),
+                                                                ('id', '!=' , self.id)
+                                                          ])
+
+            if duplicate_archived or duplicate_active:
+                # return {
+                #     'type': 'ir.actions.act_window',
+                #     'view_type': 'form',
+                #     'view_mode': 'form',
+                #     'res_model': 'duplicate.candidate.wizard',
+                #     'target': 'new',
+                #     }
+                raise ValidationError("Application Not saved. Application has duplicate entry, please review other application")
+
+
 class CharacterReference(models.Model):
     _name = "hr.character.reference"
     _rec_name = "character_name"
@@ -96,8 +121,9 @@ class CharacterReference(models.Model):
     @api.constrains('character_email')
     def _check_email(self):
         emailPattern = re.compile(r'[\w.-]+@[\w-]+[.]+[\w.-]')
-        if self.character_email and (bool(emailPattern.match(self.character_email)) == False):
-            raise ValidationError("Email is in Incorrect format \n e.g. example@company.com")
+        if self.character_email:
+            if self.character_email and (bool(emailPattern.match(self.character_email)) == False):
+                raise ValidationError("Email is in Incorrect format \n e.g. example@company.com")
 
 
 class CandidateSkill(models.Model):
@@ -206,7 +232,7 @@ class CandidateBlacklisted(models.Model):
                               'active': True,
                               'kanban_state': "normal"})
         self.unlink()
-        
+
         return {
             'res_model': 'hr.applicant',
             'view_type': 'kanban',

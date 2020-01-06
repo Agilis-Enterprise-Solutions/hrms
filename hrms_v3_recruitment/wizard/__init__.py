@@ -1,1 +1,1 @@
-from . import refuse_applicant
+from . import applicant
