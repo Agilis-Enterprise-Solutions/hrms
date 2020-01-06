@@ -32,7 +32,7 @@
         'views/skills.xml',
         'views/candidate_sourcing.xml',
         'views/candidate_assessment.xml',
-        'wizard/refuse_applicant.xml',
+        'wizard/applicant.xml',
 
     ],
     # only loaded in demonstration mode
