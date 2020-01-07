@@ -32,6 +32,8 @@ class Applicant(models.Model):
 
     candiddate_work_history = fields.One2many('hr.candidate.work.history', 'work_history_id',
                                    string="Candidate Work History")
+    
+    assessment_ids = fields.One2many('hr.assessment','job_id', string="Assessments")
 
     @api.multi
     def create_job_offer(self):
@@ -39,7 +41,15 @@ class Applicant(models.Model):
 
     @api.multi
     def action_get_assessment_tree_view(self):
-        pass
+        return{
+            'name': _('Assessments'),
+            'domain': [('applicant_name', '=', self.partner_name)],
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'view_id': False,
+            'res_model': 'hr.assessment',
+        }
 
     @api.multi
     def archive_applicant(self):

@@ -4,10 +4,12 @@ from odoo import models, fields
 
 class Assessment(models.Model):
     _name = "hr.assessment"
+    _rec_name = "applicant_name"
 
     name = fields.Char(string="Test Name",
                        required=True
                        )
+    applicant_id = fields.Many2one('hr.applicant', string="Applicant")
     applicant_name = fields.Char(string="Applicant")
     job_id = fields.Many2one('hr.job', string="Job Position")
     test_type = fields.Selection(
