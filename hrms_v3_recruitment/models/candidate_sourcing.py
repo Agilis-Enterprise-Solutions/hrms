@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-
+# coding: utf-8
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError
-from datetime import date, datetime
-import itertools
-import calendar
 from odoo.exceptions import ValidationError
+from datetime import date
 import re
 import logging
 
@@ -21,19 +17,24 @@ class Applicant(models.Model):
 
     blacklisted = fields.Boolean(string="Blacklisted")
 
-    character_reference = fields.One2many('hr.character.reference', 'character_id',
-                                   string="Character References")
+    character_reference = fields.One2many('hr.character.reference',
+                                          'character_id',
+                                          string="Character References")
 
-    candiddate_skills = fields.One2many('hr.candidate.skill', 'candidate_skill_id',
-                                   string="Candidate Skill")
+    candiddate_skills = fields.One2many('hr.candidate.skill',
+                                        'candidate_skill_id',
+                                        string="Candidate Skill")
 
-    candiddate_education = fields.One2many('hr.candidate.education', 'education_id',
-                                   string="Candidate Education")
+    candiddate_education = fields.One2many('hr.candidate.education',
+                                           'education_id',
+                                           string="Candidate Education")
 
-    candiddate_work_history = fields.One2many('hr.candidate.work.history', 'work_history_id',
-                                   string="Candidate Work History")
-    
-    assessment_ids = fields.One2many('hr.assessment','job_id', string="Assessments")
+    candiddate_work_history = fields.One2many('hr.candidate.work.history',
+                                              'work_history_id',
+                                              string="Candidate Work History")
+
+    assessment_ids = fields.One2many('hr.assessment','job_id',
+                                     string="Assessments")
 
     @api.multi
     def create_job_offer(self):
@@ -59,7 +60,7 @@ class Applicant(models.Model):
             'view_mode': 'form',
             'res_model': 'candidate_refuse.wizard',
             'target': 'new',
-            }
+        }
 
     @api.multi
     def toggle_active(self):
@@ -74,7 +75,7 @@ class Applicant(models.Model):
                     'view_mode': 'form',
                     'res_model': 'blocked.candidate.wizard',
                     'target': 'new',
-                    }
+                }
 
     @api.multi
     def reset_applicant(self):
@@ -88,31 +89,25 @@ class Applicant(models.Model):
                     'view_mode': 'form',
                     'res_model': 'blocked.candidate.wizard',
                     'target': 'new',
-                    }
-
+                }
 
     @api.constrains('partner_name')
     def _duplicate_application(self):
         if self.partner_name and self.job_id:
-            duplicate_archived = self.env['hr.applicant'].search([('partner_name', '=', self.partner_name),
-                                                          ('active', '=', False),
-                                                          ('job_id', '=', self.job_id.id),
-                                                          ('id', '!=' , self.id)
-                                                          ])
-            duplicate_active = self.env['hr.applicant'].search([('partner_name', '=', self.partner_name),
-                                                                ('active', '=', True),
-                                                                ('job_id', '=', self.job_id.id),
-                                                                ('id', '!=' , self.id)
-                                                          ])
+            duplicate_archived = self.env['hr.applicant'].search([
+                ('partner_name', '=', self.partner_name),
+                ('active', '=', False),
+                ('job_id', '=', self.job_id.id),
+                ('id', '!=' , self.id)
+            ])
+            duplicate_active = self.env['hr.applicant'].search([
+                ('partner_name', '=', self.partner_name),
+                ('active', '=', True),
+                ('job_id', '=', self.job_id.id),
+                ('id', '!=' , self.id)
+            ])
 
             if duplicate_archived or duplicate_active:
-                # return {
-                #     'type': 'ir.actions.act_window',
-                #     'view_type': 'form',
-                #     'view_mode': 'form',
-                #     'res_model': 'duplicate.candidate.wizard',
-                #     'target': 'new',
-                #     }
                 raise ValidationError("Application Not saved. Application has duplicate entry, please review other application")
 
 
@@ -123,16 +118,16 @@ class CharacterReference(models.Model):
 
     character_id = fields.Many2one('hr.applicant')
     character_name = fields.Char("Name", required=True)
-    character_email= fields.Char("Email", required=True)
+    character_email = fields.Char("Email", required=True)
     character_number = fields.Char("Mobile Number", required=True, size=11)
     character_credentials = fields.Char("Credentials", required=True)
-
 
     @api.constrains('character_email')
     def _check_email(self):
         emailPattern = re.compile(r'[\w.-]+@[\w-]+[.]+[\w.-]')
         if self.character_email:
-            if self.character_email and (bool(emailPattern.match(self.character_email)) == False):
+            if (self.character_email
+                and not emailPattern.match(self.character_email)):
                 raise ValidationError("Email is in Incorrect format \n e.g. example@company.com")
 
 
@@ -142,8 +137,9 @@ class CandidateSkill(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     candidate_skill_id = fields.Many2one('hr.applicant')
-    candidate_skill = fields.Many2one('hr.candidate.skill.type', "Skill Name", required=True)
-    candidate_skill_desc= fields.Text("Description", required=True)
+    candidate_skill = fields.Many2one('hr.candidate.skill.type', "Skill Name",
+                                      required=True)
+    candidate_skill_desc = fields.Text("Description", required=True)
 
 
 class CandidateSkillType(models.Model):
@@ -161,7 +157,8 @@ class CandidateWorkHistory(models.Model):
 
     work_history_id = fields.Many2one('hr.applicant')
     company_name = fields.Char("Company Name", required=True)
-    line_of_business = fields.Many2one('hr.candidate.work.history.company', "Line Of Business")
+    line_of_business = fields.Many2one('hr.candidate.work.history.company',
+                                       "Line Of Business")
     position = fields.Many2one('hr.candidate.work.history.position', "Position")
     address = fields.Char("Address")
     start_date = fields.Date("Date of Start", required=True)
@@ -171,14 +168,14 @@ class CandidateWorkHistory(models.Model):
     @api.depends('start_date','end_date')
     def get_year_services(self):
         for rec in self:
-            years_services = str(int(int((rec.end_date - rec.start_date).days) / 365)) + " Years"
+            years_services = (str(int(int((rec.end_date - rec.start_date).days)
+                                      / 365)) + " Years")
             month = int(int((rec.end_date - rec.start_date).days) * 0.0328767)
             if month > 12:
                 month_services = str(month % 12) + " Months"
             else:
                 month_services = str(month) + " Months"
             rec.years = years_services + " , " + month_services
-
 
 
 class CandidateCompanyLine(models.Model):
@@ -196,13 +193,15 @@ class CandidateCompanyPosition(models.Model):
 
     position = fields.Char("Position", required=True)
 
+
 class CandidateEducation(models.Model):
     _name = "hr.candidate.education"
     _rec_name = "type_id"
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     education_id = fields.Many2one('hr.applicant')
-    type_id = fields.Many2one('hr.recruitment.degree', "Level of Education", required=True)
+    type_id = fields.Many2one('hr.recruitment.degree', "Level of Education",
+                              required=True)
     course = fields.Many2one('hr.candidate.education.strand', "Course/Strand")
     standard = fields.Char("Standard")
     year = fields.Integer("Year")
@@ -225,18 +224,22 @@ class CandidateBlacklisted(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     applicant_name = fields.Char("Applicant Name", required=True)
-    date_blocked = fields.Date("Date Blocked", required=True, default=date.today())
-    job_position = fields.Many2one('hr.job',"Job Position Applied", required=True)
-    recruitment_stage = fields.Many2one('hr.recruitment.stage',"Recruitment Stage", required=True)
+    date_blocked = fields.Date("Date Blocked", required=True,
+                               default=date.today())
+    job_position = fields.Many2one('hr.job',"Job Position Applied",
+                                   required=True)
+    recruitment_stage = fields.Many2one('hr.recruitment.stage',
+                                        "Recruitment Stage", required=True)
     responsible = fields.Many2one('res.users',"Responsible", required=True)
     reason = fields.Text("Reason", required=True, default="N/A")
     number_of_days = fields.Char("Number of Days", default="0")
 
     def reset_applicant(self):
-        department = self.env['hr.applicant'].search([('partner_name', '=', self.applicant_name),
-                                                      ('active', '=', False),
-                                                      ('job_id', '=', self.job_position.id)
-                                                      ])
+        department = self.env['hr.applicant'].search([
+            ('partner_name', '=', self.applicant_name),
+            ('active', '=', False),
+            ('job_id', '=', self.job_position.id)
+        ])
         if department:
             department.write({'blacklisted': False,
                               'active': True,
