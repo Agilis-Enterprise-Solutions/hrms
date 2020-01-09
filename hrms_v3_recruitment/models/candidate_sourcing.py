@@ -3,9 +3,183 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import date
 import re
-import logging
+from logging import getLogger
 
-_logger = logging.getLogger("_name_")
+
+def log(**to_output):
+    for key, value in to_output.items():
+        getLogger().info("\n\n\n{0}: {1}\n\n".format(key, value))
+
+
+class Contract(models.Model):
+    _inherit = 'hr.contract'
+
+    def _get_default_employee_id_wage(self):
+        try:
+            return self._context['employee_id'], self._context['wage']
+        except KeyError:
+            return None
+
+    employee_id = fields.Many2one('hr.employee', string='Employee',
+                                  default=(lambda self:
+                                           self._get_default_employee_id_wage()[0]))
+    wage = fields.Monetary('Wage', digits=(16, 2), required=True,
+                           default=(lambda self:
+                                    self._get_default_employee_id_wage()[1]),
+                           track_visibility="onchange",
+                           help="Employee's monthly gross wage.")
+
+
+class Allowance(models.Model):
+    _name = 'hr.allowance'
+
+    job_offer_id = fields.Many2one('hr.job.offer')
+    allowance_description = fields.Text(required=True)
+    amount_per_cut_off = fields.Float(required=True)
+    allowance_type = fields.Selection([
+        ('Recurring', 'Recurring'),
+        ('Until Validity Date', 'Until Validity Date')
+    ])
+    until_validity_date = fields.Date()
+
+
+class JobOffer(models.Model):
+    _name = 'hr.job.offer'
+    _description = 'Job Offer'
+
+    allowance_ids = fields.One2many('hr.allowance', 'job_offer_id')
+    name = fields.Char('Job Offer Reference', required=True)
+    active = fields.Boolean(default=True)
+    employee_id = fields.Many2one('hr.employee', string='Employee')
+    department_id = fields.Many2one('hr.department', string="Department")
+    type_id = fields.Many2one('hr.contract.type', string="Employee Category",
+                              required=True,
+                              default=lambda self: self.env['hr.contract.type'].search([],
+                                                                                       limit=1))
+    job_id = fields.Many2one('hr.job', string='Job Position')
+    date_start = fields.Date('Start Date', required=True,
+                             default=fields.Date.today,
+                             help="Start date of the contract.")
+    date_end = fields.Date('End Date',
+                           help="End date of the contract (if it's a fixed-term contract).")
+    trial_date_end = fields.Date('End of Trial Period',
+                                 help="End date of the trial period (if there is one).")
+    resource_calendar_id = fields.Many2one(
+        'resource.calendar', 'Working Schedule',
+        default=lambda self: self.env['res.company']._company_default_get().resource_calendar_id.id)
+    wage = fields.Monetary('Wage', digits=(16, 2), required=True,
+                           track_visibility="onchange",
+                           help="Employee's monthly gross wage.")
+    advantages = fields.Text('Advantages')
+    notes = fields.Text('Notes')
+    state = fields.Selection([
+        ('New', 'New'),
+        ('Accepted', 'Accepted'),
+        ('Rejected', 'Rejected')
+    ], string='Status', group_expand='_expand_states',
+                             track_visibility='onchange',
+                             help='Status of the contract',
+                             default='New')
+    company_id = fields.Many2one('res.company',
+                                 default=lambda self: self.env.user.company_id)
+    currency_id = fields.Many2one(string="Currency",
+                                  related='company_id.currency_id',
+                                  readonly=True)
+    permit_no = fields.Char('Work Permit No', related="employee_id.permit_no",
+                            readonly=False)
+    visa_no = fields.Char('Visa No', related="employee_id.visa_no",
+                          readonly=False)
+    visa_expire = fields.Date('Visa Expire Date',
+                              related="employee_id.visa_expire", readonly=False)
+    reported_to_secretariat = fields.Boolean('Social Secretariat',
+                                             help='Click this button when the contract information has been transferred to the social secretariat.')
+
+    def _expand_states(self, states, domain, order):
+        return [key for key, val in type(self).state.selection]
+
+    @api.multi
+    def create_contract(self):
+        log(employee_id=self.employee_id.id)
+
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'hr.contract',
+            'context': {
+                'employee_id': self.employee_id.id,
+                'wage': self.wage
+            }
+        }
+
+    @api.multi
+    def accept_job_offer(self):
+        self.write({
+            'state': 'Accepted'
+        })
+
+        return True
+
+    @api.multi
+    def reject_job_offer(self):
+        self.write({
+            'state': 'Rejected'
+        })
+
+        return True
+
+    @api.onchange('employee_id')
+    def _onchange_employee_id(self):
+        if self.employee_id:
+            self.job_id = self.employee_id.job_id
+            self.department_id = self.employee_id.department_id
+            self.resource_calendar_id = self.employee_id.resource_calendar_id
+
+    @api.constrains('date_start', 'date_end')
+    def _check_dates(self):
+        if self.filtered(lambda c: c.date_end and c.date_start > c.date_end):
+            raise ValidationError(_('Contract start date must be earlier than contract end date.'))
+
+    # @api.model
+    # def update_state(self):
+    #     self.search([
+    #         ('state', '=', 'open'),
+    #         '|',
+    #         '&',
+    #         ('date_end', '<=', fields.Date.to_string(date.today()
+    #                                                  + relativedelta(days=7))),
+    #         ('date_end', '>=', fields.Date.to_string(date.today()
+    #                                                  + relativedelta(days=1))),
+    #         '&',
+    #         ('visa_expire', '<=', fields.Date.to_string(date.today()
+    #                                                     + relativedelta(days=60))),
+    #         ('visa_expire', '>=', fields.Date.to_string(date.today()
+    #                                                     + relativedelta(days=1))),
+    #     ]).write({
+    #         'state': 'pending'
+    #     })
+
+    #     self.search([
+    #         ('state', 'in', ('open', 'pending')),
+    #         '|',
+    #         ('date_end', '<=', fields.Date.to_string(date.today()
+    #                                                  + relativedelta(days=1))),
+    #         ('visa_expire', '<=', fields.Date.to_string(date.today()
+    #                                                     + relativedelta(days=1))),
+    #     ]).write({
+    #         'state': 'close'
+    #     })
+
+    #     return True
+
+    # @api.multi
+    # def _track_subtype(self, init_values):
+    #     self.ensure_one()
+    #     if 'state' in init_values and self.state == 'pending':
+    #         return 'hr_contract.mt_contract_pending'
+    #     elif 'state' in init_values and self.state == 'close':
+    #         return 'hr_contract.mt_contract_close'
+    #     return super(Contract, self)._track_subtype(init_values)
 
 
 class Applicant(models.Model):
@@ -38,11 +212,16 @@ class Applicant(models.Model):
 
     @api.multi
     def create_job_offer(self):
-        pass
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'hr.job.offer'
+        }
 
     @api.multi
     def action_get_assessment_tree_view(self):
-        return{
+        return {
             'name': _('Assessments'),
             'domain': [('applicant_name', '=', self.partner_name)],
             'type': 'ir.actions.act_window',
@@ -226,11 +405,11 @@ class CandidateBlacklisted(models.Model):
     applicant_name = fields.Char("Applicant Name", required=True)
     date_blocked = fields.Date("Date Blocked", required=True,
                                default=date.today())
-    job_position = fields.Many2one('hr.job',"Job Position Applied",
+    job_position = fields.Many2one('hr.job', "Job Position Applied",
                                    required=True)
     recruitment_stage = fields.Many2one('hr.recruitment.stage',
                                         "Recruitment Stage", required=True)
-    responsible = fields.Many2one('res.users',"Responsible", required=True)
+    responsible = fields.Many2one('res.users', "Responsible", required=True)
     reason = fields.Text("Reason", required=True, default="N/A")
     number_of_days = fields.Char("Number of Days", default="0")
 
@@ -241,9 +420,11 @@ class CandidateBlacklisted(models.Model):
             ('job_id', '=', self.job_position.id)
         ])
         if department:
-            department.write({'blacklisted': False,
-                              'active': True,
-                              'kanban_state': "normal"})
+            department.write({
+                'blacklisted': False,
+                'active': True,
+                'kanban_state': "normal"
+            })
         self.unlink()
 
         return {
@@ -253,4 +434,4 @@ class CandidateBlacklisted(models.Model):
             'view_id': False,
             'type': 'ir.actions.client',
             'tag': 'reload',
-            }
+        }

@@ -1,158 +1,269 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <record model="ir.ui.view" id="crm_case_form_view_job_inherit">
-            <field name="name">Jobs -Recruitment Form Inherit</field>
-            <field name="model">hr.applicant</field>
-            <field name="inherit_id" ref="hr_recruitment.crm_case_form_view_job"/>
-            <field name="arch" type="xml">
-                <xpath expr="//button[@name='create_employee_from_applicant']" position="after">
-                    <button string="Create Job Offer" name="create_job_offer"
-                      type="object" class="oe_highlight"
-                      attrs="{'invisible': ['|',('emp_id', '!=', False),('active', '=', False)]}"/>
-                </xpath>
-                <xpath expr="//div[@name='button_box']/button[@name='action_get_attachment_tree_view']" position="after">
-                    <button name="action_get_assessment_tree_view" class="oe_stat_button" icon="fa-book" type="object" string="Assessment" context="{'default_applicant_name': partner_name, 'default_job_id': active_id}"/>
-                </xpath>
-                <xpath expr="//field[@name='department_id']" position="after">
-                    <field name="skills_ids" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
-                </xpath>
-                <xpath expr="//field[@name='availability']" position="after">
-                  <field name="blacklisted" attrs="{'invisible': [('blacklisted','!=', True)]}"/>
-                </xpath>
-                <xpath expr="//group[1]" position="after">
-                    <notebook>
-                        <page string="Character Reference">
-                          <field name="assessment_ids" invisible="1"/>
-                          <field name="character_reference">
-                            <tree editable="bottom">
-                              <field name="character_name"/>
-                              <field name="character_email" />
-                              <field name="character_number" />
-                              <field name="character_credentials"/>
-                            </tree>
-                          </field>
-                        </page>
-                        <page string="Skills">
-                          <field name="candiddate_skills">
-                            <tree editable="bottom">
-                              <field name="candidate_skill"/>
-                              <field name="candidate_skill_desc" />
-                            </tree>
-                          </field>
-                        </page>
-                        <page string="Education">
-                          <field name="candiddate_education">
-                            <tree editable="bottom">
-                              <field name="type_id"/>
-                              <field name="course" />
-                              <field name="standard" />
-                              <field name="year" />
-                              <field name="school_name" />
-                              <field name="address" />
-                              <field name="vital_info" />
-                            </tree>
-                          </field>
-                        </page>
-                        <page string="Work History">
-                          <field name="candiddate_work_history">
-                            <tree editable="bottom">
-                              <field name="company_name"/>
-                              <field name="line_of_business" />
-                              <field name="position" />
-                              <field name="address" />
-                              <field name="start_date" />
-                              <field name="end_date" />
-                              <field name="years" />
-                            </tree>
-                          </field>
-                        </page>
-                    </notebook>
-                </xpath>
-            </field>
-        </record>
-
-        <record id="CandidateSkillType_view_form" model="ir.ui.view">
-          <field name="name">CandidateSkillType.form</field>
-          <field name="model">hr.candidate.skill.type</field>
-          <field name="arch" type="xml">
-            <form string="Skill Name">
-              <sheet>
-                <group>
+  <data>
+    <record model="ir.ui.view" id="crm_case_form_view_job_inherit">
+      <field name="name">Jobs -Recruitment Form Inherit</field>
+      <field name="model">hr.applicant</field>
+      <field name="inherit_id" ref="hr_recruitment.crm_case_form_view_job"/>
+      <field name="arch" type="xml">
+        <xpath expr="//button[@name='create_employee_from_applicant']"
+               position="after">
+          <button string="Create Job Offer" name="create_job_offer"
+                  type="object" class="oe_highlight"
+                  attrs="{'invisible': ['|',('emp_id', '!=', False),('active', '=', False)]}"/>
+        </xpath>
+        <xpath expr="//div[@name='button_box']/button[@name='action_get_attachment_tree_view']"
+               position="after">
+          <button name="action_get_assessment_tree_view" class="oe_stat_button"
+                  icon="fa-book" type="object" string="Assessment"
+                  context="{'default_applicant_name': partner_name, 'default_job_id': active_id}"/>
+        </xpath>
+        <xpath expr="//field[@name='department_id']" position="after">
+          <field name="skills_ids" widget="many2many_tags"
+                 options="{'color_field': 'color', 'no_create_edit': True}"/>
+        </xpath>
+        <xpath expr="//field[@name='availability']" position="after">
+          <field name="blacklisted"
+                 attrs="{'invisible': [('blacklisted','!=', True)]}"/>
+        </xpath>
+        <xpath expr="//group[1]" position="after">
+          <notebook>
+            <page string="Character Reference">
+              <field name="assessment_ids" invisible="1"/>
+              <field name="character_reference">
+                <tree editable="bottom">
+                  <field name="character_name"/>
+                  <field name="character_email" />
+                  <field name="character_number" />
+                  <field name="character_credentials"/>
+                </tree>
+              </field>
+            </page>
+            <page string="Skills">
+              <field name="candiddate_skills">
+                <tree editable="bottom">
                   <field name="candidate_skill"/>
-                </group>
-              </sheet>
-            </form>
-          </field>
-        </record>
+                  <field name="candidate_skill_desc" />
+                </tree>
+              </field>
+            </page>
+            <page string="Education">
+              <field name="candiddate_education">
+                <tree editable="bottom">
+                  <field name="type_id"/>
+                  <field name="course" />
+                  <field name="standard" />
+                  <field name="year" />
+                  <field name="school_name" />
+                  <field name="address" />
+                  <field name="vital_info" />
+                </tree>
+              </field>
+            </page>
+            <page string="Work History">
+              <field name="candiddate_work_history">
+                <tree editable="bottom">
+                  <field name="company_name"/>
+                  <field name="line_of_business" />
+                  <field name="position" />
+                  <field name="address" />
+                  <field name="start_date" />
+                  <field name="end_date" />
+                  <field name="years" />
+                </tree>
+              </field>
+            </page>
+          </notebook>
+        </xpath>
+      </field>
+    </record>
 
-        <record id="CandidateCompanyLine_view_form" model="ir.ui.view">
-          <field name="name">CandidateCompanyLine.form</field>
-          <field name="model">hr.candidate.work.history.company</field>
-          <field name="arch" type="xml">
-            <form string="Line Of Business">
-              <sheet>
+    <record id="CandidateSkillType_view_form" model="ir.ui.view">
+      <field name="name">CandidateSkillType.form</field>
+      <field name="model">hr.candidate.skill.type</field>
+      <field name="arch" type="xml">
+        <form string="Skill Name">
+          <sheet>
+            <group>
+              <field name="candidate_skill"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="CandidateCompanyLine_view_form" model="ir.ui.view">
+      <field name="name">CandidateCompanyLine.form</field>
+      <field name="model">hr.candidate.work.history.company</field>
+      <field name="arch" type="xml">
+        <form string="Line Of Business">
+          <sheet>
+            <group>
+              <field name="line_of_business"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="CandidateCompanyPosition_view_form" model="ir.ui.view">
+      <field name="name">CandidateCompanyPosition.form</field>
+      <field name="model">hr.candidate.work.history.position</field>
+      <field name="arch" type="xml">
+        <form string="Position">
+          <sheet>
+            <group>
+              <field name="position"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="CandidateEducationCourseStrand_view_form" model="ir.ui.view">
+      <field name="name">CandidateEducationCourseStrand.form</field>
+      <field name="model">hr.candidate.education.strand</field>
+      <field name="arch" type="xml">
+        <form string="Course/Strand">
+          <sheet>
+            <group>
+              <field name="course_name"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="CandidateBlacklisted_view_form" model="ir.ui.view">
+      <field name="name">CandidateBlacklisted.form</field>
+      <field name="model">hr.candidate.blacklisted</field>
+      <field name="arch" type="xml">
+        <form string="Blacklisting">
+          <header>
+            <button string="Reopen Application" name="reset_applicant"
+                    type="object"/>
+          </header>
+          <sheet>
+            <group name="Candidate Blacklisting">
+              <group name="Candidate Information">
+                <field name="applicant_name"/>
+                <field name="date_blocked"/>
+                <field name="job_position"/>
+                <field name="recruitment_stage"/>
+                <field name="responsible"/>
+              </group>
+              <group name="Candidate Information">
+                <field name="reason"/>
+                <field name="number_of_days"/>
+              </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <!-- hr.job.offer Form View -->
+    <record id="hr_job_offer_view_form" model="ir.ui.view">
+      <field name="name">hr.job.offer.form</field>
+      <field name="model">hr.job.offer</field>
+      <field name="arch" type="xml">
+        <form>
+          <header>
+            <button string="Accept" name="accept_job_offer"
+                    type="object" class="oe_highlight"
+                    attrs="{'invisible': [('state', '!=', 'New')]}"/>
+            <button string="Reject" name="reject_job_offer"
+                    type="object" class="oe_highlight"
+                    attrs="{'invisible': [('state', '!=', 'New')]}"/>
+            <button string="Create Contract" name="create_contract"
+                    type="object" class="oe_highlight"
+                    attrs="{'invisible': [('state', '!=', 'Accepted')]}"/>
+
+            <field name="state" widget="statusbar"/>
+          </header>
+
+          <sheet>
+            <div class="oe_button_box" name="button_box">
+              <button name="toggle_active" type="object" class="oe_stat_button"
+                      icon="fa-archive">
+                <field name="active" widget="boolean_button"
+                       options='{"terminology": "archive"}'/>
+              </button>
+            </div>
+
+            <div class="oe_title" name="title">
+              <label for="name" class="oe_edit_only"/>
+              <h1>
+                <field name="name" placeholder="Job Offer Reference"/>
+              </h1>
+            </div>
+
+            <group>
+              <group>
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="job_id"/>
+              </group>
+
+              <group>
+                <field name="type_id"/>
+                <field name="reported_to_secretariat" widget="toggle_button"
+                       options='{"active": "Reported to the social secretariat", "inactive": "To report to the social secretariat"}'/>
+              </group>
+            </group>
+
+            <notebook>
+              <page string="Contract Details" name="other">
                 <group>
-                  <field name="line_of_business"/>
-                </group>
-              </sheet>
-            </form>
-          </field>
-        </record>
-
-        <record id="CandidateCompanyPosition_view_form" model="ir.ui.view">
-          <field name="name">CandidateCompanyPosition.form</field>
-          <field name="model">hr.candidate.work.history.position</field>
-          <field name="arch" type="xml">
-            <form string="Position">
-              <sheet>
-                <group>
-                  <field name="position"/>
-                </group>
-              </sheet>
-            </form>
-          </field>
-        </record>
-
-        <record id="CandidateEducationCourseStrand_view_form" model="ir.ui.view">
-          <field name="name">CandidateEducationCourseStrand.form</field>
-          <field name="model">hr.candidate.education.strand</field>
-          <field name="arch" type="xml">
-            <form string="Course/Strand">
-              <sheet>
-                <group>
-                  <field name="course_name"/>
-                </group>
-              </sheet>
-            </form>
-          </field>
-        </record>
-
-        <record id="CandidateBlacklisted_view_form" model="ir.ui.view">
-          <field name="name">CandidateBlacklisted.form</field>
-          <field name="model">hr.candidate.blacklisted</field>
-          <field name="arch" type="xml">
-            <form string="Blacklisting">
-            <header>
-                <button string="Reopen Application" name="reset_applicant" type="object"/>
-            </header>
-              <sheet>
-                <group name="Candidate Blacklisting">
-                  <group name="Candidate Information">
-                    <field name="applicant_name"/>
-                    <field name="date_blocked"/>
-                    <field name="job_position"/>
-                    <field name="recruitment_stage"/>
-                    <field name="responsible"/>
+                  <group name="duration_group" string="Contract Terms">
+                    <field name="date_start"/>
+                    <label for="date_end"/>
+                    <div class="o_row">
+                      <field name="date_end" nolabel="1"/>
+                      <span class="text-muted">(If fixed-term contract)</span>
+                    </div>
+                    <field name="trial_date_end"/>
+                    <field name="resource_calendar_id"/>
                   </group>
-                  <group name="Candidate Information">
-                    <field name="reason"/>
-                    <field name="number_of_days"/>
+                </group>
+
+                <group string="Other Advantages">
+                  <field name="notes" nolabel="1"/>
+                </group>
+              </page>
+              <page string="Salary Information" name="information">
+                <group name="main_info">
+                  <group name="salary_and_advantages"
+                         string="Monthly Advantages in Cash">
+                    <label for="wage"/>
+                    <div class="o_row" name="wage">
+                      <field name="wage" nolabel="1"/>
+                      <span>/ month</span>
+                    </div>
+                    <field name="advantages" nolabel="1"
+                           placeholder="Advantages..." colspan="2"
+                           invisible="1"/>
                   </group>
                 </group>
-              </sheet>
-            </form>
-          </field>
-        </record>
-    </data>
+
+                <group name="for_allowance">
+                  <group name="allowances" string="Allowances">
+                    <field name="allowance_ids">
+                      <tree editable="bottom">
+                        <field name="allowance_description"/>
+                        <field name="amount_per_cut_off"/>
+                        <field name="allowance_type"/>
+                        <field name="until_validity_date"
+                               attrs="{'required': [('allowance_type', '=', 'Until Validity Date')]}"/>
+                      </tree>
+                    </field>
+                  </group>
+                </group>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+  </data>
 </odoo>
