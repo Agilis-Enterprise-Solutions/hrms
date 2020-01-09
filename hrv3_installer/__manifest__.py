@@ -3,6 +3,7 @@
     'depends': [
         'base',
         'hr',
+        'hr_contract',
         'hrms_v3_recruitment'
     ],
     'name': "HRv3 Installer Module",
