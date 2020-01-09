@@ -19,7 +19,7 @@
 
     'depends': [
         'base',
-        'contacts'
+        'contacts',
         'hr',
         'hr_recruitment',
     ],
