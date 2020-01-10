@@ -11,7 +11,7 @@
         Assessment, Shortlist and Job Offer, and Induction.
     """,
 
-    'author': "Agilis Enterprise Solutions",
+    'author': "John Ardosa, Raymund Martinez, and Ralf Cabarogias - Agilis Enterprise Solutions",
     'website': "http://www.yourcompany.com",
 
     'category': 'HR',
@@ -32,10 +32,6 @@
         'views/skills.xml',
         'views/candidate_sourcing.xml',
         'views/candidate_assessment.xml',
-        'wizard/applicant.xml',
-
-    ],
-    'demo': [
-        'demo/demo.xml',
+        'wizard/applicant.xml'
     ],
 }

@@ -15,5 +15,4 @@ access_recruitment_candidate_sourcing_company_postion,access.hr_candidate_work_h
 access_recruitment_candidate_sourcing_education,access.hr_candidate_education,model_hr_candidate_education,,1,1,1,1
 access_recruitment_candidate_sourcing_education_course,access.hr_candidate_education_strand,model_hr_candidate_education_strand,,1,1,1,1
 access_recruitment_blacklisting,access.hr_candidate_blacklisted,model_hr_candidate_blacklisted,,1,1,1,1
-access_recruitment_job_offer,access.hr_job_offer,model_hr_job_offer,,1,1,1,1
 access_recruitment_allowance,access.hr_allowance,model_hr_allowance,,1,1,1,1

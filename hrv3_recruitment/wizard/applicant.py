@@ -1,7 +1,11 @@
 from openerp import models, api, fields
-import logging
+from logging import getLogger
 
-_logger = logging.getLogger("_name_")
+
+def log(**to_output):
+    for key, value in to_output.items():
+        getLogger().info("\n\n\n{0}: {1}\n\n".format(key, value))
+
 
 class CandidateRefuseWizard(models.TransientModel):
     _name = "candidate_refuse.wizard"
@@ -25,19 +29,20 @@ class CandidateRefuseWizard(models.TransientModel):
             'responsible': applicant.user_id.id,
         })
 
-        applicant.write({'blacklisted': True,
-                         'active': False,
-                         'kanban_state': "blocked"})
-
+        applicant.write({
+            'blacklisted': True,
+            'active': False,
+            'kanban_state': "blocked"
+        })
 
         return {
-                'type': 'ir.actions.act_window',
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'hr.candidate.blacklisted',
-                'res_id': int(blacklist.id),
-                'view_id': False,
-                'target': 'new',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'hr.candidate.blacklisted',
+            'res_id': int(blacklist.id),
+            'view_id': False,
+            'target': 'new',
         }
 
     @api.multi
