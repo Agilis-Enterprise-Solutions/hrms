@@ -4,7 +4,7 @@
         'base',
         'hr',
         'hr_contract',
-        'hrms_v3_recruitment'
+        'hrv3_recruitment'
     ],
     'name': "HRv3 Installer Module",
     'description': '''Installs the necessary modules for HRv3''',
