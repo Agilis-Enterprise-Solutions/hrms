@@ -8,7 +8,7 @@
       <field name="arch" type="xml">
         <xpath expr="//button[@name='create_employee_from_applicant']"
                position="after">
-          <button string="Create Job Offer" name="create_job_offer"
+          <button string="Create Contract" name="create_contract"
                   type="object" class="oe_highlight"
                   attrs="{'invisible': ['|',('emp_id', '!=', False),('active', '=', False)]}"/>
         </xpath>
@@ -162,107 +162,27 @@
       </field>
     </record>
 
-    <!-- hr.job.offer Form View -->
-    <record id="hr_job_offer_view_form" model="ir.ui.view">
-      <field name="name">hr.job.offer.form</field>
-      <field name="model">hr.job.offer</field>
+    <!-- Inherit Form view -->
+    <record id="hr_contract_inherit_form" model="ir.ui.view">
+      <field name="name">hr.contract.form</field>
+      <field name="model">hr.contract</field>
+      <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
       <field name="arch" type="xml">
-        <form>
-          <header>
-            <button string="Accept" name="accept_job_offer"
-                    type="object" class="oe_highlight"
-                    attrs="{'invisible': [('state', '!=', 'New')]}"/>
-            <button string="Reject" name="reject_job_offer"
-                    type="object" class="oe_highlight"
-                    attrs="{'invisible': [('state', '!=', 'New')]}"/>
-            <button string="Create Contract" name="create_contract"
-                    type="object" class="oe_highlight"
-                    attrs="{'invisible': [('state', '!=', 'Accepted')]}"/>
+        <page name="information" position="inside">
+          <group name="for_allowances">
+            <group name="allowances" string="Allowances"/>
+          </group>
 
-            <field name="state" widget="statusbar"/>
-          </header>
-
-          <sheet>
-            <div class="oe_button_box" name="button_box">
-              <button name="toggle_active" type="object" class="oe_stat_button"
-                      icon="fa-archive">
-                <field name="active" widget="boolean_button"
-                       options='{"terminology": "archive"}'/>
-              </button>
-            </div>
-
-            <div class="oe_title" name="title">
-              <label for="name" class="oe_edit_only"/>
-              <h1>
-                <field name="name" placeholder="Job Offer Reference"/>
-              </h1>
-            </div>
-
-            <group>
-              <group>
-                <field name="employee_id"/>
-                <field name="department_id"/>
-                <field name="job_id"/>
-              </group>
-
-              <group>
-                <field name="type_id"/>
-                <field name="reported_to_secretariat" widget="toggle_button"
-                       options='{"active": "Reported to the social secretariat", "inactive": "To report to the social secretariat"}'/>
-              </group>
-            </group>
-
-            <notebook>
-              <page string="Contract Details" name="other">
-                <group>
-                  <group name="duration_group" string="Contract Terms">
-                    <field name="date_start"/>
-                    <label for="date_end"/>
-                    <div class="o_row">
-                      <field name="date_end" nolabel="1"/>
-                      <span class="text-muted">(If fixed-term contract)</span>
-                    </div>
-                    <field name="trial_date_end"/>
-                    <field name="resource_calendar_id"/>
-                  </group>
-                </group>
-
-                <group string="Other Advantages">
-                  <field name="notes" nolabel="1"/>
-                </group>
-              </page>
-              <page string="Salary Information" name="information">
-                <group name="main_info">
-                  <group name="salary_and_advantages"
-                         string="Monthly Advantages in Cash">
-                    <label for="wage"/>
-                    <div class="o_row" name="wage">
-                      <field name="wage" nolabel="1"/>
-                      <span>/ month</span>
-                    </div>
-                    <field name="advantages" nolabel="1"
-                           placeholder="Advantages..." colspan="2"
-                           invisible="1"/>
-                  </group>
-                </group>
-
-                <group name="for_allowance">
-                  <group name="allowances" string="Allowances">
-                    <field name="allowance_ids">
-                      <tree editable="bottom">
-                        <field name="allowance_description"/>
-                        <field name="amount_per_cut_off"/>
-                        <field name="allowance_type"/>
-                        <field name="until_validity_date"
-                               attrs="{'required': [('allowance_type', '=', 'Until Validity Date')]}"/>
-                      </tree>
-                    </field>
-                  </group>
-                </group>
-              </page>
-            </notebook>
-          </sheet>
-        </form>
+          <field name="allowance_ids">
+            <tree editable="bottom">
+              <field name="allowance_description"/>
+              <field name="amount_per_cut_off"/>
+              <field name="allowance_type"/>
+              <field name="until_validity_date"
+                     attrs="{'required': [('allowance_type', '=', 'Until Validity Date')]}"/>
+            </tree>
+          </field>
+        </page>
       </field>
     </record>
   </data>
