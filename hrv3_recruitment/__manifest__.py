@@ -21,7 +21,8 @@
         'base',
         'contacts',
         'hr',
-        'hr_recruitment',
+        'hr_contract',
+        'hr_recruitment'
     ],
 
     'data': [

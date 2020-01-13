@@ -3,7 +3,10 @@
     'depends': [
         'base',
         'hr',
+        'hr_attendance',
         'hr_contract',
+        'hr_holidays',
+        'hrv3_employee_201',
         'hrv3_recruitment'
     ],
     'name': "HRv3 Installer Module",
