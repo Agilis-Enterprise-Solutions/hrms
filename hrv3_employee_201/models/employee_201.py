@@ -1,5 +1,6 @@
 # coding: utf-8
 from odoo import models, fields, api
+from datetime import date
 from logging import getLogger
 
 
@@ -18,6 +19,110 @@ class Employee(models.Model):
 
     passport_validity_date = fields.Date()
     place_of_passport_issuance = fields.Char()
+
+    marital = fields.Selection([
+        ('Single', 'Single'),
+        ('Single Mother', 'Single Mother'),
+        ('Single Father', 'Single Father'),
+        ('Married', 'Married'),
+        ('Divorced', 'Divorced'),
+        ('Widowed', 'Widowed')
+    ], default='Single')
+
+    age = fields.Integer(compute="_compute_age_years")
+
+    sss_checkbox = fields.Boolean('SSS', compute="_auto_tick")
+    hdmf_checkbox = fields.Boolean(compute="_auto_tick")
+    philhealth_checkbox = fields.Boolean(compute="_auto_tick")
+    gsis_checkbox = fields.Boolean(compute="_auto_tick")
+    tin_checkbox = fields.Boolean(compute="_auto_tick")
+    medical_transaction_number_checkbox = fields.Boolean(compute="_auto_tick")
+
+    nbi_checkbox = fields.Boolean(compute="_auto_tick")
+    police_checkbox = fields.Boolean(compute="_auto_tick")
+    barangay_checkbox = fields.Boolean(compute="_auto_tick")
+
+    birth_checkbox = fields.Boolean(compute="_auto_tick")
+    tor_checkbox = fields.Boolean(compute="_auto_tick")
+    diploma_checkbox = fields.Boolean(compute="_auto_tick")
+
+    sss = fields.Integer('SSS')
+    hdmf = fields.Integer('HDMF')
+    philhealth = fields.Integer('PhilHealth', default=None)
+    gsis = fields.Integer('GSIS')
+    tin = fields.Integer('TIN')
+    medical_transaction_number = fields.Char()
+
+    nbi_clearance = fields.Char('NBI')
+    nbi_expiration = fields.Date()
+    nbi_issued_at = fields.Char()
+    nbi_date_issued = fields.Date()
+    nbi_clearance_photo = fields.Binary()
+
+    police_clearance = fields.Char('Police Clearance')
+    police_expiration = fields.Date()
+    police_issued_at = fields.Char()
+    police_date_issued = fields.Date()
+    police_clearance_photo = fields.Binary()
+
+    barangay_clearance = fields.Char('Barangay Clearance')
+    barangay_expiration = fields.Date()
+    barangay_issued_at = fields.Char()
+    barangay_date_issued = fields.Date()
+    barangay_clearance_photo = fields.Binary()
+
+    birth_certificate = fields.Binary()
+    transcript_of_records = fields.Binary()
+    diploma = fields.Binary()
+
+    @api.depends('sss', 'hdmf', 'philhealth', 'gsis', 'nbi_clearance',
+                 'nbi_expiration', 'nbi_issued_at', 'nbi_date_issued',
+                 'nbi_clearance_photo', 'birth_certificate',
+                 'transcript_of_records', 'diploma', 'police_clearance',
+                 'police_expiration', 'police_issued_at', 'police_date_issued',
+                 'police_clearance_photo', 'barangay_clearance',
+                 'barangay_expiration', 'barangay_issued_at',
+                 'barangay_date_issued', 'barangay_clearance_photo', 'tin',
+                 'medical_transaction_number')
+    def _auto_tick(self):
+        for rec in self:
+            rec.sss_checkbox = True if rec.sss else False
+            rec.hdmf_checkbox = True if rec.hdmf else False
+            rec.philhealth_checkbox = True if rec.philhealth else False
+            rec.gsis_checkbox = True if rec.gsis else False
+            rec.tin_checkbox = True if rec.tin else False
+            rec.medical_transaction_number_checkbox = (True if
+                                                       rec.medical_transaction_number
+                                                       else False)
+
+            rec.nbi_checkbox = True if (rec.nbi_clearance
+                                        and rec.nbi_expiration
+                                        and rec.nbi_issued_at
+                                        and rec.nbi_date_issued
+                                        and rec.nbi_clearance_photo) else False
+            rec.police_checkbox = True if (rec.police_clearance
+                                           and rec.police_expiration
+                                           and rec.police_issued_at
+                                           and rec.police_date_issued
+                                           and rec.police_clearance_photo) else False
+            rec.barangay_checkbox = True if (rec.barangay_clearance
+                                             and rec.barangay_expiration
+                                             and rec.barangay_issued_at
+                                             and rec.barangay_date_issued
+                                             and rec.barangay_clearance_photo) else False
+
+            rec.birth_checkbox = True if rec.birth_certificate else False
+            rec.tor_checkbox = True if rec.transcript_of_records else False
+            rec.diploma_checkbox = True if rec.diploma else False
+
+    @api.depends('birthday')
+    def _compute_age_years(self):
+        today = date.today()
+        for rec in self:
+            if rec.birthday:
+                rec.age = (today.year - rec.birthday.year
+                           - ((today.month, today.day) < (rec.birthday.month,
+                                                          rec.birthday.day)))
 
     @api.depends('address_id')
     def _auto_populate_work_info(self):
