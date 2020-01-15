@@ -65,8 +65,20 @@ class PersonnelRequisition(models.Model):
     proposed_salary = fields.Float(string="Proposed Salary")
     replacement_for_id = fields.Many2one(
         'hr.employee', string="Replacement For")
+    replacement_emp_job_id = fields.Many2one('hr.job', string='Job Position',
+                                             related='replacement_for_id.job_id',
+                                            #  readonly=True,
+                                             store=True
+                                             )
+    replacement_contract = fields.Many2one('hr.contract', string="Current Contract",
+                                           related='replacement_for_id.contract_id',
+                                        #    readonly=True,
+                                           store=True
+                                           )
     replacement_for_id_check_box = fields.Boolean(
         string='Replacement')
+
+    
 
     state = fields.Selection(STATUS, string="Status",
                              default="draft", readonly=True, copy=False)
@@ -76,7 +88,8 @@ class PersonnelRequisition(models.Model):
         if vals.get('job_req_id_seq', _('New')) == ('New'):
             vals['job_req_id_seq'] = self.env['ir.sequence'].next_by_code(
                 'job.requisition.sequence') or _('New')
-        result = super().create(vals)
+        _logger.info('\n\n\n{}\n\n\n'.format(vals))
+        result = super(PersonnelRequisition, self).create(vals)
         return result
 
     @api.multi

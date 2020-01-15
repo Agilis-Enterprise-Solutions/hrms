@@ -78,6 +78,8 @@
                 <field name="proposed_salary"/>
                 <field name="replacement_for_id_check_box" class="oe_inline"/>
                 <field name="replacement_for_id" class="oe_inline" attrs="{'invisible': [('replacement_for_id_check_box','=', False)]}"/>
+                <field name="replacement_emp_job_id" attrs="{'invisible': [('replacement_for_id_check_box','=', False)]}"/>
+                <field name="replacement_contract" attrs="{'invisible': [('replacement_for_id_check_box','=', False)]}"/>
               </group>
             </group>
             <notebook>
