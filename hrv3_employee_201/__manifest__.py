@@ -2,7 +2,8 @@
     'author':  'Raymund Martinez - Agilis Enterprise Solutions',
     'depends': [
         'base',
-        'hr'
+        'hr',
+        'hrv3_recruitment'
     ],
     'data': [
         'views/hr_employee.xml'
