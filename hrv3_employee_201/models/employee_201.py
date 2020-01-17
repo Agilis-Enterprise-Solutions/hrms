@@ -75,6 +75,9 @@ class Employee(models.Model):
     transcript_of_records = fields.Binary()
     diploma = fields.Binary()
 
+    skill_ids = fields.One2many('hrmsv3.skills', 'employee_id',
+                                string="Skills")
+
     @api.depends('sss', 'hdmf', 'philhealth', 'gsis', 'nbi_clearance',
                  'nbi_expiration', 'nbi_issued_at', 'nbi_date_issued',
                  'nbi_clearance_photo', 'birth_certificate',
