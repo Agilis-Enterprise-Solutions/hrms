@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+        <!-- Top menu item -->
+
+        <menuitem name="Compliance" id="hrv3_compliance_root" sequence="1"/>
+
+        <!-- SubMenu -->
+
+        <menuitem name="Infractions" id="hrv3_compliance.infractions" parent="hrv3_compliance_root" action="hrv3_compliance_infraction_action_window"/>
+        <menuitem name="Configuration" id="hrv3_compliance_configuration" parent="hrv3_compliance_root"/>
+        <menuitem name="Policy Codes" id="hrv3_compliance_policy_code" parent="hrv3_compliance_configuration" sequence="1" action="hrv3_company_policy_action_window"/>
+        <menuitem name="Offense Codes" id="hrv3_compliance_offense_code" parent="hrv3_compliance_configuration" sequence="2" action="hrv3_company_offense_action_window"/>
+    </data>
+
+</odoo>

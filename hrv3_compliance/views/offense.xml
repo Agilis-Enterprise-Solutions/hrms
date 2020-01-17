@@ -1,0 +1,50 @@
+<odoo>
+    <data>
+        <!-- explicit list view definition -->
+
+        <record model="ir.ui.view" id="hrv3_company_offense_code_list">
+            <field name="name">hr.company.offense.code.list</field>
+            <field name="model">hr.company.offense</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <!-- <field name="description"/> -->
+                    <!-- <field name="offense_code_id"/> -->
+                </tree>
+            </field>
+        </record>
+
+        <!-- explicit form view definition -->
+
+       
+
+
+        <!-- actions opening views on models -->
+
+        <record model="ir.actions.act_window" id="hrv3_company_offense_action_window">
+            <field name="name">Company Offense Code List</field>
+            <field name="res_model">hr.company.offense</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+        </record>
+
+        <record model="ir.ui.view" id="hrv3_company_offense_code_form">
+            <field name="name">hr.company.offense.code.form</field>
+            <field name="model">hr.company.offense</field>
+            <field name="arch" type="xml">
+                <form action="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+    </data>
+</odoo>

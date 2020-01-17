@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hrv3_compliance_infraction,access.hr_infraction,model_hr_infraction,,1,1,1,1
+access_hrv3_compliance_policy,access.hr_policy,model_hr_company_policy,,1,1,1,1
+access_hrv3_compliance_offense,access.hr_offense,model_hr_company_offense,,1,1,1,1

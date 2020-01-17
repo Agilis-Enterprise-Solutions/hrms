@@ -1,0 +1,90 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+
+    <record model="ir.ui.view" id="hrv3_compliance_infraction_list">
+      <field name="name">HRV3 Infraction List</field>
+      <field name="model">hr.infraction</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="emp_id" string="Name"/>
+          <field name="violation_id"/>
+          <field name="violation_date"/>
+          <field name="corrective_action"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="hrv3_compliance_infraction_form">
+      <field name="name">HRV3 Infraction Form</field>
+      <field name="model">hr.infraction</field>
+      <field name="arch" type="xml">
+        <form>
+          <header>
+            <button string="Submit" class="oe_highlight" states="open"/>
+            <button string="Discard" class="oe_highlight" states="open"/>
+            <field name="state" widget="statusbar" statusbar_visible="open,in_progress,closure,closed"/>
+          </header>
+          <sheet>
+            <group>
+              <group string="Employee Details"> 
+                <field name="emp_id" string="Name"/>
+                <field name="job_id" string="Job Description"/>
+                <field name="manager_id"/>
+              </group>
+
+              <group string="Violation Details"> 
+                <field name="violation_id"/>
+                <field name="policy_id"/>
+                <field name="frequency_id"/>
+                <field name="violation_date"/>
+                <field name="case_status"/>
+              </group>
+            </group>
+            <group>
+              <field name="violation_details"/>
+              <field name="corrective_action"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+
+    <!-- actions opening views on models -->
+    
+    <record model="ir.actions.act_window" id="hrv3_compliance_infraction_action_window">
+      <field name="name">Infraction</field>
+      <field name="res_model">hr.infraction</field>
+      <field name="view_mode">tree,form</field>
+      <field name="view_type">form</field>
+    </record>
+   
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="hrv3_compliance.action_server">
+      <field name="name">hrv3_compliance server</field>
+      <field name="model_id" ref="model_hrv3_compliance_hrv3_compliance"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    
+    <menuitem name="Compliance" id="hrv3_compliance_root" sequence="5" parent="hr.menu_hr_root"/>
+
+    <!-- actions -->
+    
+    <menuitem name="Infractions" id="hrv3_compliance.infractions" parent="hrv3_compliance_root" action="hrv3_compliance_infraction_action_window"/>
+    <menuitem name="Configuration" id="hrv3_compliance_configuration" parent="hrv3_compliance_root"/>
+   
+  </data>
+</odoo>
