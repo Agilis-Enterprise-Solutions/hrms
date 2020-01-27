@@ -27,9 +27,9 @@
         'views/infraction.xml',
         'views/policy.xml',
         'views/offense.xml',
+        'views/violation.xml',
         'views/menu_views.xml',
         # 'views/templates.xml',
-        # 'views/offense.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

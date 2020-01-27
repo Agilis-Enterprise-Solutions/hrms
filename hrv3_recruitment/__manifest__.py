@@ -28,11 +28,11 @@
     'data': [
         'security/ir.model.access.csv',
         'views/job_posting.xml',
-        'data/sequence.xml',
         'views/personnel_requisition.xml',
         'views/skills.xml',
         'views/candidate_sourcing.xml',
         'views/candidate_assessment.xml',
-        'wizard/applicant.xml'
+        'wizard/applicant.xml',
+        'data/sequence.xml',
     ],
 }

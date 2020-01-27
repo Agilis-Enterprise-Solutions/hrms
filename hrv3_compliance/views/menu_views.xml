@@ -1,8 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <odoo>
     <data>
         <!-- Top menu item -->
 
-        <menuitem name="Compliance" id="hrv3_compliance_root" sequence="1"/>
+        <menuitem name="Compliance" id="hrv3_compliance_root" sequence="1" web_icon="hrv3_compliance,static/description/compliance_graphic2.png"/>
 
         <!-- SubMenu -->
 
@@ -10,6 +12,7 @@
         <menuitem name="Configuration" id="hrv3_compliance_configuration" parent="hrv3_compliance_root"/>
         <menuitem name="Policy Codes" id="hrv3_compliance_policy_code" parent="hrv3_compliance_configuration" sequence="1" action="hrv3_company_policy_action_window"/>
         <menuitem name="Offense Codes" id="hrv3_compliance_offense_code" parent="hrv3_compliance_configuration" sequence="2" action="hrv3_company_offense_action_window"/>
+        <menuitem name="Violation" id="hrv3_compliance_violation" parent="hrv3_compliance_configuration" sequence="3" action="hrv3_company_violation_action_window"/>
     </data>
 
 </odoo>

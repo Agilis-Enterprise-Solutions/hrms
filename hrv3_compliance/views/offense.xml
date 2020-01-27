@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <odoo>
     <data>
         <!-- explicit list view definition -->
@@ -8,15 +10,11 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="name"/>
-                    <!-- <field name="description"/> -->
-                    <!-- <field name="offense_code_id"/> -->
+                    <field name="frequency"/>
+                    <field name="corrective_action_ids" widget="many2many_tags"/>
                 </tree>
             </field>
         </record>
-
-        <!-- explicit form view definition -->
-
-       
 
 
         <!-- actions opening views on models -->
@@ -29,14 +27,21 @@
             <field name="view_type">form</field>
         </record>
 
+        <!-- explicit form view definition -->
         <record model="ir.ui.view" id="hrv3_company_offense_code_form">
             <field name="name">hr.company.offense.code.form</field>
             <field name="model">hr.company.offense</field>
             <field name="arch" type="xml">
-                <form action="">
+                <form>
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="corrective_action_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="action"/>
+                                </tree>
+                            </field>
                         </group>
                         <group>
                             <field name="description"/>
@@ -45,6 +50,6 @@
                 </form>
             </field>
         </record>
-        
+
     </data>
 </odoo>
