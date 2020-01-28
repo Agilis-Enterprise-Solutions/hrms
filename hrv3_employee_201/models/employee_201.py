@@ -109,6 +109,16 @@ class Employee(models.Model):
         ('Negative', 'Negative')
     ])
 
+    health_card_provider = fields.Char()
+    id_number = fields.Char(string='ID Number')
+    cap_limit = fields.Float()
+    credit_usage = fields.Float()
+
+    hmo_validity_date = fields.Date(string='HMO Validity Date')
+    hmo_validity_date_end = fields.Date()
+    for_renewal = fields.Boolean()
+    renewal_date = fields.Date()
+
     @api.depends('sss', 'hdmf', 'philhealth', 'gsis', 'nbi_clearance',
                  'nbi_expiration', 'nbi_issued_at', 'nbi_date_issued',
                  'nbi_clearance_photo', 'birth_certificate',
