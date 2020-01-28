@@ -200,7 +200,8 @@
             </group>
           </page>
 
-          <page string="Skills and Training">
+          <page string="Skills and Training"
+                name="for_skills">
             <label for="skill_ids"/>
             <field name="skill_ids">
               <tree editable="bottom">
