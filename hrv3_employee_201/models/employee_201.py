@@ -78,6 +78,37 @@ class Employee(models.Model):
     skill_ids = fields.One2many('hrmsv3.skills', 'employee_id',
                                 string="Skills")
 
+    fit_to_work = fields.Boolean()
+
+    height = fields.Float()
+    height_uom = fields.Selection([
+        ('mm', 'mm'),
+        ('cm', 'cm'),
+        ('inch', 'inch'),
+        ('ft', 'ft')
+    ])
+
+    weight = fields.Float()
+    weight_uom = fields.Selection([
+        ('lbs', 'lbs'),
+        ('kg', 'kg')
+    ])
+
+    blood_type = fields.Selection([
+        ('A+', 'A+'),
+        ('A-', 'A-'),
+        ('B+', 'B+'),
+        ('B-', 'B-'),
+        ('O+', 'O+'),
+        ('O-', 'O-'),
+        ('AB+', 'AB+'),
+        ('AB-', 'AB-')
+    ])
+    drug_test = fields.Selection([
+        ('Positive', 'Positive'),
+        ('Negative', 'Negative')
+    ])
+
     @api.depends('sss', 'hdmf', 'philhealth', 'gsis', 'nbi_clearance',
                  'nbi_expiration', 'nbi_issued_at', 'nbi_date_issued',
                  'nbi_clearance_photo', 'birth_certificate',

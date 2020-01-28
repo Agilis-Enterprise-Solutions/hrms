@@ -211,6 +211,23 @@
               </tree>
             </field>
           </page>
+
+          <page string="Health Information">
+            <group>
+              <group>
+                <field name="fit_to_work"/>
+
+                <h2>
+                  Current Medical Information
+                </h2>
+
+                <field name="height"/>
+                <field name="weight"/>
+                <field name="blood_type"/>
+                <field name="drug_test"/>
+              </group>
+            </group>
+          </page>
         </page>
       </field>
     </record>
