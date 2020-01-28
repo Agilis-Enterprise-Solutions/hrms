@@ -8,6 +8,7 @@
         'hr_holidays',
         'hrv3_compliance',
         'hrv3_employee_201',
+        'hrv3_events',
         'hrv3_recruitment'
     ],
     'name': "HRv3 Installer Module",

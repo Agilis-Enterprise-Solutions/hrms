@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <!-- Inherit Form view -->
+    <record id="inherit_employee_for_training" model="ir.ui.view">
+      <field name="name">hr.employee.form</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id"
+             ref="hrv3_employee_201.inherit_employee_form_view"/>
+      <field name="arch" type="xml">
+        <page name="for_skills" position="inside">
+          <label for="training_ids"/>
+          <field name="training_ids">
+            <tree>
+              <field name="state" invisible="1"/>
+              <field name="name" string="Training Name"/>
+              <field name="subject"/>
+              <field name="training_type"/>
+              <field name="date_completed"/>
+              <field name="venue"/>
+              <field name="acquire_certificate"/>
+              <field name="trainor"/>
+              <field name="hour"/>
+              <field name="cost"/>
+              <field name="sponsor"/>
+              <field name="status"/>
+            </tree>
+          </field>
+        </page>
+      </field>
+    </record>
+
+    <!-- Inherit Form view -->
+    <record id="inherit_view_event_form" model="ir.ui.view">
+      <field name="name">event.event.form</field>
+      <field name="model">event.event</field>
+      <field name="inherit_id" ref="event.view_event_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//notebook" position="before">
+          <group string="Training Details"
+                 attrs="{'invisible': [('category_name', '!=', 'Training')]}">
+            <field name="category_name" invisible="1"/>
+
+            <group>
+              <field name="subject"/>
+              <field name="training_type"/>
+              <field name="date"/>
+              <field name="date_completed"/>
+            </group>
+
+            <group>
+              <field name="trainor"/>
+              <field name="hour"/>
+              <field name="cost"/>
+              <field name="sponsor"/>
+              <field name="acquire_certificate"/>
+              <field name="status"/>
+            </group>
+          </group>
+        </xpath>
+      </field>
+    </record>
+
+
+  </data>
+</openerp>
