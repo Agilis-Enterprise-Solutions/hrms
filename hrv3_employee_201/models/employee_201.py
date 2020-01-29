@@ -9,6 +9,20 @@ def log(**to_output):
         getLogger().info("\n\n\n{0}: {1}\n\n".format(key, value))
 
 
+class HealthCondition(models.Model):
+    _name = 'health.condition'
+
+    employee_id = fields.Many2one('hr.employee')
+
+    health_condition = fields.Char()
+    doctor_name = fields.Char('Name of the Doctor')
+    address = fields.Char()
+    medications = fields.Char()
+    medical_documents = fields.Binary()
+    date = fields.Date()
+    fit_to_work = fields.Boolean()
+
+
 class Employee(models.Model):
     _inherit = 'hr.employee'
 
@@ -118,6 +132,8 @@ class Employee(models.Model):
     hmo_validity_date_end = fields.Date()
     for_renewal = fields.Boolean()
     renewal_date = fields.Date()
+
+    health_condition_ids = fields.One2many('health.condition', 'employee_id')
 
     @api.depends('sss', 'hdmf', 'philhealth', 'gsis', 'nbi_clearance',
                  'nbi_expiration', 'nbi_issued_at', 'nbi_date_issued',

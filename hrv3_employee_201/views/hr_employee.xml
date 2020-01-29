@@ -222,6 +222,20 @@
               <group string="Insert HMO, renewal, etc. here">
               </group>
             </group>
+
+            <group>
+                <field name="health_condition_ids" nolabel="1">
+                  <tree editable="bottom">
+                    <field name="health_condition"/>
+                    <field name="doctor_name"/>
+                    <field name="address"/>
+                    <field name="medications"/>
+                    <field name="medical_documents"/>
+                    <field name="date"/>
+                    <field name="fit_to_work"/>
+                  </tree>
+                </field>
+              </group>
           </page>
         </page>
       </field>

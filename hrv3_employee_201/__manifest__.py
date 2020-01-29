@@ -6,6 +6,7 @@
         'hrv3_recruitment'
     ],
     'data': [
+        'security/ir.model.access.csv',
         'views/hr_employee.xml'
     ],
     'name': "HRv3 Employee 201",
