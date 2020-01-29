@@ -5,3 +5,4 @@ access_hrv3_compliance_offense,access.hr_offense,model_hr_company_offense,,1,1,1
 access_hrv3_compliance_offense_code_frequency,access.hr_offense_code_frequency,model_hr_company_offense_frequency,,1,1,1,1
 access_hrv3_compliance_violation,access.hr_violation,model_hr_company_violation,,1,1,1,1
 access_hrv3_compliance_violation_policy_offense, access.hr_violation_policy_offense,model_hr_company_violation_policy_offense,,1,1,1,1
+access_hrv3_compliance_action_history, access.hr_infraction_action_history,model_hr_infraction_action_history,,1,1,1,1

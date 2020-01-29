@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
+import logging
+from odoo.exceptions import UserError, ValidationError
+from datetime import date, datetime, timedelta
+_logger = logging.getLogger("_name_")
 
 
 class Infractions(models.Model):
@@ -19,9 +23,12 @@ class Infractions(models.Model):
                                  store=True
                                  )
 
-    violation_id = fields.Char(string='Violation')
-    policy_id = fields.Char(string='Policies Violated')
-    frequency_id = fields.Char(string='Frequency')
+    violation_id = fields.Many2one('hr.company.violation', string='Violation')
+    policy_id = fields.Many2one(
+        'hr.company.policy', string='Policies Violated')
+    frequency_id = fields.Many2one('hr.company.offense.frequency', string='Frequency',
+                                   #    domain=[('', '',)]
+                                   )
     violation_date = fields.Date(string="Date of Violation")
     case_status = fields.Char(string='Case Status')
     state = fields.Selection(string='status',
@@ -35,7 +42,11 @@ class Infractions(models.Model):
     violation_details = fields.Text(string="How Did It Occur?",
                                     required=True
                                     )
-    corrective_action = fields.Text(string="Corrective Action")
+    history = fields.One2many(
+        'hr.infraction.action_history',
+        'infraction_id',
+        string="Action History"
+    )
 
 
 class PolicyCode(models.Model):
@@ -85,12 +96,13 @@ class CorrectiveAction(models.Model):
 
     action = fields.Selection(
         string='Action',
-        selection=[('verbal', 'Verbal Warning'),
-                   ('written', 'Written Warning'),
-                   ('suspension', 'Suspension'),
-                   ('demotion', 'Demotion'),
-                   ('dismissal', 'Dismissal'),
-                   ]
+        selection=[
+            ('Verbal Warning', 'Verbal Warning'),
+            ('Written Warning', 'Written Warning'),
+            ('Suspension', 'Suspension'),
+            ('Demotion', 'Demotion'),
+            ('Dismissal', 'Dismissal'),
+        ]
     )
 
 
@@ -122,6 +134,8 @@ class PolicyOffenseViolationLine(models.Model):
 class ActionHistory(models.Model):
     _name = 'hr.infraction.action_history'
 
+    infraction_id = fields.Many2one(
+        'hr.infraction', string="Infraction Record")
 
     stage = fields.Selection(
         string='Stage',
@@ -133,9 +147,40 @@ class ActionHistory(models.Model):
         ])
 
     corrective_action = fields.Many2one('hr.company.offense.frequency')
+    action = fields.Selection(string="Corrective Action",
+                              related='corrective_action.action',
+                              readonly=True,
+                              )
+    offense_frequency = fields.Char(
+        string="Offense & Frequency", compute="_get_default_offense")
     violation_id = fields.Many2one('hr.company.violation', string="Violation")
     start_date = fields.Date(string="Start Date")
     end_date = fields.Date(string="End Date")
+    duration = fields.Integer(string="Duration")
+    days_remaining = fields.Integer(
+        string="Days Remaining", compute="_get_remaining_days")
     submit_nte = fields.Boolean(string="Submit NTE")
     attachment = fields.Binary(string='Attachment')
     notes = fields.Text(string="Notes")
+    number_of_days = fields.Integer(string="Number of Days")
+    staggered = fields.Boolean(string="Staggered")
+
+    @api.depends('infraction_id', 'stage')
+    def _get_default_offense(self):
+        code = self.infraction_id.policy_id.offense_code_id.name
+        _logger.info('\n\n\n{}\n\n\n'.format(code))
+        frequency = "Sample 2nd Offense"
+        self.offense_frequency = '{} - {}'.format(code, frequency)
+        return True
+
+    @api.depends('start_date', 'end_date')
+    def _get_remaining_days(self):
+        duration = abs((self.end_date - self.start_date).days)
+        self.days_remaining = duration
+        _logger.info('\n\n\nDuration: {}\n\n\n'.format(self.duration))
+        return True
+
+    @api.onchange('start_date', 'end_date')
+    def _get_duration(self):
+        duration = abs((self.end_date - self.start_date).days)
+        self.duration = duration

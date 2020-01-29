@@ -24,11 +24,14 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'wizard/suspension.xml',
         'views/infraction.xml',
         'views/policy.xml',
         'views/offense.xml',
         'views/violation.xml',
         'views/menu_views.xml',
+        'views/action_history.xml',
+        
         # 'views/templates.xml',
     ],
     # only loaded in demonstration mode
