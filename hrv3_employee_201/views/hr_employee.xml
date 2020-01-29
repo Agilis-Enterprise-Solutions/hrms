@@ -209,7 +209,33 @@
                 <field name="blood_type"/>
                 <field name="drug_test"/>
               </group>
+
+              <group/>
+
+              <group string="Health Insurance">
+                <field name="health_card_provider"/>
+                <field name="id_number"/>
+                <field name="cap_limit"/>
+                <field name="credit_usage"/>
+              </group>
+
+              <group string="Insert HMO, renewal, etc. here">
+              </group>
             </group>
+
+            <group>
+                <field name="health_condition_ids" nolabel="1">
+                  <tree editable="bottom">
+                    <field name="health_condition"/>
+                    <field name="doctor_name"/>
+                    <field name="address"/>
+                    <field name="medications"/>
+                    <field name="medical_documents"/>
+                    <field name="date"/>
+                    <field name="fit_to_work"/>
+                  </tree>
+                </field>
+              </group>
           </page>
         </page>
       </field>

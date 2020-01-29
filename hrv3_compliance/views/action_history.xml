@@ -74,4 +74,14 @@
     </record>
 
 
+  <record id="hrv3.action.history.tree" model="ir.ui.view">
+    <field name="name">Action History List</field>
+    <field name="model">model.name</field>
+    <field name="type">tree</field>
+    <field name="mode">primary</field>
+    <field name="priority" eval="16" />
+    <field name="active" eval="True" />
+    <field name="inherit_id" ref="xml_id" />
+    <field name="arch" type="xml"/>
+  </record>
 </odoo>
