@@ -213,29 +213,45 @@
               <group/>
 
               <group string="Health Insurance">
-                <field name="health_card_provider"/>
-                <field name="id_number"/>
-                <field name="cap_limit"/>
-                <field name="credit_usage"/>
-              </group>
+                <group>
+                  <field name="health_card_provider"/>
+                  <field name="id_number"/>
+                  <field name="cap_limit"/>
+                  <field name="credit_usage"/>
+                </group>
 
-              <group string="Insert HMO, renewal, etc. here">
+                <group>
+                  <label for="hmo_validity_date"/>
+                  <div class="o_row">
+                    <field name="hmo_validity_date" nolabel="1"/>
+                    <span>
+                      <field name="hmo_validity_date_end"/>
+                    </span>
+                  </div>
+                  <label for="for_renewal"/>
+                  <div class="o_row">
+                    <field name="for_renewal" nolabel="1"/>
+                    <span>
+                      <field name="renewal_date"/>
+                    </span>
+                  </div>
+                </group>
               </group>
             </group>
 
             <group>
-                <field name="health_condition_ids" nolabel="1">
-                  <tree editable="bottom">
-                    <field name="health_condition"/>
-                    <field name="doctor_name"/>
-                    <field name="address"/>
-                    <field name="medications"/>
-                    <field name="medical_documents"/>
-                    <field name="date"/>
-                    <field name="fit_to_work"/>
-                  </tree>
-                </field>
-              </group>
+              <field name="health_condition_ids" nolabel="1">
+                <tree editable="bottom">
+                  <field name="health_condition"/>
+                  <field name="doctor_name"/>
+                  <field name="address"/>
+                  <field name="medications"/>
+                  <field name="medical_documents"/>
+                  <field name="date"/>
+                  <field name="fit_to_work"/>
+                </tree>
+              </field>
+            </group>
           </page>
         </page>
       </field>
