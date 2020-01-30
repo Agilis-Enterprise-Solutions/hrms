@@ -150,6 +150,7 @@ class ActionHistory(models.Model):
     action = fields.Selection(string="Corrective Action",
                               related='corrective_action.action',
                               readonly=True,
+                              store=True,
                               )
     offense_frequency = fields.Char(
         string="Offense & Frequency", compute="_get_default_offense")

@@ -11,77 +11,67 @@
             <field name="context">{'default_offense_frequency':'testtesttest'}</field>
             <!-- <field name="target">new</field> -->
         </record>
-    </data>
 
 
-    <record id="hrv3_action_history_tree" model="ir.ui.view">
-        <field name="name">Action History List</field>
-        <field name="model">hr.infraction.action_history</field>
-        <field name="type">tree</field>
-        <!-- <field name="mode">primary</field>
+
+        <record id="hrv3_action_history_tree" model="ir.ui.view">
+            <field name="name">Action History List</field>
+            <field name="model">hr.infraction.action_history</field>
+            <field name="type">tree</field>
+            <!-- <field name="mode">primary</field>
         <field name="priority" eval="16" />
         <field name="active" eval="True" />
         <field name="inherit_id" ref="xml_id" /> -->
-        <field name="arch" type="xml">
-            <field name="stage"/>
-            <field name="corrective_action"/>
-            <field name="start_date" string="Date Executed"/>
-            <field name="end_date" string="End Date"/>
-            <field name="duration"/>
-            <field name="days_remaining"/>
-        </field>
-    </record>
+            <field name="arch" type="xml">
+                <field name="stage"/>
+                <field name="corrective_action"/>
+                <field name="start_date" string="Date Executed"/>
+                <field name="end_date" string="End Date"/>
+                <field name="duration"/>
+                <field name="days_remaining"/>
+            </field>
+        </record>
 
 
-    <record id="hrv3_action_history_form" model="ir.ui.view">
-        <field name="name">Action History Form</field>
-        <field name="model">hr.infraction.action_history</field>
-        <field name="type">form</field>
-        <field name="context">{'default_offense_frequency':'testtesttest'}</field>
-        <field name="arch" type="xml">
-            <form action="">
-                <sheet>
-                    <group>
+        <record id="hrv3_action_history_form" model="ir.ui.view">
+            <field name="name">Action History Form</field>
+            <field name="model">hr.infraction.action_history</field>
+            <field name="type">form</field>
+            <field name="context">{'default_offense_frequency':'testtesttest'}</field>
+            <field name="arch" type="xml">
+                <form action="">
+                    <sheet>
                         <group>
-                            <field name="stage"/>
-                            <field name="infraction_id"/>
-                            <field name="offense_frequency" attrs="{'invisible': [('stage','not in',('corrective_action'))]}"/>
-                            <field name="corrective_action" attrs="{'readonly': [('stage','in',('incident_report','collaboration'))], 'invisible': [('stage','in',('inv_nte_issuance'))]}"/>
-                            <field name="number_of_days" attrs="{'invisible': [('stage','not in',('corrective_action')),('corrective_action.action','not in',['suspension'])]}"/>
-                            <field name="violation_id" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
-                            <field name="attachment" attrs="{'invisible': [('stage','not in',('inv_nte_issuance', 'collaboration'))]}" />
-                            <field name="submit_nte" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
-                            <label for="staggered"/>
-                            <div class="o_row">
-                                <field name="staggered" attrs="{'invisible': [('stage','not in',('corrective_action')),('corrective_action','not in',['Suspension'])]}" nolabel="1"/>
-                                <span>
-                                    <button name="%(hrv3_compliance.create_suspension_wizard)d" string="Use Suspension" type="action" class="btn-primary" attrs="{'invisible': [('staggered','=',False)]}" context="{'default_suspension_days': number_of_days}" />
-                                </span>
-                            </div>
+                            <group>
+                                <field name="stage"/>
+                                <field name="infraction_id"/>
+                                <field name="action" invisible="1" force_save="1" readonly="1" />
+                                <field name="offense_frequency" attrs="{'invisible': [('stage','not in',('corrective_action'))]}"/>
+                                <field name="corrective_action" attrs="{'readonly': [('stage','in',('incident_report','collaboration'))], 'invisible': [('stage','in',('inv_nte_issuance'))]}"/>
+                                <field name="number_of_days" attrs="{'invisible': [('stage','not in',('corrective_action')),('action','not in',['suspension'])]}"/>
+                                <field name="violation_id" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
+                                <field name="attachment" attrs="{'invisible': [('stage','not in',('inv_nte_issuance', 'collaboration'))]}" />
+                                <field name="submit_nte" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
+                                <label for="staggered"/>
+                                <div class="o_row">
+                                    <field name="staggered" attrs="{'invisible': [('stage','not in',('corrective_action')),('corrective_action','not in',['Suspension'])]}" nolabel="1"/>
+                                    <span>
+                                        <button name="%(hrv3_compliance.create_suspension_wizard)d" string="Use Suspension" type="action" class="btn-primary" attrs="{'invisible': [('staggered','=',False)]}" context="{'default_suspension_days': number_of_days}" />
+                                    </span>
+                                </div>
+                            </group>
+                            <group>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                            </group>
                         </group>
                         <group>
-                            <field name="start_date"/>
-                            <field name="end_date"/>
+                            <field name="notes"/>
                         </group>
-                    </group>
-                    <group>
-                        <field name="notes"/>
-                    </group>
-                </sheet>
-            </form>
+                    </sheet>
+                </form>
 
-        </field>
-    </record>
-
-
-  <record id="hrv3.action.history.tree" model="ir.ui.view">
-    <field name="name">Action History List</field>
-    <field name="model">model.name</field>
-    <field name="type">tree</field>
-    <field name="mode">primary</field>
-    <field name="priority" eval="16" />
-    <field name="active" eval="True" />
-    <field name="inherit_id" ref="xml_id" />
-    <field name="arch" type="xml"/>
-  </record>
+            </field>
+        </record>
+    </data>
 </odoo>
