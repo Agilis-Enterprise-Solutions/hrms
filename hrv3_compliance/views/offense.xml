@@ -37,7 +37,7 @@
               <field name="name"/>
               <field name="corrective_action_ids">
                 <tree editable="bottom">
-                  <field name="name"/>
+                  <field name="frequency"/>
                   <field name="action"/>
                 </tree>
               </field>

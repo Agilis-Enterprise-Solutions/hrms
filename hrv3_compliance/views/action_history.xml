@@ -9,7 +9,6 @@
             <field name="view_mode">tree,form</field>
             <field name="view_type">form</field>
             <field name="context">{'default_offense_frequency':'testtesttest'}</field>
-            <!-- <field name="target">new</field> -->
         </record>
 
 
@@ -44,7 +43,7 @@
                         <group>
                             <group>
                                 <field name="stage"/>
-                                <field name="infraction_id"/>
+                                <field name="infraction_id" invisible="1"/>
                                 <field name="action" invisible="1" force_save="1" readonly="1" />
                                 <field name="offense_frequency" attrs="{'invisible': [('stage','not in',('corrective_action'))]}"/>
                                 <field name="corrective_action" attrs="{'readonly': [('stage','in',('incident_report','collaboration'))], 'invisible': [('stage','in',('inv_nte_issuance'))]}"/>
@@ -54,7 +53,7 @@
                                 <field name="submit_nte" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
                                 <label for="staggered"/>
                                 <div class="o_row">
-                                    <field name="staggered" attrs="{'invisible': [('stage','not in',('corrective_action')),('corrective_action','not in',['Suspension'])]}" nolabel="1"/>
+                                    <field name="staggered" attrs="{'invisible': [('stage','not in',('corrective_action')),('corrective_action','not in',['Suspension'])], 'readonly': [('stage','not in',('corrective_action')),('corrective_action','not in',['Suspension'])]}" nolabel="1"/>
                                     <span>
                                         <button name="%(hrv3_compliance.create_suspension_wizard)d" string="Use Suspension" type="action" class="btn-primary" attrs="{'invisible': [('staggered','=',False)]}" context="{'default_suspension_days': number_of_days}" />
                                     </span>

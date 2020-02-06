@@ -27,8 +27,7 @@
           <header>
             <button string="Submit" class="oe_highlight" states="open"/>
             <button string="Discard" class="oe_highlight" states="open"/>
-            <field name="state" widget="statusbar"
-                   statusbar_visible="open,in_progress,closure,closed"/>
+            <field name="state" widget="statusbar" statusbar_visible="open,in_progress,closure,closed"/>
           </header>
           <sheet>
             <group>
@@ -40,9 +39,14 @@
 
               <group string="Violation Details">
                 <field name="violation_id"/>
-                <field name="policy_id"/>
+                <field name="policy_violated_id"/>
                 <field name="frequency_id"/>
                 <field name="violation_date"/>
+                <div class="col-xs-4">
+                </div>
+                <div class="col-xs-4">
+                <button type="object" string="History..." name="type_offenses_others" icon="fa-clock-o" class="oe_inline oe_link"/>
+              </div>
                 <field name="case_status"/>
               </group>
             </group>
@@ -54,7 +58,6 @@
                     <create string="Add record" context="{'default_infraction_id': active_id}" />
                   </control>
                   <field name="stage"/>
-                  <field name="infraction_id"/>
                   <field name="corrective_action"/>
                   <field name="start_date"/>
                   <field name="end_date"/>
@@ -64,6 +67,11 @@
               </field>
             </group>
           </sheet>
+          <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+            <field name="activity_ids" widget="mail_activity"/>
+            <field name="message_ids" widget="mail_thread"/>
+          </div>
         </form>
       </field>
     </record>
