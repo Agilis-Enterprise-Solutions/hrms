@@ -8,8 +8,10 @@
       <field name="model">hr.infraction</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="infraction_sequence_id"/>
           <field name="emp_id" string="Name"/>
           <field name="violation_id"/>
+          <field name="policy_violated_ids" invisible="1" />
           <field name="violation_date"/>
           <field name="history"/>
         </tree>
@@ -25,11 +27,18 @@
       <field name="arch" type="xml">
         <form>
           <header>
-            <button string="Submit" class="oe_highlight" states="open"/>
-            <button string="Discard" class="oe_highlight" states="open"/>
-            <field name="state" widget="statusbar" statusbar_visible="open,in_progress,closure,closed"/>
+            <button string="Open" type="object" name="set_state_open" class="oe_highlight" attrs="{'invisible':[('state','not in','draft')]}"/>
+            <button string="In Progress" type="object" name="set_state_inprogress" class="oe_highlight" attrs="{'invisible':[('state','not in','open')]}"/>
+            <button string="For Closure" type="object" name="set_state_forclosure" class="oe_highlight" attrs="{'invisible':[('state','not in','in_progress')]}"/>
+            <button string="Close" type="object" name="set_state_closed" class="oe_highlight" attrs="{'invisible':[('state','not in','for_closure')]}"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,open,in_progress,for_closure,closed"/>
           </header>
           <sheet>
+            <div class="oe_title">
+              <h1>
+                <field name="infraction_sequence_id" readonly="1" force_save="1"/>
+              </h1>
+            </div>
             <group>
               <group string="Employee Details">
                 <field name="emp_id" string="Name"/>
@@ -39,14 +48,16 @@
 
               <group string="Violation Details">
                 <field name="violation_id"/>
+                <field name="policy_violated_ids" invisible="1" />
                 <field name="policy_violated_id"/>
-                <field name="frequency_id"/>
+                <field name="offense_code_id"/>
+                <field name="frequency" />
                 <field name="violation_date"/>
                 <div class="col-xs-4">
                 </div>
                 <div class="col-xs-4">
-                <button type="object" string="History..." name="type_offenses_others" icon="fa-clock-o" class="oe_inline oe_link"/>
-              </div>
+                  <button type="object" string="History..." name="type_offenses_others" icon="fa-clock-o" class="oe_inline oe_link"/>
+                </div>
                 <field name="case_status"/>
               </group>
             </group>
@@ -55,7 +66,7 @@
               <field name="history">
                 <tree>
                   <control>
-                    <create string="Add record" context="{'default_infraction_id': active_id}" />
+                    <create string="Add record" context="{'default_infraction_id': id}" />
                   </control>
                   <field name="stage"/>
                   <field name="corrective_action"/>

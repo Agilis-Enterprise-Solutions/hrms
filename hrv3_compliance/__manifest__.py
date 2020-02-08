@@ -33,6 +33,7 @@
         'views/violation.xml',
         'views/menu_views.xml',
         'views/action_history.xml',
+        'data/sequence.xml',
 
     ],
     'demo': [
