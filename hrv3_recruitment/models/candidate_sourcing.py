@@ -3,7 +3,10 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import date
 import re
+import logging
 from logging import getLogger
+_logger = logging.getLogger("_name_")
+
 
 
 def log(**to_output):
@@ -35,7 +38,14 @@ class Applicant(models.Model):
 
     skills_ids = fields.Many2many(
         'hrmsv3.skills',
-        string="Skills")
+        string="Skills",compute="get_skills")
+    
+    @api.depends("job_id")
+    def get_skills(self):
+        self.update({
+            'skills_ids':[(6,0,self.job_id.skills_ids.ids)],
+        })
+        return True
 
     blacklisted = fields.Boolean(string="Blacklisted")
 
