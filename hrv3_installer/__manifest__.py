@@ -8,8 +8,8 @@
         'hr_holidays',
         'hrv3_compliance',
         'hrv3_employee_201',
-        'hrv3_events',
-        'hrv3_recruitment'
+        'hrv3_recruitment',
+        'hrv3_training'
     ],
     'name': "HRv3 Installer Module",
     'description': '''Installs the necessary modules for HRv3''',
