@@ -69,9 +69,7 @@ class PersonnelRequisition(models.Model):
                                              store=True)
     replacement_contract = fields.Many2many('hr.contract',
                                             string="Current Contract",
-                                            #    related='replacement_for_id.contract_id',
                                             compute='get_contract',
-                                            # store=True
                                             )
     replacement_for_id_check_box = fields.Boolean(string='Replacement')
 
@@ -96,7 +94,8 @@ class PersonnelRequisition(models.Model):
         for record in self:
             replacement_ids = record.replacement_for_id
             for rec in replacement_ids:
-                result.append(rec.contract_id.id)
+                if rec.contract_id:
+                    result.append(rec.contract_id.id)
         self.update({
             'replacement_contract': [(6, 0, result)]
         })
