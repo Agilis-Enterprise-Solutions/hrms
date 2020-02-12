@@ -179,16 +179,11 @@ class Infractions(models.Model):
                 for i in self.offense_code_id.corrective_action_ids:
                     frequency = i.frequencies
                 if self.offense_code_id and self.offense_code_id.corrective_action_ids:
-                    _logger.info("\n\n\nCASE 1\n\n\n")
                     self.frequency = frequency[counter -
                                                1 if counter > 0 else counter][1]
-                    _logger.info("\n\n\nCounter{}\nFrequency{}\n\n\n".format(
-                        counter-1, frequency))
                 elif counter < 0:
-                    _logger.info("\n\n\nCASE 2\n\n\n")
                     self.frequency = frequency[0][1]
                 else:
-                    _logger.info("\n\n\nCASE 3\n\n\n")
                     self.frequency = ""
 
                     return frequency
@@ -359,7 +354,7 @@ class CorrectiveAction(models.Model):
                 i.name = frequencies[9][1]
 
 
-"""Violation deals with acts committed by offenders which are then assigned 
+"""Violation deals with acts committed by offenders which are then assigned
     offense codes based on company policies violated by said act/s"""
 
 
@@ -409,7 +404,7 @@ class PolicyOffenseViolationLine(models.Model):
 """======================Action History===================
    Action stages such as Investigation and Issuance of NTE,
    Collaboration with IMC and Corrective Action are created
-   in this model. 
+   in this model.
    =======================================================
 """
 
@@ -566,7 +561,7 @@ class ActionHistory(models.Model):
 """========================SUSPENSION HISTORY=======================
         ALL INSTANCES OF EMPLOYEE SUSPENSION IS RECORDED HERE
         THIS MAY BE USED FOR PAYROLL AND TIMEKEEPING PURPOSES
-   =================================================================     
+   =================================================================
 """
 
 
