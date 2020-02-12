@@ -1,7 +1,9 @@
 # coding: utf-8
 from odoo import models, fields, api
 from datetime import date
+import logging
 from logging import getLogger
+_logger = logging.getLogger("_name_")
 
 
 def log(**to_output):
@@ -26,11 +28,13 @@ class HealthCondition(models.Model):
 class Employee(models.Model):
     _inherit = 'hr.employee'
 
+    """======================WORK INFORMATION======================"""
     mobile_phone = fields.Char(compute="_auto_populate_work_info")
     work_email = fields.Char(compute="_auto_populate_work_info")
     work_location = fields.Char(compute="_auto_populate_work_info")
     work_phone = fields.Char(compute="_auto_populate_work_info")
 
+    """======================PRIVATE INFORMATION======================"""
     passport_validity_date = fields.Date()
     place_of_passport_issuance = fields.Char()
 
@@ -45,6 +49,7 @@ class Employee(models.Model):
 
     age = fields.Integer(compute="_compute_age_years")
 
+    """======================PRE-EMPLOYMENT INFORMATION======================"""
     sss_checkbox = fields.Boolean('SSS', compute="_auto_tick")
     hdmf_checkbox = fields.Boolean(compute="_auto_tick")
     philhealth_checkbox = fields.Boolean(compute="_auto_tick")
@@ -89,9 +94,11 @@ class Employee(models.Model):
     transcript_of_records = fields.Binary()
     diploma = fields.Binary()
 
+    """======================SKILLS AND TRAINING======================"""
     skill_ids = fields.One2many('hrmsv3.skills', 'employee_id',
                                 string="Skills")
 
+    """======================HEALTH INFORMATION======================"""
     fit_to_work = fields.Boolean()
 
     height = fields.Float()
@@ -135,6 +142,25 @@ class Employee(models.Model):
 
     health_condition_ids = fields.One2many('health.condition', 'employee_id')
 
+    """======================INFRACTION======================"""
+    infraction_ids = fields.One2many(
+        'hr.infraction', 'emp_id',
+        string="Infractions",
+        compute='_compute_infraction_record'
+    )
+
+    @api.depends('children')
+    def _compute_infraction_record(self):
+        record = self.env['hr.infraction'].search([('emp_id', '=', self.id)])
+        self.update({
+            'infraction_ids': [(6, 0, record.ids)],
+        })
+        _logger.info('\n\n\nEMP ID{}\n\n\n'.format(record))
+        # for record in self:
+        #     record.infraction_record = something
+
+    """======================PRE-EMPLOYMENT REQUIREMENTS FUNCTIONS======================"""
+
     @api.depends('sss', 'hdmf', 'philhealth', 'gsis', 'nbi_clearance',
                  'nbi_expiration', 'nbi_issued_at', 'nbi_date_issued',
                  'nbi_clearance_photo', 'birth_certificate',
@@ -175,6 +201,7 @@ class Employee(models.Model):
             rec.tor_checkbox = True if rec.transcript_of_records else False
             rec.diploma_checkbox = True if rec.diploma else False
 
+    """======================PRIVATE INFORMATION FUNCTIONS======================"""
     @api.depends('birthday')
     def _compute_age_years(self):
         today = date.today()
@@ -184,6 +211,7 @@ class Employee(models.Model):
                            - ((today.month, today.day) < (rec.birthday.month,
                                                           rec.birthday.day)))
 
+    """======================WORK INFORMATION FUNCTIONS======================"""
     @api.depends('address_id')
     def _auto_populate_work_info(self):
         for rec in self:

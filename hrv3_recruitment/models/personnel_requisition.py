@@ -1,6 +1,9 @@
 # coding: utf-8
 from odoo import models, fields, api, _
 from logging import getLogger
+from odoo.exceptions import UserError, ValidationError
+from datetime import date, datetime, timedelta
+import re
 
 
 def log(**to_output):
@@ -40,6 +43,13 @@ class PersonnelRequisition(models.Model):
 
     responsible_id = fields.Many2one('res.users',  string="Responsible")
     email_alias = fields.Char(string="Email Alias")
+    @api.constrains('email_alias')
+    def _check_email(self):
+        emailPattern = re.compile(r'[\w.-]+@[\w-]+[.]+[\w.-]')
+        if self.email_alias:
+            if (self.email_alias
+                and not emailPattern.match(self.email_alias)):
+                raise ValidationError("Email is in Incorrect format \n e.g. example@company.com")
     job_description = fields.Text(string="Job Description",
                                   related='job_position_id.description',
                                   readonly=True,
@@ -49,17 +59,18 @@ class PersonnelRequisition(models.Model):
                                        readonly=True)
     number_of_employees = fields.Char(string="Number of Employees",
                                       readonly=True)
-    expected_new_employee = fields.Char(string="Expected New Employee",
-                                        required=True)
+    expected_new_employee = fields.Integer(string="Expected New Employee",
+                                           required=True)
     proposed_salary = fields.Float(string="Proposed Salary")
-    replacement_for_id = fields.Many2one('hr.employee', string="Replacement For")
+    replacement_for_id = fields.Many2many('hr.employee', string="Replacement For",
+                                          )
     replacement_emp_job_id = fields.Many2one('hr.job', string='Job Position',
                                              related='replacement_for_id.job_id',
                                              store=True)
-    replacement_contract = fields.Many2one('hr.contract',
-                                           string="Current Contract",
-                                           related='replacement_for_id.contract_id',
-                                           store=True)
+    replacement_contract = fields.Many2many('hr.contract',
+                                            string="Current Contract",
+                                            compute='get_contract',
+                                            )
     replacement_for_id_check_box = fields.Boolean(string='Replacement')
 
     state = fields.Selection([
@@ -77,6 +88,32 @@ class PersonnelRequisition(models.Model):
         result = super(PersonnelRequisition, self).create(vals)
         return result
 
+    @api.depends('replacement_for_id')
+    def get_contract(self):
+        result = []
+        for record in self:
+            replacement_ids = record.replacement_for_id
+            for rec in replacement_ids:
+                if rec.contract_id:
+                    result.append(rec.contract_id.id)
+        self.update({
+            'replacement_contract': [(6, 0, result)]
+        })
+
+        return True
+
+    @api.constrains('replacement_for_id', 'expected_new_employee')
+    def check_replacement_employee_count(self):
+        counter = 0
+        for record in self:
+            replacement_ids = record.replacement_for_id
+            for rec in replacement_ids:
+                counter += 1
+                if counter > record.expected_new_employee:
+                    raise UserError(
+                        _('Number of employees to be replaced should not exceed number of expected employees.'))
+
+    # Submit Button Function
     @api.multi
     def submit_jobreq_form(self):
         self.write({
@@ -84,22 +121,9 @@ class PersonnelRequisition(models.Model):
         })
         return True
 
+    # Approve Button Function
     @api.multi
     def approve_jobreq_form(self):
-        self.write({
-            'state': 'approved',
-        })
-        return True
-
-    @api.multi
-    def cancel_jobreq_form(self):
-        self.write({
-            'state': 'canceled',
-        })
-        return True
-
-    @api.multi
-    def action_hr_job_form(self):
         for record in self:
             user_id = record.responsible_id.id
             job_qualification = record.job_qualification
@@ -116,8 +140,44 @@ class PersonnelRequisition(models.Model):
                     'job_qualification': job_qualification,
                     'proposed_salary': proposed_salary
                 })
-
+        self.write({
+            'state': 'approved',
+        })
         return True
+
+    # Cancel Button Function
+    @api.multi
+    def cancel_jobreq_form(self):
+        self.write({
+            'state': 'canceled',
+        })
+        return True
+
+    # Commented out function. Redundant
+    # Update Job Post Button Function
+    # @api.multi
+    # def action_hr_job_form(self):
+        # for record in self:
+        #     user_id = record.responsible_id.id
+        #     job_qualification = record.job_qualification
+        #     expected_new_employee = record.expected_new_employee
+        #     skills_ids = record.skills_ids
+        #     job_position = record.job_position_id
+        #     proposed_salary = record.proposed_salary
+        #     for rec in job_position:
+        #         if skills_ids:
+        #             rec.skills_ids = skills_ids
+        #         rec.write({
+        #             'user_id': user_id,
+        #             'no_of_recruitment': expected_new_employee,
+        #             'job_qualification': job_qualification,
+        #             'proposed_salary': proposed_salary
+        #         })
+        # self.write({
+        #     'state': 'approved',
+        # })
+
+    #     return True
 
 
 class Skills(models.Model):
@@ -125,11 +185,11 @@ class Skills(models.Model):
     _rec_name = 'skill_name'
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
-    @api.depends('skill_name')
-    def _get_last_skill_level(self):
-        for rec in self:
-            if rec.skill_name.skill_level_ids:
-                rec.skill_level_id = rec.skill_name.skill_level_ids[-1]
+    # @api.depends('skill_name')
+    # def _get_last_skill_level(self):
+    #     for rec in self:
+    #         if rec.skill_name.skill_level_ids:
+    #             rec.skill_level_id = rec.skill_name.skill_level_ids[-1]
 
     employee_id = fields.Many2one('hr.employee')
 
@@ -140,9 +200,9 @@ class Skills(models.Model):
     skill_type_id = fields.Many2one('hrmsv3.skills_type',
                                     related='skill_name.skill_type_id',
                                     string="Skill Type")
-    skill_description = fields.Text()
+    skill_description = fields.Text(string="Skill Description", related="skill_name.skill_description")
     skill_level_id = fields.Many2one('hrmsv3.skills_level',
-                                     compute='_get_last_skill_level',
+                                     domain="[('skill_name_id', '=',skill_name)]",
                                      string="Skill Level")
 
 

@@ -253,6 +253,16 @@
               </field>
             </group>
           </page>
+          <page string="Infractions">
+            <group string="Infractions">
+              <field name="infraction_ids" nolabel="1">
+                <field name="infraction_sequence_id" string="Case ID"/>
+                <field name="department_id" string="Department"/>
+                <field name="violation_id" string="Violation"/>
+                <field name="violation_date" string="Date Committed"/>
+              </field>
+            </group>
+          </page>
         </page>
       </field>
     </record>

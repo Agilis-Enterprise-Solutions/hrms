@@ -22,5 +22,8 @@
     <menuitem name="Violation" id="hrv3_compliance_violation"
               parent="hrv3_compliance_configuration" sequence="3"
               action="hrv3_company_violation_action_window"/>
+    <menuitem name="Suspension History" id="hrv3_suspension_history_menu" 
+              parent="hrv3_compliance_configuration" 
+              action="hrv3_suspension_history_action" sequence="4"/>
   </data>
 </odoo>

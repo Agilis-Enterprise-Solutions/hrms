@@ -34,6 +34,12 @@ class Infractions(models.Model):
         readonly=True,
         store=True,
     )
+    department_id = fields.Many2one('hr.department',
+                                    string="Department",
+                                    related='emp_id.department_id',
+                                    readonly=True,
+                                    store=True
+                                    )
 
     violation_id = fields.Many2one(
         "hr.company.violation", string="Violation", track_visibility="onchange"
@@ -78,15 +84,32 @@ class Infractions(models.Model):
         ],
         default="draft",
     )
+    corrective_action = fields.Many2one(
+        "hr.infraction.action_history",
+        string="Corrective Action",
+        compute="get_corrective_action",
+        readonly=True,
+    )
+
     violation_details = fields.Text(
         string="How Did It Occur?", required=True, track_visibility="onchange"
     )
-    history = fields.One2many(
+    history_ids = fields.One2many(
         "hr.infraction.action_history",
         "infraction_id",
         string="Action History",
         track_visibility="onchange",
     )
+
+    @api.depends('history_ids')
+    def get_corrective_action(self):
+        for record in self:
+            history_line = record.history_ids.ids
+        if history_line:
+            self.update({
+                'corrective_action': history_line[-1]
+            })
+        return True
 
     # ============================================================================================
     # STATE BUTTON FIELDS
@@ -117,8 +140,18 @@ class Infractions(models.Model):
     # ============================================================================================
 
     @api.multi
-    def type_offenses_others(self):
-        pass
+    def get_offense_history(self):
+        emp_domain = [('emp_id', '=', self.emp_id.id),
+                      ('policy_violated_id', 'in', self.policy_violated_ids.ids)]
+
+        return {
+            'name': _('Violations for {}'.format(self.emp_id.name)),
+            'type': 'ir.actions.act_window',
+            'res_model': 'hr.infraction',
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'domain': emp_domain,
+        }
 
     @api.model
     def create(self, vals):
@@ -135,26 +168,30 @@ class Infractions(models.Model):
     def compute_policy_violation_instance(self):
         data = []
         frequency = ""
-        active_emp_id = self.emp_id.id
-        record_set = self.env['hr.infraction'].search(
-            [('emp_id', '=', active_emp_id), ('state', 'not in ', ['closed'])])
-        for i in record_set:
-            data.append(i.policy_violated_id.id)
-        counter = data.count(self.policy_violated_id.id)
-        for i in self.offense_code_id.corrective_action_ids:
-            frequency = i.frequencies
-        if self.offense_code_id and self.offense_code_id.corrective_action_ids:
-            _logger.info("\n\n\nCASE 1\n\n\n")
-            self.frequency = frequency[counter -
-                                       1 if counter > 0 else counter][1]
-            _logger.info("\n\n\nCounter{}\nFrequency{}\n\n\n".format(
-                counter-1, frequency))
-        elif counter < 0:
-            _logger.info("\n\n\nCASE 2\n\n\n")
-            self.frequency = frequency[0][1]
-        else:
-            _logger.info("\n\n\nCASE 3\n\n\n")
-            self.frequency = ""
+        active_emp_id = self.emp_id.id if self.emp_id.id else False
+        if active_emp_id:
+            record_set = self.env['hr.infraction'].search(
+                [('emp_id', '=', active_emp_id), ('state', '!=', 'closed')])
+            for i in record_set:
+                data.append(i.policy_violated_id.id)
+            counter = data.count(self.policy_violated_id.id)
+            if self.offense_code_id.corrective_action_ids:
+                for i in self.offense_code_id.corrective_action_ids:
+                    frequency = i.frequencies
+                if self.offense_code_id and self.offense_code_id.corrective_action_ids:
+                    _logger.info("\n\n\nCASE 1\n\n\n")
+                    self.frequency = frequency[counter -
+                                               1 if counter > 0 else counter][1]
+                    _logger.info("\n\n\nCounter{}\nFrequency{}\n\n\n".format(
+                        counter-1, frequency))
+                elif counter < 0:
+                    _logger.info("\n\n\nCASE 2\n\n\n")
+                    self.frequency = frequency[0][1]
+                else:
+                    _logger.info("\n\n\nCASE 3\n\n\n")
+                    self.frequency = ""
+
+                    return frequency
     # ============================================================================================
 
     # =============================================================================================
@@ -170,14 +207,14 @@ class Infractions(models.Model):
     # STATE BUTTON FUNCTIONS
     # ============================================================================================
 
-    @api.multi
-    def set_state_open(self):
-        self.write({
-            'state': 'open',
-            'date_opened': datetime.now(),
-            'set_open_by': self._uid
-        })
-        return True
+    # @api.multi
+    # def set_state_open(self):
+    #     self.write({
+    #         'state': 'open',
+    #         'date_opened': datetime.now(),
+    #         'set_open_by': self._uid
+    #     })
+    #     return True
 
     @api.multi
     def set_state_inprogress(self):
@@ -321,14 +358,6 @@ class CorrectiveAction(models.Model):
             else:
                 i.name = frequencies[9][1]
 
-    # @api.multi
-    # def name_get(self):
-    #     data = []
-    #     for i in self:
-    #         display_value = frequencies[i]
-    #         data.append((i.id, display_value))
-    #     return data
-
 
 """Violation deals with acts committed by offenders which are then assigned 
     offense codes based on company policies violated by said act/s"""
@@ -377,15 +406,26 @@ class PolicyOffenseViolationLine(models.Model):
         return data
 
 
-"""Every corrective action applied to employee is recorded here"""
+"""======================Action History===================
+   Action stages such as Investigation and Issuance of NTE,
+   Collaboration with IMC and Corrective Action are created
+   in this model. 
+   =======================================================
+"""
 
 
 class ActionHistory(models.Model):
     _name = "hr.infraction.action_history"
     _description = "Every corrective action applied to employee for specific violation is recorded here"
+    _rec_name = 'corrective_action'
 
     infraction_id = fields.Many2one(
         "hr.infraction", string="Infraction Record")
+    emp_id = fields.Many2one('hr.employee', string="Offending Employee",
+                             related='infraction_id.emp_id',
+                             readonly=True,
+                             store=True
+                             )
 
     stage = fields.Selection(
         string="Stage",
@@ -402,7 +442,7 @@ class ActionHistory(models.Model):
                                       store=True
                                       )
     corrective_action = fields.Many2one("hr.company.offense.frequency",
-                                        domain="[('offense_code_id', '=', offense_code_id)]"
+                                        domain="[('offense_code_id', '=', offense_code_id)]",
                                         )
     action = fields.Selection(
         string="Corrective Action",
@@ -426,13 +466,9 @@ class ActionHistory(models.Model):
     attachment = fields.Binary(string="Attachment")
     notes = fields.Text(string="Notes")
     number_of_days = fields.Integer(
-        string="Number of Days", compute='_get_duration')
+        string="Number of Days",
+    )
     staggered = fields.Boolean(string="Staggered")
-
-    @api.depends
-    def _get_corrective_action(self):
-
-        pass
 
     @api.depends("infraction_id", "stage")
     def _get_default_offense(self):
@@ -446,15 +482,9 @@ class ActionHistory(models.Model):
 
     @api.onchange("start_date", "end_date")
     def _get_duration(self):
-        duration = (
-            abs((self.end_date - self.start_date)).days
-            if self.end_date
-            and self.start_date
-            and (self.end_date - self.start_date).days > 0
-            else 0
-        )
+        duration = abs((self.end_date - self.start_date)).days if self.end_date and self.start_date and (self.end_date - self.start_date).days > 0 else 0
+
         self.duration = duration
-        self.number_of_days = duration
 
     @api.depends("start_date", "end_date")
     def _get_remaining_days(self):
@@ -467,8 +497,108 @@ class ActionHistory(models.Model):
                 else 0
             )
             line.days_remaining = (
-                abs((line.end_date - line.today())).days
+                abs((line.end_date - date.today())).days
                 if line.end_date and line.start_date and (date.today() > line.start_date)
                 else duration
             )
         return True
+
+
+# class Suspension(models.Model):
+#     _name = 'create.suspension'
+#     _description = 'Create Suspension'
+
+#     status = [
+#         ('on_going', 'On Going'),
+#         ('completed', 'Completed')
+#     ]
+
+#     state = fields.Selection(
+#         string='Status',
+#         selection=status
+#     )
+#     emp_id = fields.Many2one('hr.employee', string="Offending Employee")
+#     infraction_id = fields.Many2one(
+#         'hr.infraction', string="Infraction Record")
+#     suspension_days = fields.Integer(string="Suspension Days")
+#     remaining_days = fields.Integer(
+#         string="Remaining Days", compute='compute_remaining_days')
+#     use_suspension_days = fields.Integer(
+#         string="Use Suspension", compute='compute_use_suspension_days')
+#     start_date = fields.Date(string="Start Date")
+#     end_date = fields.Date(string="End Date")
+#     history_ids = fields.Many2many('suspension.history', string="History",
+#     # domain="[('emp_id','=',emp_id)]"
+#     )
+
+#     @api.depends('use_suspension_days')
+#     def compute_remaining_days(self):
+#         for rec in self:
+#             suspension_days = rec.suspension_days
+#         self.remaining_days = suspension_days - rec.use_suspension_days
+#         return True
+
+#     @api.depends('start_date', 'end_date')
+#     def compute_use_suspension_days(self):
+#         if self.start_date and self.end_date:
+#             self.use_suspension_days = abs(
+#                 (self.start_date - self.end_date)).days
+#         return True
+
+#     @api.multi
+#     def create_suspension(self):
+#         self.state = "on_going"
+#         if self.remaining_days < 0:
+#             raise UserError(
+#                 _('Suspension days to be used must not be more than remaining suspension days.'))
+#         else:
+#             vals = {
+#                 'emp_id': self.emp_id.id,
+#                 'infraction_id': self.infraction_id.id,
+#                 'used_days': self.use_suspension_days,
+#                 'date_from': self.start_date,
+#                 'date_to': self.end_date,
+#                 'state': self.state,
+#             }
+#         self.env['suspension.history'].create(vals)
+
+
+"""========================SUSPENSION HISTORY=======================
+        ALL INSTANCES OF EMPLOYEE SUSPENSION IS RECORDED HERE
+        THIS MAY BE USED FOR PAYROLL AND TIMEKEEPING PURPOSES
+   =================================================================     
+"""
+
+
+class SuspensionHistory(models.Model):
+    _name = 'suspension.history'
+    _description = 'Staggered Suspension History Model'
+    _rec_name = 'infraction_id'
+
+    status = [
+        ('on_going', 'On Going'),
+        ('completed', 'Completed')
+    ]
+    emp_id = fields.Many2one('hr.employee', string="Offending Employee")
+    infraction_id = fields.Many2one(
+        'hr.infraction', string="Infraction Record")
+    used_days = fields.Integer(string="Used Days")
+    date_from = fields.Date(string="Date From")
+    date_to = fields.Date(string="Date To")
+    duration = fields.Integer(string="Duration", compute="_get_duration")
+    state = fields.Selection(
+        string='Status',
+        selection=status
+    )
+
+    @api.onchange("date_from", "date_to")
+    def _get_duration(self):
+        for rec in self:
+            duration = (
+                abs((rec.date_from - rec.date_to)).days
+                if rec.date_from
+                and rec.date_to
+                and (rec.date_to - rec.date_from).days > 0
+                else 0
+            )
+            rec.duration = duration

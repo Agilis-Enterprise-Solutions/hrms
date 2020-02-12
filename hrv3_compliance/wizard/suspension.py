@@ -1,32 +1,105 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 import logging
 from odoo.exceptions import UserError, ValidationError
 from datetime import date, datetime, timedelta
 _logger = logging.getLogger("_name_")
 
 
-
 class Suspension(models.TransientModel):
     _name = 'create.suspension'
     _description = 'Suspension Wizard Model'
 
+    status = [
+        ('on_going', 'On Going'),
+        ('completed', 'Completed')
+    ]
 
+    state = fields.Selection(
+        string='Status',
+        selection=status
+    )
+    emp_id = fields.Many2one('hr.employee', string="Offending Employee")
+    infraction_id = fields.Many2one(
+        'hr.infraction', string="Infraction Record")
     suspension_days = fields.Integer(string="Suspension Days")
-    remaining_days = fields.Integer(string="Remaining Days")
-    use_suspension_days = fields.Integer(string="Use Suspension")
+    remaining_days = fields.Integer(
+        string="Remaining Days", compute='compute_remaining_days')
+    use_suspension_days = fields.Integer(
+        string="Use Suspension", compute='compute_use_suspension_days')
     start_date = fields.Date(string="Start Date")
     end_date = fields.Date(string="End Date")
+    history_ids = fields.Many2many('suspension.history',
+                                   string="History",
+                                   # domain="[('emp_id','=',emp_id)]",
+                                   compute="get_history"
+                                   )
 
-    # def create_suspension(self):
-    #     vals = {
-    #         'patient_id': self.patient_id.id,
-    #         'appointment_date': self.appointment_date,
-    #         'notes': 'Created From The Wizard/Code'
-    #     }
-    #     # adding a message to the chatter from code
-    #     self.patient_id.message_post(body="Test string ", subject="Appointment Creation")
-    #     # creating appointments from the code
-    #     self.env['hospital.appointment'].create(vals)
+    @api.depends('use_suspension_days')
+    def compute_remaining_days(self):
+        for rec in self:
+            suspension_days = rec.suspension_days
+        self.remaining_days = suspension_days - rec.use_suspension_days
+        return True
 
+    @api.depends('start_date', 'end_date')
+    def compute_use_suspension_days(self):
+        if self.start_date and self.end_date:
+            self.use_suspension_days = abs(
+                (self.start_date - self.end_date)).days
+        return True
+
+    @api.depends('infraction_id')
+    def get_history(self):
+        # result = []
+        # for rec in self:
+        #     result.append(self.env['suspension.history'].search(
+        #         [('infraction_id', '=', rec.infraction_id.id)]))
+        result = self.env['suspension.history'].search(
+            [('infraction_id', '=', self.infraction_id.id)]).ids
+        self.update({
+            "history_ids": [(6, 0, result)]
+        })
+
+    @api.multi
+    def create_suspension(self):
+        self.state = "on_going"
+        if self.remaining_days < 0:
+            raise UserError(
+                _('Suspension days to be used must not be more than remaining suspension days.'))
+        else:
+            vals = {
+                'emp_id': self.emp_id.id,
+                'infraction_id': self.infraction_id.id,
+                'used_days': self.use_suspension_days,
+                'date_from': self.start_date,
+                'date_to': self.end_date,
+                'state': self.state,
+            }
+        # adding a message to the chatter from code
+        # self.patient_id.message_post(
+        #     body="Test string ", subject="Appointment Creation")
+        # creating appointments from the code
+        self.env['suspension.history'].create(vals)
+
+
+class SuspensionHistoryWizard(models.TransientModel):
+    _name = 'suspension.history.wizard'
+    _description = 'Staggered Suspension History Model Wizard'
+
+    status = [
+        ('on_going', 'On Going'),
+        ('completed', 'Completed')
+    ]
+
+    # suspension_id = fields.Many2one(
+    #     'create.suspension', string="Create Suspension")
+    used_days = fields.Integer(string="Used Days")
+    date_from = fields.Date(string="Date From")
+    date_to = fields.Date(string="Date To")
+    duration = fields.Integer(string="Duration")
+    state = fields.Selection(
+        string='Status',
+        selection=status
+    )

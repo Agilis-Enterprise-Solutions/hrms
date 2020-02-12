@@ -33,6 +33,8 @@
         'views/violation.xml',
         'views/menu_views.xml',
         'views/action_history.xml',
+        # 'views/create_suspension.xml',
+        'views/suspension_history.xml',
         'data/sequence.xml',
 
     ],
