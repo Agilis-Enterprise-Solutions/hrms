@@ -8,7 +8,6 @@
             <field name="res_model">hr.infraction.action_history</field>
             <field name="view_mode">tree,form</field>
             <field name="view_type">form</field>
-            <field name="context">{'default_offense_frequency':'testtesttest'}</field>
         </record>
 
 
@@ -20,8 +19,9 @@
             <field name="arch" type="xml">
                 <field name="stage"/>
                 <field name="corrective_action"/>
-                <field name="infraction_id" invisible="1" />
-                <field name="offense_code_id" invisible="1" />
+                <field name="emp_id" groups="base.group_no_one"/>
+                <field name="infraction_id" groups="base.group_no_one"/>
+                <field name="offense_code_id" igroups="base.group_no_one"/>
                 <field name="start_date" string="Date Executed"/>
                 <field name="end_date" string="End Date"/>
                 <field name="duration"/>
@@ -39,21 +39,27 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="stage"/>
-                                <field name="infraction_id" invisible="1" />
-                                <field name="offense_code_id" invisible="1" />
-                                <field name="action" invisible="1" force_save="1" readonly="1" />
+                                <field name="stage" required="1" />
+                                <field name="emp_id" groups="base.group_no_one"/>
+                                <field name="infraction_id" readonly="1" groups="base.group_no_one"/>
+                                <field name="offense_code_id" groups="base.group_no_one"/>
+                                <field name="action" groups="base.group_no_one" force_save="1" readonly="1" />
                                 <field name="offense_frequency" attrs="{'invisible': [('stage','not in',('corrective_action'))]}"/>
-                                <field name="corrective_action" attrs="{'readonly': [('stage','in',('incident_report','collaboration'))], 'invisible': [('stage','in',('inv_nte_issuance'))]}" />
+                                <field name="corrective_action" attrs="{'readonly': [('stage','in',('incident_report','collaboration'))], 'invisible': [('stage','not in',['collaboration','corrective_action'])], 'required': [('stage','in',['corrective_action'])]}" />
                                 <field name="number_of_days" attrs="{'invisible': [('stage','not in',('corrective_action')),('action','not in',['suspension'])]}"/>
                                 <field name="violation_id" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
                                 <field name="attachment" attrs="{'invisible': [('stage','not in',('inv_nte_issuance', 'collaboration'))]}" />
                                 <field name="submit_nte" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
                                 <label for="staggered"/>
                                 <div class="o_row">
-                                    <field name="staggered" attrs="{'invisible': [('stage','not in',('corrective_action')),('corrective_action','not in',['Suspension'])], 'readonly': [('stage','not in',('corrective_action')),('corrective_action','not in',['Suspension'])]}" nolabel="1"/>
+                                    <field name="staggered" attrs="{'invisible': [('action','not in',['Suspension'])], 'readonly': [('action','not in',['Suspension'])]}" nolabel="1"/>
                                     <span>
-                                        <button name="%(hrv3_compliance.create_suspension_wizard)d" string="Use Suspension" type="action" class="btn-primary" attrs="{'invisible': [('staggered','=',False)]}" context="{'default_suspension_days': number_of_days}" />
+                                        <button name="%(hrv3_compliance.create_suspension_wizard)d" 
+                                            string="Use Suspension" 
+                                            type="action" 
+                                            class="btn-primary" 
+                                            attrs="{'invisible': ['|',('staggered','=',False), ('action','not in',['Suspension'])], 'readonly':[('staggered','=',False)]}" 
+                                            context="{'default_suspension_days': number_of_days, 'default_emp_id':emp_id, 'default_infraction_id': infraction_id}" />
                                     </span>
                                 </div>
                             </group>

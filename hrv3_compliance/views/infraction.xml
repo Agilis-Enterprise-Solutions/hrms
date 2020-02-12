@@ -13,7 +13,7 @@
           <field name="violation_id"/>
           <field name="policy_violated_ids" invisible="1" />
           <field name="violation_date"/>
-          <field name="history"/>
+          <field name="history_ids"/>
         </tree>
       </field>
     </record>
@@ -27,11 +27,11 @@
       <field name="arch" type="xml">
         <form>
           <header>
-            <button string="Open" type="object" name="set_state_open" class="oe_highlight" attrs="{'invisible':[('state','not in','draft')]}"/>
-            <button string="In Progress" type="object" name="set_state_inprogress" class="oe_highlight" attrs="{'invisible':[('state','not in','open')]}"/>
+            <!-- <button string="Open" type="object" name="set_state_open" class="oe_highlight" attrs="{'invisible':[('state','not in','draft')]}"/> -->
+            <button string="Submit" type="object" name="set_state_inprogress" class="oe_highlight" attrs="{'invisible':[('state','not in','draft')]}"/>
             <button string="For Closure" type="object" name="set_state_forclosure" class="oe_highlight" attrs="{'invisible':[('state','not in','in_progress')]}"/>
             <button string="Close" type="object" name="set_state_closed" class="oe_highlight" attrs="{'invisible':[('state','not in','for_closure')]}"/>
-            <field name="state" widget="statusbar" statusbar_visible="draft,open,in_progress,for_closure,closed"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,for_closure,closed"/>
           </header>
           <sheet>
             <div class="oe_title">
@@ -41,33 +41,35 @@
             </div>
             <group>
               <group string="Employee Details">
-                <field name="emp_id" string="Name"/>
-                <field name="job_id" string="Job Description"/>
+                <field name="emp_id" string="Name" attrs="{'readonly': [('state','not in',['draft'])]}"/>
+                <field name="job_id" string="Job Description" attrs="{'readonly': [('state','not in',['draft'])]}"/>
                 <field name="manager_id"/>
               </group>
 
-              <group string="Violation Details">
+              <group string="Violation Details" attrs="{'readonly': [('state','not in',['draft'])]}">
                 <field name="violation_id"/>
                 <field name="policy_violated_ids" invisible="1" />
-                <field name="policy_violated_id"/>
+                <field name="policy_violated_id" attrs="{'readonly': [('state','not in',['draft'])]}" string="Policy Violated"/>
                 <field name="offense_code_id"/>
                 <field name="frequency" />
-                <field name="violation_date"/>
+                <field name="violation_date" attrs="{'readonly': [('state','not in',['draft'])]}"/>
+                <field name="corrective_action"/>
                 <div class="col-xs-4">
                 </div>
                 <div class="col-xs-4">
-                  <button type="object" string="History..." name="type_offenses_others" icon="fa-clock-o" class="oe_inline oe_link"/>
+                  <button type="object" string="History (Object)..." name="get_offense_history" icon="fa-clock-o" class="oe_inline oe_link"/>
                 </div>
-                <field name="case_status"/>
               </group>
             </group>
             <group>
-              <field name="violation_details"/>
-              <field name="history">
+              <field name="violation_details" attrs="{'readonly': [('state','not in',['draft'])]}"/>
+              <field name="history_ids" attrs="{'readonly': [('state','in',['closed'])]}">
                 <tree>
                   <control>
-                    <create string="Add record" context="{'default_infraction_id': id}" />
+                    <create string="Add record" context="{'default_infraction_id': id,'default_emp_id':emp_id}" />
                   </control>
+                  <field name="emp_id" groups="base.group_no_one"/>
+                  <field name="infraction_id" groups="base.group_no_one"/>
                   <field name="stage"/>
                   <field name="corrective_action"/>
                   <field name="start_date"/>
