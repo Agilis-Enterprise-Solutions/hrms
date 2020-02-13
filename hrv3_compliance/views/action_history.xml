@@ -46,13 +46,13 @@
                                 <field name="action" groups="base.group_no_one" force_save="1" readonly="1" />
                                 <field name="offense_frequency" attrs="{'invisible': [('stage','not in',('corrective_action'))]}"/>
                                 <field name="corrective_action" attrs="{'readonly': [('stage','in',('incident_report','collaboration'))], 'invisible': [('stage','not in',['collaboration','corrective_action'])], 'required': [('stage','in',['corrective_action'])]}" />
-                                <field name="number_of_days" attrs="{'invisible': [('stage','not in',('corrective_action')),('action','not in',['suspension'])]}"/>
+                                <field name="number_of_days" attrs="{'invisible': ['|',('stage','not in',('corrective_action')),('action','not in',['Suspension'])]}"/>
                                 <field name="violation_id" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
                                 <field name="attachment" attrs="{'invisible': [('stage','not in',('inv_nte_issuance', 'collaboration'))]}" />
                                 <field name="submit_nte" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
                                 <label for="staggered"/>
-                                <div class="o_row">
-                                    <field name="staggered" attrs="{'invisible': [('action','not in',['Suspension'])], 'readonly': [('action','not in',['Suspension'])]}" nolabel="1"/>
+                                <div class="o_row" attrs="{'invisible': [('action','not in',['Suspension'], ), ('stage','not in',['corrective_action'])], 'readonly': [('action','not in',['Suspension']),('stage','not in',['corrective_action'])]}">
+                                    <field name="staggered" attrs="{'invisible': [('action','not in',['Suspension']), ('stage','not in',['corrective_action'])], 'readonly': [('action','not in',['Suspension']),('stage','not in',['corrective_action'])]}" nolabel="1"/>
                                     <span>
                                         <button name="%(hrv3_compliance.create_suspension_wizard)d" 
                                             string="Use Suspension" 
