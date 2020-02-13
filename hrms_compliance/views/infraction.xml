@@ -3,7 +3,7 @@
   <data>
 
     <!-- explicit list view definition -->
-    <record model="ir.ui.view" id="hrv3_compliance_infraction_list">
+    <record model="ir.ui.view" id="hrms_compliance_infraction_list">
       <field name="name">HRV3 Infraction List</field>
       <field name="model">hr.infraction</field>
       <field name="arch" type="xml">
@@ -21,7 +21,7 @@
 
     <!-- explicit form view definition -->
 
-    <record model="ir.ui.view" id="hrv3_compliance_infraction_form">
+    <record model="ir.ui.view" id="hrms_compliance_infraction_form">
       <field name="name">HRV3 Infraction Form</field>
       <field name="model">hr.infraction</field>
       <field name="arch" type="xml">
@@ -91,7 +91,7 @@
 
     <!-- actions opening views on models -->
 
-    <record model="ir.actions.act_window" id="hrv3_compliance_infraction_action_window">
+    <record model="ir.actions.act_window" id="hrms_compliance_infraction_action_window">
       <field name="name">Infraction</field>
       <field name="res_model">hr.infraction</field>
       <field name="view_mode">tree,form</field>
@@ -101,9 +101,9 @@
 
     <!-- server action to the one above -->
     <!--
-    <record model="ir.actions.server" id="hrv3_compliance.action_server">
-      <field name="name">hrv3_compliance server</field>
-      <field name="model_id" ref="model_hrv3_compliance_hrv3_compliance"/>
+    <record model="ir.actions.server" id="hrms_compliance.action_server">
+      <field name="name">hrms_compliance server</field>
+      <field name="model_id" ref="model_hrms_compliance_hrms_compliance"/>
       <field name="state">code</field>
       <field name="code">
         action = {
@@ -117,12 +117,12 @@
 
     <!-- Top menu item -->
 
-    <menuitem name="Compliance" id="hrv3_compliance_root" sequence="5" parent="hr.menu_hr_root"/>
+    <menuitem name="Compliance" id="hrms_compliance_root" sequence="5" parent="hr.menu_hr_root"/>
 
     <!-- actions -->
 
-    <menuitem name="Infractions" id="hrv3_compliance.infractions" parent="hrv3_compliance_root" action="hrv3_compliance_infraction_action_window"/>
-    <menuitem name="Configuration" id="hrv3_compliance_configuration" parent="hrv3_compliance_root"/>
+    <menuitem name="Infractions" id="hrms_compliance.infractions" parent="hrms_compliance_root" action="hrms_compliance_infraction_action_window"/>
+    <menuitem name="Configuration" id="hrms_compliance_configuration" parent="hrms_compliance_root"/>
 
   </data>
 </odoo>

@@ -6,8 +6,9 @@
         'hr_attendance',
         'hr_contract',
         'hr_holidays',
-        'hrv3_compliance',
+        'hrms_compliance',
         'hrms_employee_201',
+        'hrms_employee_exit',
         'hrms_recruitment',
         'hrms_training'
     ],

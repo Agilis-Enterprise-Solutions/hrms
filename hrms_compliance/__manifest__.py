@@ -1,6 +1,6 @@
 # coding: utf-8
 {
-    'name': "hrv3_compliance",
+    'name': "HRMS Compliance",
 
     'summary': """
         This module focuses on Infraction Management and Workplace Accidents""",
@@ -9,7 +9,7 @@
         Long description of module's purpose
     """,
 
-    'author': "My Company",
+    'author': "John Christian Ardosa, Raymund MARTINEZ, Ralf Cabarogias – Agilis Enterprise Solutions Inc.",
     'website': "http://www.yourcompany.com",
 
     # Categories can be used to filter modules in modules listing
