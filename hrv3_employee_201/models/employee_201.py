@@ -39,13 +39,13 @@ class Employee(models.Model):
     place_of_passport_issuance = fields.Char()
 
     marital = fields.Selection([
-        ('Single', 'Single'),
+        ('single', 'Single'),
         ('Single Mother', 'Single Mother'),
         ('Single Father', 'Single Father'),
         ('Married', 'Married'),
         ('Divorced', 'Divorced'),
         ('Widowed', 'Widowed')
-    ], default='Single')
+    ])
 
     age = fields.Integer(compute="_compute_age_years")
 
