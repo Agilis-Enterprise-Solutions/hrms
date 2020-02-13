@@ -7,11 +7,11 @@
         'hr_contract',
         'hr_holidays',
         'hrv3_compliance',
-        'hrv3_employee_201',
-        'hrv3_recruitment',
-        'hrv3_training'
+        'hrms_employee_201',
+        'hrms_recruitment',
+        'hrms_training'
     ],
-    'name': "HRv3 Installer Module",
+    'name': "HRMS Installer Module",
     'description': '''Installs the necessary modules for HRv3''',
     'website': 'agilis-solutions.com',
     'license': 'AGPL-3',

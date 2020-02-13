@@ -3,7 +3,7 @@
     'depends': [
         'base',
         'hr',
-        'hrv3_recruitment'
+        'hrms_recruitment'
     ],
     'data': [
         'security/ir.model.access.csv',

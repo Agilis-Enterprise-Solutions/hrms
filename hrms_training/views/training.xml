@@ -3,14 +3,14 @@
   <data>
 
     <!-- hrv3.training Action -->
-    <record id="hrv3_training_action_form" model="ir.actions.act_window">
+    <record id="hrms_training_action_form" model="ir.actions.act_window">
       <field name="name">Training</field>
       <field name="res_model">hrv3.training</field>
       <field name="view_mode">tree,form</field>
     </record>
 
     <!-- hrv3.training Tree View -->
-    <record id="hrv3_training_view_tree" model="ir.ui.view">
+    <record id="hrms_training_view_tree" model="ir.ui.view">
       <field name="name">hrv3.training.tree</field>
       <field name="model">hrv3.training</field>
       <field name="arch" type="xml">
@@ -21,11 +21,11 @@
     </record>
 
     <!-- Top menu item -->
-    <menuitem name="Training" id="hrv3_training" sequence="1"
-              action="hrv3_training_action_form"/>
+    <menuitem name="Training" id="hrms_training" sequence="1"
+              action="hrms_training_action_form"/>
 
     <!-- hrv3.training Form View -->
-    <record id="hrv3_training_view_form" model="ir.ui.view">
+    <record id="hrms_training_view_form" model="ir.ui.view">
       <field name="name">hrv3.training.form</field>
       <field name="model">hrv3.training</field>
       <field name="arch" type="xml">
@@ -87,7 +87,7 @@
       <field name="name">hr.employee.form</field>
       <field name="model">hr.employee</field>
       <field name="inherit_id"
-             ref="hrv3_employee_201.inherit_employee_form_view"/>
+             ref="hrms_employee_201.inherit_employee_form_view"/>
       <field name="arch" type="xml">
         <page name="for_skills" position="inside">
           <label for="training_ids"/>

@@ -1,6 +1,6 @@
 # coding: utf-8
 {
-    'name': "hrv3_recruitment",
+    'name': "HRMS Recruitment",
 
     'summary': """
         Part of HRMS V3 Application""",
