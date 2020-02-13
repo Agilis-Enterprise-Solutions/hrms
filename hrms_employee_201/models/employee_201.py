@@ -155,6 +155,9 @@ class Employee(models.Model):
         self.update({
             'infraction_ids': [(6, 0, record.ids)],
         })
+        _logger.info('\n\n\nEMP ID{}\n\n\n'.format(record))
+        # for record in self:
+        #     record.infraction_record = something
 
     """======================PRE-EMPLOYMENT REQUIREMENTS FUNCTIONS======================"""
 
