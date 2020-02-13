@@ -2,7 +2,6 @@
 from odoo import models, fields, api, _
 from logging import getLogger
 from odoo.exceptions import UserError, ValidationError
-from datetime import date, datetime, timedelta
 import re
 
 
