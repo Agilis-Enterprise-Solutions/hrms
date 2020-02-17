@@ -13,21 +13,22 @@ class HRMSResignationLetter(models.Model):
 
     name = fields.Many2one('hr.employee', "Employee Name", required=True)
     relieved = fields.Date("Relieved Date Request", required=True)
-    reason = fields.Selection([
-        ('underappreciated', 'Underappreciated (resignation)'),
-        ('lack_of_proper_compensation',
-         'Lack of Proper Compensation (resignation)'),
-        ('unrealistic_goals', 'Unrealistic Goals (resignation)'),
-        ('lack_of_joy', 'Lack of a Joyful Environment (resignation)'),
-        ('lack_of_work', 'lack of work/life balance (resignation)'),
-        ('upward_mobility', 'No upward mobility (resignation)'),
-        ('prioritize_health', 'Prioritize  health (retirement)'),
-        ('caring_for_family', 'Caring for Family (retirement)'),
-        ('violation', 'Violating Company Policy  (termination)'),
-        ('poor_performance', 'Poor Performance (termination)'),
-        ('misconduct', 'Misconduct (termination)'),
-        ('insubordination', 'Insubordination (termination)')
-    ], string="Reason", required=True)
+    reason = fields.Many2one('hr.resignation.reason', "Reason", required=True)
+    # reason = fields.Selection([
+    #     ('underappreciated', 'Underappreciated (resignation)'),
+    #     ('lack_of_proper_compensation',
+    #      'Lack of Proper Compensation (resignation)'),
+    #     ('unrealistic_goals', 'Unrealistic Goals (resignation)'),
+    #     ('lack_of_joy', 'Lack of a Joyful Environment (resignation)'),
+    #     ('lack_of_work', 'lack of work/life balance (resignation)'),
+    #     ('upward_mobility', 'No upward mobility (resignation)'),
+    #     ('prioritize_health', 'Prioritize  health (retirement)'),
+    #     ('caring_for_family', 'Caring for Family (retirement)'),
+    #     ('violation', 'Violating Company Policy  (termination)'),
+    #     ('poor_performance', 'Poor Performance (termination)'),
+    #     ('misconduct', 'Misconduct (termination)'),
+    #     ('insubordination', 'Insubordination (termination)')
+    # ], string="Reason", required=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('submit', 'Submitted'),
@@ -93,3 +94,11 @@ class HRMSResignationLetter(models.Model):
             if duplicate:
                 raise UserError('''Duplicate Resignation Letter.
                                 Please Check the other records for Reference''')
+
+
+class HRMSResignationReason(models.Model):
+    _name = "hr.resignation.reason"
+    _description = "Resignation Reason"
+    _inherit = ["mail.thread", "mail.activity.mixin", "resource.mixin"]
+
+    name = fields.Char("Resignation Reason")

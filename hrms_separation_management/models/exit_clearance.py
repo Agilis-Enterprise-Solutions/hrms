@@ -50,13 +50,13 @@ class HRMSExitClearance(models.Model):
 
     date_submitted = fields.Date("Date Submitted")
     submitted_by = fields.Many2one('res.users', 'Submitted By')
-    date_approved = fields.Date("Date Approved")
-    approved_by = fields.Many2one('res.users', 'Approved By')
+    date_approved = fields.Date("Date Cleared")
+    approved_by = fields.Many2one('res.users', 'Cleared By')
 
     @api.multi
     def unlink(self):
         for i in self:
-            if i.separation_parent_id and i.state == 'pending':
+            if i.separation_parent_id and i.state == 'cleared':
                 separation = self.env['hr.separation'].search([
                     ('id', '=', i.separation_parent_id.id)])
                 separation.clearance = False
@@ -77,13 +77,6 @@ class HRMSExitClearance(models.Model):
                 raise UserError('''Duplicate Exit Clearance.
                                 Please Check the other records for Reference''')
 
-            separation_req = self.env['hr.separation'].search([
-                ('name','=',self.name.id),
-                ('state','=','approve'),
-                ('clearance','=',False)])
-            if separation_req:
-                separation_req.clearance = True
-
         return self.write({'state': 'pending'})
 
     @api.multi
@@ -98,6 +91,14 @@ class HRMSExitClearance(models.Model):
                 i.date_approved = date.today()
                 user_id = self.env['res.users'].browse(self._context.get('uid'))
                 i.approved_by = user_id.id
+                separation_req = self.env['hr.separation'].search([
+                    ('name','=',self.name.id),
+                    ('state','=','approve'),
+                    ('clearance','=',False)])
+
+                if separation_req:
+                    separation_req.clearance = True
+
                 return self.write({'state': 'cleared'})
             else:
                 raise UserError('Employee need to be approved in every Approver below')

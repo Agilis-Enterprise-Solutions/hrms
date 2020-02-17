@@ -18,6 +18,8 @@
     'depends': [
         'base',
         'hr',
+        'survey',
+        'hrms_employee_exit'
     ],
 
     'data': [

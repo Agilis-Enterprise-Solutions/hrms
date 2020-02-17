@@ -20,5 +20,15 @@
               action="HRMSExitClearance_action_form"
               sequence="2"/>
 
+    <menuitem name="Configuration"
+              id="menu_item_separation_management_configuration"
+              parent="hrms_separation_management_root"/>
+
+    <menuitem name="Resignation Reason"
+              id="menu_item_configuration_resignation_reason"
+              parent="menu_item_separation_management_configuration"
+              action="HRMSResignationReason_action_form"
+              sequence="0"/>
+
   </data>
 </odoo>

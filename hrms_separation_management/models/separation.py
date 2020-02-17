@@ -22,21 +22,8 @@ class HRMSSeparation(models.Model):
     ], string="Separation Type", required=True)
     resignation_letter = fields.Many2one('hr.resignation.letter',
                                          "Resignation Letter")
-    reason = fields.Selection([
-        ('underappreciated', 'Underappreciated (resignation)'),
-        ('lack_of_proper_compensation', 'Lack of Proper Compensation (resignation)'),
-        ('unrealistic_goals', 'Unrealistic Goals (resignation)'),
-        ('lack_of_joy', 'Lack of a Joyful Environment (resignation)'),
-        ('lack_of_work', 'lack of work/life balance (resignation)'),
-        ('upward_mobility', 'No upward mobility (resignation)'),
-        ('prioritize_health', 'Prioritize  health (retirement)'),
-        ('caring_for_family', 'Caring for Family (retirement)'),
-        ('violation', 'Violating Company Policy  (termination)'),
-        ('poor_performance', 'Poor Performance (termination)'),
-        ('misconduct', 'Misconduct (termination)'),
-        ('insubordination', 'Insubordination (termination)')
-    ], string="Reason", required=True)
-    joined = fields.Date("Joined Date",  required=True)
+    reason = fields.Many2one('hr.resignation.reason', "Reason", required=True)
+    joined = fields.Date("Joined Date", related="name.date_started")
     relieved = fields.Date("Relieved Date", required=True)
     date_raised = fields.Date("Raised on")
     date_of_request = fields.Date("Date of Request approval")
@@ -66,9 +53,10 @@ class HRMSSeparation(models.Model):
 
     @api.onchange('resignation_letter')
     def _separation_letter(self):
-        if self.resignation_letter:
-            self.relieved = self.resignation_letter.relieved
-            self.reason = self.resignation_letter.reason
+        for rec in self:
+            if rec.resignation_letter:
+                rec.relieved = rec.resignation_letter.relieved
+                rec.reason = rec.resignation_letter.reason.id
 
     @api.onchange('name')
     def _duplicate_employee_entry(self):
@@ -172,4 +160,24 @@ class HRMSSeparation(models.Model):
 
     @api.multi
     def set_claim(self):
-        return self.write({'state':'claim'})
+        for i in self:
+            if not i.quit_claim:
+                raise UserError("Employee has no Quit Claims")
+            if not i.cert_of_employment:
+                raise UserError("Employee has no Certificate of Employment")
+            if not i.details:
+                raise UserError("Employee has no 2316 Details")
+            if not i.clearance:
+                raise UserError("Employee has no Exit Clearance")
+
+            if i.separation_type == "resignation":
+                i.name.status = 'Resigned'
+            elif i.separation_type == "retirement":
+                i.name.status = 'Retired'
+            else:
+                i.name.status = 'Terminated'
+            i.name.date_exited = i.relieved
+            i.name.exit_reason = i.note
+            i.name.active = False
+
+            return self.write({'state':'claim'})
