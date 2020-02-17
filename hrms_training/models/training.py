@@ -10,7 +10,7 @@ def log(**to_output):
 
 
 class Training(models.Model):
-    _name = 'hrv3.training'
+    _name = 'hrms.training'
     _rec_name = 'training_name'
 
     employee_id = fields.Many2one('hr.employee')
@@ -70,12 +70,12 @@ class Training(models.Model):
 class Employee(models.Model):
     _inherit = 'hr.employee'
 
-    training_ids = fields.One2many('hrv3.training', 'employee_id',
+    training_ids = fields.One2many('hrms.training', 'employee_id',
                                    compute="_get_trainings",
                                    string='Assigned Training')
 
     @api.depends('name')
     def _get_trainings(self):
         for rec in self:
-            rec.training_ids = self.env['hrv3.training'].search([
+            rec.training_ids = self.env['hrms.training'].search([
             ]).filtered(lambda x: rec.id in x.employee_ids.ids)
