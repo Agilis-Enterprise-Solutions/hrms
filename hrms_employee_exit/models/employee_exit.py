@@ -1,11 +1,12 @@
 # coding: utf-8
 from odoo import models, fields, api
-from datetime import datetime, date
+from datetime import date
 
 
 class InheritEmployeeAddExit(models.Model):
     _inherit = 'hr.employee'
 
+    on_hold = fields.Boolean()
     date_started = fields.Date()
     date_exited = fields.Date()
     years_of_service = fields.Char('Year(s) of Service',
