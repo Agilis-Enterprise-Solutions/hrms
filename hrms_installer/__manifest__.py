@@ -7,11 +7,12 @@
         'hr_contract',
         'hr_holidays',
         'hrms_compliance',
+        'hrms_employee_movement',
         'hrms_employee_201',
         'hrms_employee_exit',
         'hrms_recruitment',
+        'hrms_training',
         'hrms_separation_management',
-        'hrms_training'
     ],
     'name': "HRMS Installer Module",
     'description': '''Installs the necessary modules for HRv3''',
