@@ -7,7 +7,8 @@
     ],
     'data': [
         'security/ir.model.access.csv',
-        'views/hr_employee.xml'
+        'views/hr_employee.xml',
+        'views/hr_contract.xml'
     ],
     'name': "HRv3 Employee 201",
     'website': 'agilis-solutions.com',

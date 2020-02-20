@@ -263,6 +263,20 @@
               </field>
             </group>
           </page>
+          <page string="Contract History">
+            <group string="Contract History">
+              <field name="contract_history_ids" nolabel="1">
+                <tree editable="bottom">
+                  <field name="name" string="Contract Reference"/>
+                  <field name="date_created" string="Created On"/>
+                  <field name="date_start" string="Date Start"/>
+                  <field name="date_end" string="Date End"/>
+                  <field name="state" string="Status"/>
+                  <field name="reason_changing" string="Reason for Changing"/>
+                </tree>
+              </field>
+            </group>
+          </page>
         </page>
       </field>
     </record>

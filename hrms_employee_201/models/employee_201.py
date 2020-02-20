@@ -155,11 +155,23 @@ class Employee(models.Model):
         self.update({
             'infraction_ids': [(6, 0, record.ids)],
         })
-        _logger.info('\n\n\nEMP ID{}\n\n\n'.format(record))
-        # for record in self:
-        #     record.infraction_record = something
 
-    """======================PRE-EMPLOYMENT REQUIREMENTS FUNCTIONS======================"""
+
+    """======================EMPLOYEE MOVEMENT======================"""
+    contract_history_ids = fields.One2many(
+        'hr.contract', 'employee_id',
+        string="Contract History",
+        compute='_compute_contract_history_record'
+    )
+
+    @api.depends('children')
+    def _compute_contract_history_record(self):
+        record = self.env['hr.contract'].search([('employee_id', '=', self.id)])
+        self.update({
+            'contract_history_ids': [(6, 0, record.ids)],
+        })
+
+    """================PRE-EMPLOYMENT REQUIREMENTS FUNCTIONS==============="""
 
     @api.depends('sss', 'hdmf', 'philhealth', 'gsis', 'nbi_clearance',
                  'nbi_expiration', 'nbi_issued_at', 'nbi_date_issued',
