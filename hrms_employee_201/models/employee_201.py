@@ -1,14 +1,11 @@
 # coding: utf-8
 from odoo import models, fields, api
 from datetime import date
-import logging
 from logging import getLogger
-_logger = logging.getLogger("_name_")
 
 
 def log(**to_output):
-    for key, value in to_output.items():
-        getLogger().info("\n\n\n{0}: {1}\n\n".format(key, value))
+    getLogger().info("\n\n\n{0}\n\n".format(to_output))
 
 
 class HealthCondition(models.Model):
@@ -155,7 +152,6 @@ class Employee(models.Model):
         self.update({
             'infraction_ids': [(6, 0, record.ids)],
         })
-
 
     """======================EMPLOYEE MOVEMENT======================"""
     contract_history_ids = fields.One2many(

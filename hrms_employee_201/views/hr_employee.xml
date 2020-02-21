@@ -24,86 +24,103 @@
                 <div class="row">
                   <div class="col-sm-4">
                     <span>
-                      <field name="sss_checkbox" nolabel="1" readonly="1" class="oe_inline"/>
+                      <field name="sss_checkbox" nolabel="1" readonly="1"
+                             class="oe_inline"/>
                       <label for="sss" class="oe_inline" />
                     </span>
                     <br/>
 
                     <span>
-                      <field name="hdmf_checkbox" nolabel="1" readonly="1" class="oe_inline" />
+                      <field name="hdmf_checkbox" nolabel="1" readonly="1"
+                             class="oe_inline" />
                       <label for="hdmf" class="oe_inline"/>
                     </span>
                     <br/>
 
                     <span>
-                      <field name="philhealth_checkbox" nolabel="1" readonly="1" class="oe_inline"/>
+                      <field name="philhealth_checkbox" nolabel="1" readonly="1"
+                             class="oe_inline"/>
                       <label for="philhealth"/>
                     </span>
                     <br/>
 
                     <span>
-                      <field name="gsis_checkbox" nolabel="1" readonly="1" class="oe_inline"/>
+                      <field name="gsis_checkbox" nolabel="1" readonly="1"
+                             class="oe_inline"/>
                       <label for="gsis" class="oe_inline" />
                     </span>
                     <br/>
 
                     <span>
-                      <field name="tin_checkbox" nolabel="1" readonly="1" class="oe_inline"/>
+                      <field name="tin_checkbox" nolabel="1" readonly="1"
+                             class="oe_inline"/>
                       <label for="tin" class="oe_inline"/>
                     </span>
                     <br/>
 
                     <span>
-                      <field name="medical_transaction_number_checkbox" nolabel="1" readonly="1" class="oe_inline"/>
+                      <field name="medical_transaction_number_checkbox"
+                             nolabel="1" readonly="1" class="oe_inline"/>
                       <label for="medical_transaction_number"/>
                     </span>
                     <br/>
 
                     <span>
-                      <field name="nbi_checkbox" nolabel="1" readonly="1" class="oe_inline" />
+                      <field name="nbi_checkbox" nolabel="1" readonly="1"
+                             class="oe_inline" />
                       <label for="nbi_clearance" class="oe_inline" />
                     </span>
                   </div>
 
                   <div class="col-sm-4">
                     <span>
-                      <field name="sss" class="oe_inline" placeholder="e.g. 34-2431064-5"/>
+                      <field name="sss" class="oe_inline"
+                             placeholder="e.g. 34-2431064-5"/>
                     </span>
                     <br/>
 
                     <span>
-                      <field name="hdmf" class="oe_inline" placeholder="e.g. 1234567"/>
+                      <field name="hdmf" class="oe_inline"
+                             placeholder="e.g. 1234567"/>
                     </span>
                     <br/>
 
                     <span>
-                      <field name="philhealth" class="oe_inline" placeholder="e.g. 34-2431064-5"/>
+                      <field name="philhealth" class="oe_inline"
+                             placeholder="e.g. 34-2431064-5"/>
                     </span>
                     <br/>
 
                     <span>
-                      <field name="gsis" class="oe_inline" placeholder="e.g. 34-2431064-5"/>
+                      <field name="gsis" class="oe_inline"
+                             placeholder="e.g. 34-2431064-5"/>
                     </span>
                     <br/>
 
                     <span>
-                      <field name="tin" class="oe_inline" placeholder="e.g. 000-123-456-001"/>
+                      <field name="tin" class="oe_inline"
+                             placeholder="e.g. 000-123-456-001"/>
                     </span>
                     <br/>
 
                     <span>
-                      <field name="medical_transaction_number" class="oe_inline"/>
+                      <field name="medical_transaction_number"
+                             class="oe_inline"/>
                     </span>
                     <br/>
 
                     <div>
-                      <field name="nbi_clearance" class="oe_inline" placeholder="No."/>
-                      <field name="nbi_expiration" class="oe_inline" placeholder="Expiration Date" nolabel="1"/>
+                      <field name="nbi_clearance" class="oe_inline"
+                             placeholder="No."/>
+                      <field name="nbi_expiration" class="oe_inline"
+                             placeholder="Expiration Date" nolabel="1"/>
                     </div>
 
                     <div>
-                      <field name="nbi_issued_at" class="oe_inline" placeholder="Issued At" nolabel="1"/>
-                      <field name="nbi_date_issued" class="oe_inline" placeholder="Date Issued" nolabel="1"/>
+                      <field name="nbi_issued_at" class="oe_inline"
+                             placeholder="Issued At" nolabel="1"/>
+                      <field name="nbi_date_issued" class="oe_inline"
+                             placeholder="Date Issued" nolabel="1"/>
                     </div>
 
                     <div>
@@ -139,13 +156,17 @@
                 <field name="police_checkbox" nolabel="1" readonly="1"/>
                 <label for="police_clearance"/>
                 <div>
-                  <field name="police_clearance" class="oe_inline" placeholder="No."/>
-                  <field name="police_expiration" class="oe_inline" placeholder="Expiration Date" nolabel="1"/>
+                  <field name="police_clearance" class="oe_inline"
+                         placeholder="No."/>
+                  <field name="police_expiration" class="oe_inline"
+                         placeholder="Expiration Date" nolabel="1"/>
                 </div>
 
                 <div>
-                  <field name="police_issued_at" class="oe_inline" placeholder="Issued At" nolabel="1"/>
-                  <field name="police_date_issued" class="oe_inline" placeholder="Date Issued" nolabel="1"/>
+                  <field name="police_issued_at" class="oe_inline"
+                         placeholder="Issued At" nolabel="1"/>
+                  <field name="police_date_issued" class="oe_inline"
+                         placeholder="Date Issued" nolabel="1"/>
                 </div>
 
                 <div>
@@ -159,13 +180,17 @@
                 <field name="barangay_checkbox" nolabel="1" readonly="1"/>
                 <label for="barangay_clearance"/>
                 <div>
-                  <field name="barangay_clearance" class="oe_inline" placeholder="No."/>
-                  <field name="barangay_expiration" class="oe_inline" placeholder="Expiration Date" nolabel="1"/>
+                  <field name="barangay_clearance" class="oe_inline"
+                         placeholder="No."/>
+                  <field name="barangay_expiration" class="oe_inline"
+                         placeholder="Expiration Date" nolabel="1"/>
                 </div>
 
                 <div>
-                  <field name="barangay_issued_at" class="oe_inline" placeholder="Issued At" nolabel="1"/>
-                  <field name="barangay_date_issued" class="oe_inline" placeholder="Date Issued" nolabel="1"/>
+                  <field name="barangay_issued_at" class="oe_inline"
+                         placeholder="Issued At" nolabel="1"/>
+                  <field name="barangay_date_issued" class="oe_inline"
+                         placeholder="Date Issued" nolabel="1"/>
                 </div>
 
                 <div>
@@ -186,7 +211,7 @@
             </field>
           </page>
 
-          <page string="Health Information">
+          <page name="health_info" string="Health Information">
             <group>
               <field name="fit_to_work"/>
             </group>
@@ -253,6 +278,7 @@
               </field>
             </group>
           </page>
+
           <page string="Infractions">
             <group string="Infractions">
               <field name="infraction_ids" nolabel="1">
@@ -280,6 +306,5 @@
         </page>
       </field>
     </record>
-
   </data>
 </odoo>
