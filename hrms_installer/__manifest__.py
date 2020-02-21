@@ -4,6 +4,7 @@
     'depends': [
         'base',
         'hr',
+        'hr_appraisal',
         'hr_attendance',
         'hr_contract',
         'hr_holidays',
