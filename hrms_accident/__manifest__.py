@@ -2,7 +2,8 @@
     'author':  'John Christian Ardosa, Raymund MARTINEZ, and Ralf Cabarogias – Agilis Enterprise Solutions Inc.',
     'depends': [
         'base',
-        'hr'
+        'hr',
+        'hrms_employee_201'
     ],
     'data': [
         'data/sequence.xml',

@@ -2,6 +2,34 @@
 <odoo>
   <data>
 
+    <!-- Inherit Form view -->
+    <record id="inherit_employee_accident" model="ir.ui.view">
+      <field name="name">hr.employee.form</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id"
+             ref="hrms_employee_201.inherit_employee_form_view"/>
+      <field name="arch" type="xml">
+        <xpath expr="//page[@name='health_info']"
+               position="inside">
+          <group>
+            <label for="accident_ids"/>
+            <field name="accident_ids" nolabel="1">
+              <tree>
+                <field name="accident_sequence_id"/>
+                <field name="department_id"/>
+                <field name="incident_type"/>
+                <field name="severity"/>
+                <field name="incident_date"/>
+                <field name="location"/>
+                <field name="physician_notes"/>
+                <field name="credit_usage_for_treatment"/>
+              </tree>
+            </field>
+          </group>
+        </xpath>
+      </field>
+    </record>
+
     <!-- HRMS Accident Form View -->
     <record id="hrms_accident_view_form" model="ir.ui.view">
       <field name="name">hrms.accident.form</field>
@@ -49,7 +77,7 @@
                 <field name="date_reviewed"/>
 
                 <h3>
-                    Reviewed by the company-authorized corporate HSE representative
+                  Reviewed by the company-authorized corporate HSE representative
                 </h3>
 
                 <field name="reviewer"/>
