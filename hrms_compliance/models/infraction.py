@@ -1,18 +1,35 @@
-# -*- coding: utf-8 -*-
-
+# coding: utf-8
 from odoo import models, fields, api, _
-import logging
-from odoo.exceptions import UserError, ValidationError
-from datetime import date, datetime, timedelta
-
-_logger = logging.getLogger("_name_")
+from logging import getLogger
+from odoo.exceptions import UserError
+from datetime import date, datetime
 
 
-"""Main Model of Infractions which houses the fields
-    responsible for the main form and tree view"""
+def log(**to_output):
+    getLogger().info("\n\n\n{0}\n\n".format(to_output))
+
+
+class InheritEmployeeInfractions(models.Model):
+    _inherit = 'hr.employee'
+
+    infraction_ids = fields.One2many(
+        'hr.infraction', 'emp_id',
+        string="Infractions",
+        compute='_compute_infraction_record'
+    )
+
+    @api.depends('children')
+    def _compute_infraction_record(self):
+        record = self.env['hr.infraction'].search([('emp_id', '=', self.id)])
+        self.update({
+            'infraction_ids': [(6, 0, record.ids)],
+        })
 
 
 class Infractions(models.Model):
+    """Main Model of Infractions which houses the fields
+    responsible for the main form and tree view
+    """
     _name = "hr.infraction"
     _rec_name = "infraction_sequence_id"
     _description = "Infractions Management"
@@ -240,7 +257,7 @@ class Infractions(models.Model):
                 'date_in_progress': datetime.now(),
                 'set_in_progress_by': self._uid
                     })
-                break    
+                break
         else:
             raise UserError(_('Investigation and NTE Issuance should be created in Action History before setting the record in progress'))
 
@@ -378,7 +395,7 @@ class CorrectiveAction(models.Model):
                 i.name = frequencies[9][1]
 
 
-"""Violation deals with acts committed by offenders which are then assigned 
+"""Violation deals with acts committed by offenders which are then assigned
     offense codes based on company policies violated by said act/s"""
 
 
@@ -428,7 +445,7 @@ class PolicyOffenseViolationLine(models.Model):
 """======================Action History===================
    Action stages such as Investigation and Issuance of NTE,
    Collaboration with IMC and Corrective Action are created
-   in this model. 
+   in this model.
    =======================================================
 """
 
@@ -548,7 +565,7 @@ class ActionHistory(models.Model):
     #             return True
     #     else:
     #         raise UserError(_('Infraction has to undergo Collaboration with IMC stage before applying Corrective Action'))
-            
+
     """Compute to assign current users id to user_id field """
     @api.depends('infraction_id')
     def get_current_user(self):
@@ -590,7 +607,7 @@ class ActionHistory(models.Model):
                 else duration
             )
         return True
-    
+
     @api.multi
     def send_nte_email(self):
         """
@@ -645,7 +662,7 @@ class ActionHistory(models.Model):
 """========================SUSPENSION HISTORY=======================
         ALL INSTANCES OF EMPLOYEE SUSPENSION IS RECORDED HERE
         THIS MAY BE USED FOR PAYROLL AND TIMEKEEPING PURPOSES
-   =================================================================     
+   =================================================================
 """
 
 

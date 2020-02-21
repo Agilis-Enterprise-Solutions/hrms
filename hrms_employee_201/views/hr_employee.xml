@@ -279,17 +279,7 @@
             </group>
           </page>
 
-          <page string="Infractions">
-            <group string="Infractions">
-              <field name="infraction_ids" nolabel="1">
-                <field name="infraction_sequence_id" string="Case ID"/>
-                <field name="department_id" string="Department"/>
-                <field name="violation_id" string="Violation"/>
-                <field name="violation_date" string="Date Committed"/>
-              </field>
-            </group>
-          </page>
-          <page string="Contract History">
+          <page name="contract_history" string="Contract History">
             <group string="Contract History">
               <field name="contract_history_ids" nolabel="1">
                 <tree editable="bottom">

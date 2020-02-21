@@ -139,20 +139,6 @@ class Employee(models.Model):
 
     health_condition_ids = fields.One2many('health.condition', 'employee_id')
 
-    """======================INFRACTION======================"""
-    infraction_ids = fields.One2many(
-        'hr.infraction', 'emp_id',
-        string="Infractions",
-        compute='_compute_infraction_record'
-    )
-
-    @api.depends('children')
-    def _compute_infraction_record(self):
-        record = self.env['hr.infraction'].search([('emp_id', '=', self.id)])
-        self.update({
-            'infraction_ids': [(6, 0, record.ids)],
-        })
-
     """======================EMPLOYEE MOVEMENT======================"""
     contract_history_ids = fields.One2many(
         'hr.contract', 'employee_id',
