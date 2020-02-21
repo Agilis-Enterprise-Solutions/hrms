@@ -1,13 +1,14 @@
+# coding: utf-8
 {
-    'author':  'Raymund Martinez, Ralf Cabarogias, John Ardosa – Agilis Enterprise Solutions Inc.',
+    'author':  'Raymund MARTINEZ, Ralf Cabarogias, John Ardosa – Agilis Enterprise Solutions Inc.',
     'depends': [
         'base',
         'hr',
         'hr_attendance',
         'hr_contract',
         'hr_holidays',
+        'hrms_accident',
         'hrms_compliance',
-        'hrms_employee_movement',
         'hrms_employee_201',
         'hrms_employee_exit',
         'hrms_recruitment',
