@@ -52,10 +52,6 @@ class Suspension(models.TransientModel):
 
     @api.depends('infraction_id')
     def get_history(self):
-        # result = []
-        # for rec in self:
-        #     result.append(self.env['suspension.history'].search(
-        #         [('infraction_id', '=', rec.infraction_id.id)]))
         result = self.env['suspension.history'].search(
             [('infraction_id', '=', self.infraction_id.id)]).ids
         self.update({
@@ -68,6 +64,18 @@ class Suspension(models.TransientModel):
         if self.remaining_days < 0:
             raise UserError(
                 _('Suspension days to be used must not be more than remaining suspension days.'))
+        elif self.start_date == False and self.end_date == False:
+            raise UserError(_('Please set start date and end date before clicking on Submit'))
+        elif self.start_date == False and self.end_date != False:
+            raise UserError('Please set start date before clicking on Submit')
+        elif self.start_date != False and self.end_date == False:
+            raise UserError('Please set end date before clicking on Submit')    
+        elif self.start_date < date.today():
+            raise UserError(_('You cannot set the start date before today\'s date.'))
+        elif self.start_date > self.end_date:
+            raise UserError('Start Date must not be later than End Date')
+        elif self.start_date == self.end_date and self.use_suspension_days == 0:
+            raise UserError(_('Start Date must not be the same as End Date'))
         else:
             vals = {
                 'emp_id': self.emp_id.id,

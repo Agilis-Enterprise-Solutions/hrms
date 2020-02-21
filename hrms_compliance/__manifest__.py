@@ -21,7 +21,8 @@
     'depends': [
         'base',
         'hr',
-        'contacts'
+        'contacts',
+        'mail',
     ],
 
     'data': [
@@ -35,6 +36,7 @@
         # 'views/create_suspension.xml',
         'views/suspension_history.xml',
         'data/sequence.xml',
+        'data/mail_template.xml',
         'views/menu_views.xml',
 
     ],

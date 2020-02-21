@@ -53,7 +53,7 @@
                 <field name="offense_code_id"/>
                 <field name="frequency" />
                 <field name="violation_date" attrs="{'readonly': [('state','not in',['draft'])]}"/>
-                <field name="corrective_action"/>
+                <field name="corrective_action" groups="base.group_no_one"/>
                 <div class="col-xs-4">
                 </div>
                 <div class="col-xs-4">
@@ -97,32 +97,5 @@
       <field name="view_mode">tree,form</field>
       <field name="view_type">form</field>
     </record>
-
-
-    <!-- server action to the one above -->
-    <!--
-    <record model="ir.actions.server" id="hrms_compliance.action_server">
-      <field name="name">hrms_compliance server</field>
-      <field name="model_id" ref="model_hrms_compliance_hrms_compliance"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": self._name,
-        }
-      </field>
-    </record>
-    -->
-
-    <!-- Top menu item -->
-
-    <menuitem name="Compliance" id="hrms_compliance_root" sequence="5" parent="hr.menu_hr_root"/>
-
-    <!-- actions -->
-
-    <menuitem name="Infractions" id="hrms_compliance.infractions" parent="hrms_compliance_root" action="hrms_compliance_infraction_action_window"/>
-    <menuitem name="Configuration" id="hrms_compliance_configuration" parent="hrms_compliance_root"/>
-
   </data>
 </odoo>

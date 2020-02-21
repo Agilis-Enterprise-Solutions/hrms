@@ -27,13 +27,12 @@ class Infractions(models.Model):
     job_id = fields.Many2one(
         "hr.job", string="Job", related="emp_id.job_id", readonly=True, store=True
     )
-    manager_id = fields.Many2one(
-        "hr.employee",
-        string="Manager",
-        related="emp_id.parent_id",
-        readonly=True,
-        store=True,
-    )
+    manager_id = fields.Many2one("hr.employee",
+                                 string="Manager",
+                                 related="emp_id.parent_id",
+                                 readonly=True,
+                                 store=True,
+                                 )
     department_id = fields.Many2one('hr.department',
                                     string="Department",
                                     related='emp_id.department_id',
@@ -99,6 +98,7 @@ class Infractions(models.Model):
         "infraction_id",
         string="Action History",
         track_visibility="onchange",
+        # compute='_auto_fill_history'
     )
 
     @api.depends('history_ids')
@@ -110,6 +110,13 @@ class Infractions(models.Model):
                 'corrective_action': history_line[-1]
             })
         return True
+
+    # @api.depends('history_ids')
+    # def _auto_fill_history(self):
+    #     for rec in self:
+    #         result = self.env['hr.infraction.action_history'].search(
+    #             []).filtered(lambda x: x.infraction_id.id == rec.id).ids
+    #         rec.update({'history_ids': [(6, 0, result)]})
 
     # ============================================================================================
     # STATE BUTTON FIELDS
@@ -159,6 +166,14 @@ class Infractions(models.Model):
             vals['infraction_sequence_id'] = self.env['ir.sequence'].next_by_code(
                 'infraction.code.sequence') or _('New')
         result = super(Infractions, self).create(vals)
+        self.env['hr.infraction.action_history'].create({
+            'stage': 'incident_report',
+            'emp_id': result.emp_id.id,
+            'infraction_id': result.id,
+            'offense_code_id': result.offense_code_id.id,
+            'start_date': result.create_date,
+            'end_date': result.create_date,
+        })
         return result
 
     # ============================================================================================
@@ -218,12 +233,16 @@ class Infractions(models.Model):
 
     @api.multi
     def set_state_inprogress(self):
-        self.write({
-            'state': 'in_progress',
-            'date_in_progress': datetime.now(),
-            'set_in_progress_by': self._uid
-        })
-        return True
+        for i in self.history_ids:
+            if i.stage == 'inv_nte_issuance':
+                self.write({
+                'state': 'in_progress',
+                'date_in_progress': datetime.now(),
+                'set_in_progress_by': self._uid
+                    })
+                break    
+        else:
+            raise UserError(_('Investigation and NTE Issuance should be created in Action History before setting the record in progress'))
 
     @api.multi
     def set_state_forclosure(self):
@@ -454,7 +473,12 @@ class ActionHistory(models.Model):
         string="Offense & Frequency",
         compute="_get_default_offense"
     )
-    violation_id = fields.Many2one("hr.company.violation", string="Violation")
+    violation_id = fields.Many2one(
+        "hr.company.violation",
+        string="Violation",
+        related='infraction_id.violation_id',
+        store=True,
+    )
     start_date = fields.Date(string="Start Date")
     end_date = fields.Date(string="End Date")
     duration = fields.Integer(string="Duration")
@@ -469,9 +493,72 @@ class ActionHistory(models.Model):
         string="Number of Days",
     )
     staggered = fields.Boolean(string="Staggered")
+    user_id = fields.Many2one(
+        'res.users', string="Current User", compute="get_current_user")
+
+    """ Checks if there are 2 or more instances of incident reports and NTE issuances """
+    @api.constrains('stage')
+    def check_stage_count(self):
+        for rec in self:
+            incident_report_count = rec.infraction_id.history_ids.search_count(
+                [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)])
+            inv_nte_count = rec.infraction_id.history_ids.search_count(
+                [('stage', 'in', ['inv_nte_issuance']), ('infraction_id.id', '=', rec.infraction_id.id)])
+            if incident_report_count > 1:
+                raise UserError(
+                    _('Cannot create more than one instance of Incident Report per Record'))
+            if inv_nte_count > 1:
+                raise UserError(
+                    _('Cannot create more than one instance of Investigation and NTE issuance per Record'))
+
+    """Checks if record state is set to In progress before creating Collaboration with IMC stage"""
+    @api.constrains('stage')
+    def check_record_stage(self):
+        for i in self:
+            record_state = i.infraction_id.state
+            if i.stage == 'collaboration' and record_state != 'in_progress':
+                raise UserError(_('Please click Submit button first before creating new Action record with stage Collaboration with IMC.'))
+
+    @api.constrains('start_date', 'end_date')
+    def check_start_end_date(self):
+        for rec in self:
+            incident_report_start_date = rec.infraction_id.history_ids.search(
+                [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)]).start_date
+            incident_report_end_date = rec.infraction_id.history_ids.search(
+                [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)]).end_date
+            if rec.stage == 'inv_nte_issuance':
+                if rec.start_date:
+                    if rec.end_date:
+                        if rec.start_date < incident_report_end_date:
+                            raise UserError(
+                                _('Start Date of investigation must be after Incident Report End Date'))
+                        elif rec.start_date > rec.end_date:
+                            raise UserError(
+                                _('End Date must be later than Start Date'))
+                    else:
+                        raise UserError(_('End Date must be set.'))
+                else:
+                    raise UserError(_('Start Date must be set.'))
+
+    # """Checks if Infraction has went through Collaboration with IMC stage before creating Corrective Action"""
+    # @api.constrains('stage')
+    # def check_collab_before_corrective_action(self):
+    #     for rec in self.infraction_id.history_ids:
+    #         if rec.stage == 'collaboration':
+    #             return True
+    #     else:
+    #         raise UserError(_('Infraction has to undergo Collaboration with IMC stage before applying Corrective Action'))
+            
+    """Compute to assign current users id to user_id field """
+    @api.depends('infraction_id')
+    def get_current_user(self):
+        for record in self:
+            user_id = record._uid
+        self.user_id = user_id
 
     @api.depends("infraction_id", "stage")
     def _get_default_offense(self):
+        code = ""
         for i in self:
             policy_violated_id = i.infraction_id.policy_violated_id
             for j in policy_violated_id:
@@ -482,7 +569,8 @@ class ActionHistory(models.Model):
 
     @api.onchange("start_date", "end_date")
     def _get_duration(self):
-        duration = abs((self.end_date - self.start_date)).days if self.end_date and self.start_date and (self.end_date - self.start_date).days > 0 else 0
+        duration = abs((self.end_date - self.start_date)).days if self.end_date and self.start_date and (
+            self.end_date - self.start_date).days > 0 else 0
 
         self.duration = duration
 
@@ -502,6 +590,56 @@ class ActionHistory(models.Model):
                 else duration
             )
         return True
+    
+    @api.multi
+    def send_nte_email(self):
+        """
+        This function opens a window to compose an email, with the notice to explain template message loaded by default
+        """
+
+        self.ensure_one()
+        ir_model_data = self.env['ir.model.data']
+        try:
+            """
+            Find the email template that we've created in data/mail_template_data.xml
+            get_object_reference first needs the module name where the template is build and then the name
+            of the email template (the record id in XML).
+            """
+            template_id = ir_model_data.get_object_reference(
+                'hrms_compliance', 'nte_email_template')[1]
+        except ValueError:
+            template_id = False
+
+        try:
+            """
+            Load the e-mail composer to show the e-mail template in
+            """
+            compose_form_id = ir_model_data.get_object_reference(
+                'mail', 'email_compose_message_wizard_form')[1]
+        except ValueError:
+            compose_form_id = False
+        ctx = {
+            # Model on which you load the e-mail dialog
+            'default_model': 'hr.infraction.action_history',
+            'default_res_id': self.ids[0],
+            # Checks if we have a template and sets it if Odoo found our e-mail template
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'default_composition_mode': 'comment',
+            'force_email': True
+        }
+
+        # Will show the e-mail dialog to the user in the frontend
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
+        }
 
 
 """========================SUSPENSION HISTORY=======================
