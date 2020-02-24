@@ -6,7 +6,6 @@
         'hrms_employee_201'
     ],
     'data': [
-        'security/ir.model.access.csv',
         'views/appraisal.xml'
     ],
     'name': "HRMS Appraisal",
