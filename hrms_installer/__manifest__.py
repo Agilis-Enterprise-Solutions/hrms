@@ -9,6 +9,7 @@
         'hr_contract',
         'hr_holidays',
         'hrms_accident',
+        'hrms_appraisal',
         'hrms_compliance',
         'hrms_employee_201',
         'hrms_employee_exit',
