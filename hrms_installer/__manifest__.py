@@ -1,6 +1,6 @@
 # coding: utf-8
 {
-    'author':  'Raymund MARTINEZ, Ralf Cabarogias, John Ardosa – Agilis Enterprise Solutions Inc.',
+    'author':  'Raymund MARTINEZ, Ralf Cabarogias, and John Ardosa – Agilis Enterprise Solutions Inc.',
     'depends': [
         'base',
         'hr',
@@ -13,8 +13,8 @@
         'hrms_employee_201',
         'hrms_employee_exit',
         'hrms_recruitment',
-        'hrms_training',
         'hrms_separation_management',
+        'hrms_training'
     ],
     'name': "HRMS Installer Module",
     'description': '''Installs the necessary modules for HRv3''',
