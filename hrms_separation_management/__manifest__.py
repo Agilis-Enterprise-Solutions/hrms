@@ -19,7 +19,8 @@
         'base',
         'hr',
         'survey',
-        'hrms_employee_exit'
+        'hrms_employee_exit',
+        'board'
     ],
 
     'data': [
@@ -27,6 +28,7 @@
         'views/separation.xml',
         'views/resignation_letter.xml',
         'views/exit_clearance.xml',
+        'views/separation_dashboard.xml',
         'views/menu_items.xml'
 
     ],

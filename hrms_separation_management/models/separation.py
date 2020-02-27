@@ -10,30 +10,30 @@ class HRMSSeparation(models.Model):
     _description = "Separation Management"
     _inherit = ["mail.thread", "mail.activity.mixin", "resource.mixin"]
 
-    name = fields.Many2one('hr.employee', "Employee Name", required=True)
+    name = fields.Many2one('hr.employee', "Employee Name", required=True, store=True)
     department_id = fields.Many2one('hr.department', "Department", related="name.department_id")
-    job_id = fields.Many2one('hr.job', "Job Position", related="name.job_id")
-    parent_id = fields.Many2one('hr.employee', "Manager", related="name.parent_id")
+    job_id = fields.Many2one('hr.job', "Job Position", related="name.job_id", store=True)
+    parent_id = fields.Many2one('hr.employee', "Manager", related="name.parent_id", store=True)
     separation_type = fields.Selection([
         ('resignation', 'Resignation'),
         ('terminated_company', 'Termination(Company Initiated)'),
         ('terminated_infraction', 'Termination (Infraction)'),
         ('retirement', 'Retirement')
-    ], string="Separation Type", required=True)
+    ], string="Separation Type", required=True, store=True)
     resignation_letter = fields.Many2one('hr.resignation.letter',
                                          "Resignation Letter")
-    reason = fields.Many2one('hr.resignation.reason', "Reason", required=True)
-    joined = fields.Date("Joined Date", related="name.date_started")
-    relieved = fields.Date("Relieved Date", required=True)
-    date_raised = fields.Date("Raised on")
-    date_of_request = fields.Date("Date of Request approval")
+    reason = fields.Many2one('hr.resignation.reason', "Reason", required=True, store=True)
+    joined = fields.Date("Joined Date", related="name.date_started", store=True)
+    relieved = fields.Date("Relieved Date", required=True, store=True)
+    date_raised = fields.Date("Raised on", store=True)
+    date_of_request = fields.Date("Date of Request approval", store=True)
     note = fields.Text(string="Notes")
 
-    iterview_form = fields.Many2one('survey.survey', 'Interview Form')
-    quit_claim = fields.Boolean("Quit Claims")
-    cert_of_employment = fields.Boolean(string="Certificate of Employment")
-    details = fields.Boolean("2316 Details")
-    loan = fields.Boolean("Loan Deduction Summary Table")
+    iterview_form = fields.Many2one('survey.survey', 'Interview Form', store=True)
+    quit_claim = fields.Boolean("Quit Claims", store=True)
+    cert_of_employment = fields.Boolean(string="Certificate of Employment", store=True)
+    details = fields.Boolean("2316 Details", store=True)
+    loan = fields.Boolean("Loan Deduction Summary Table", store=True)
     clearance = fields.Boolean("Employee Clearance", default=False)
 
     date_submitted = fields.Date("Date Submitted")
@@ -49,7 +49,7 @@ class HRMSSeparation(models.Model):
         ('for_approval', 'Waiting for Approval'),
         ('approve', 'Approved'),
         ('claim', 'Claimed')
-    ], string="Status", default="draft", readonly=True, copy=False)
+    ], string="Status", default="draft", readonly=True, copy=False, store=True)
 
     @api.onchange('resignation_letter')
     def _separation_letter(self):
