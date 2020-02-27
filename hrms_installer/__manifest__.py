@@ -15,6 +15,7 @@
         'hrms_employee_exit',
         'hrms_recruitment',
         'hrms_separation_management',
+        'hrms_employee_movement',
         'hrms_training'
     ],
     'name': "HRMS Installer Module",
