@@ -19,7 +19,7 @@ class InheritEmployeeAddExit(models.Model):
     ])
     exit_reason = fields.Text()
 
-    @api.depends('date_started')
+    @api.depends('date_started','date_exited')
     def _get_years_of_service(self):
         for rec in self:
             if rec.date_started:
