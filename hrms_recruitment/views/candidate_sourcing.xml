@@ -16,11 +16,14 @@
                position="after">
           <button name="action_get_assessment_tree_view" class="oe_stat_button"
                   icon="fa-book" type="object" string="Assessment"
-                  context="{'default_applicant_name': partner_name, 'default_job_id': active_id}"/>
+                  context="{'default_applicant_name': partner_name, 'default_job_id': job_id}"/>
         </xpath>
         <xpath expr="//field[@name='department_id']" position="after">
           <field name="skills_ids" widget="many2many_tags"
                  options="{'color_field': 'color', 'no_create_edit': True}"/>
+          <field name="requisition_id" 
+          domain="[('job_position_id', '=', job_id),('state','in',['approved'])]"
+          />
         </xpath>
         <xpath expr="//field[@name='availability']" position="after">
           <field name="blacklisted"
