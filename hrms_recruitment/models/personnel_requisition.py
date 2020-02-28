@@ -35,37 +35,56 @@ class PersonnelRequisition(models.Model):
                              readonly=True, store=True)
     skills_ids = fields.One2many('hrmsv3.skills',
                                  'personnel_requisition_id',
-                                 string="Skills")
+                                 string="Skills",
+                                 track_visibility='onchange'
+                                 )
 
-    skill_name_ids = fields.One2many('hrmsv3.skills_name', 'requisition_id',
-                                     string="Skills")
+    skill_name_ids = fields.One2many('hrmsv3.skills_name',
+                                     'requisition_id',
+                                     string="Skills",
+                                     track_visibility='onchange'
+                                     )
 
-    responsible_id = fields.Many2one('res.users',  string="Responsible")
+    responsible_id = fields.Many2one('res.users',
+                                     string="Responsible",
+                                     track_visibility='onchange'
+                                     )
     email_alias = fields.Char(string="Email Alias")
+
     @api.constrains('email_alias')
     def _check_email(self):
         emailPattern = re.compile(r'[\w.-]+@[\w-]+[.]+[\w.-]')
         if self.email_alias:
             if (self.email_alias
-                and not emailPattern.match(self.email_alias)):
-                raise ValidationError("Email is in Incorrect format \n e.g. example@company.com")
+                    and not emailPattern.match(self.email_alias)):
+                raise ValidationError(
+                    "Email is in Incorrect format \n e.g. example@company.com")
+
     job_description = fields.Text(string="Job Description",
-                                  related='job_position_id.description',
-                                  readonly=True,
-                                  store=True)
+                                  track_visibility='onchange'
+                                  )
     job_qualification = fields.Text(string="Job Qualification")
     number_of_applicants = fields.Char(string="Number of Applicants",
                                        readonly=True)
     number_of_employees = fields.Char(string="Number of Employees",
-                                      readonly=True)
+                                      readonly=True,
+                                      track_visibility='onchange'
+                                      )
     expected_new_employee = fields.Integer(string="Expected New Employee",
-                                           required=True)
+                                           required=True,
+                                           track_visibility='onchange'
+                                           )
     proposed_salary = fields.Float(string="Proposed Salary")
-    replacement_for_id = fields.Many2many('hr.employee', string="Replacement For",
-                                          )
+    replacement_for_id = fields.Many2many(
+        'hr.employee',
+        string="Replacement For",
+        track_visibility='onchange',
+    )
     replacement_emp_job_id = fields.Many2one('hr.job', string='Job Position',
                                              related='replacement_for_id.job_id',
-                                             store=True)
+                                             store=True,
+                                             track_visibility='onchange'
+                                             )
     replacement_contract = fields.Many2many('hr.contract',
                                             string="Current Contract",
                                             compute='get_contract',
@@ -85,6 +104,33 @@ class PersonnelRequisition(models.Model):
             vals['job_req_id_seq'] = self.env['ir.sequence'].next_by_code(
                 'job.requisition.sequence') or _('New')
         result = super(PersonnelRequisition, self).create(vals)
+        self.env['hr.job'].browse(vals.get('job_position_id')).write({
+            'description': result.job_description})
+        return result
+
+    @api.onchange('job_position_id')
+    def reset_replacement_id(self):
+        for rec in self:
+            if rec.job_position_id:
+                rec.replacement_for_id = False
+
+    @api.multi
+    def write(self, vals):
+        """
+            Update all record(s) in recordset, with new value comes as {values}
+            return True on success, False otherwise
+
+            @param values: dict of new values to be set
+
+            @return: True on success, False otherwise
+        """
+
+        result = super(PersonnelRequisition, self).write(vals)
+
+        data = {}
+        if vals.get("job_description"):
+            data['description'] = vals.get("job_description")
+        self.job_position_id.write(data)
         return result
 
     @api.depends('replacement_for_id')
@@ -184,26 +230,31 @@ class Skills(models.Model):
     _rec_name = 'skill_name'
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
-    # @api.depends('skill_name')
-    # def _get_last_skill_level(self):
-    #     for rec in self:
-    #         if rec.skill_name.skill_level_ids:
-    #             rec.skill_level_id = rec.skill_name.skill_level_ids[-1]
-
     employee_id = fields.Many2one('hr.employee')
 
     personnel_requisition_id = fields.Many2one('hrmsv3.personnel_requisition',
                                                string="Personnel Requisition ID")
+
     candidate_sourcing_id = fields.Many2one('hr.applicant')
     skill_name = fields.Many2one('hrmsv3.skills_name', string="Skill Name",
                                  required=True)
     skill_type_id = fields.Many2one('hrmsv3.skills_type',
                                     related='skill_name.skill_type_id',
                                     string="Skill Type")
-    skill_description = fields.Text(string="Skill Description", related="skill_name.skill_description")
+    skill_description = fields.Text(
+        string="Skill Description", related="skill_name.skill_description")
     skill_level_id = fields.Many2one('hrmsv3.skills_level',
                                      domain="[('skill_name_id', '=',skill_name)]",
                                      string="Skill Level")
+
+    @api.multi
+    def name_get(self):
+        data = []
+        for rec in self:
+            display_value = "{} - {}".format(rec.skill_name.skill_name,
+                                             rec.skill_level_id.skill_level)
+            data.append((rec.id, display_value))
+        return data
 
 
 class SkillName(models.Model):
@@ -211,6 +262,7 @@ class SkillName(models.Model):
     _rec_name = 'skill_name'
 
     requisition_id = fields.Many2one('hrmsv3.personnel_requisition')
+
     skill_name = fields.Char(string="Skill Name", required=True)
     skill_type_id = fields.Many2one('hrmsv3.skills_type', string="Skill Type")
     skill_description = fields.Text()
