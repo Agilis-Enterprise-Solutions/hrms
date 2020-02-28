@@ -194,6 +194,7 @@ class Skills(models.Model):
 
     personnel_requisition_id = fields.Many2one('hrmsv3.personnel_requisition',
                                                string="Personnel Requisition ID")
+    candidate_sourcing_id = fields.Many2one('hr.applicant')
     skill_name = fields.Many2one('hrmsv3.skills_name', string="Skill Name",
                                  required=True)
     skill_type_id = fields.Many2one('hrmsv3.skills_type',
@@ -210,7 +211,6 @@ class SkillName(models.Model):
     _rec_name = 'skill_name'
 
     requisition_id = fields.Many2one('hrmsv3.personnel_requisition')
-
     skill_name = fields.Char(string="Skill Name", required=True)
     skill_type_id = fields.Many2one('hrmsv3.skills_type', string="Skill Type")
     skill_description = fields.Text()

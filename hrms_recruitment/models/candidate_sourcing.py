@@ -39,7 +39,7 @@ class Applicant(models.Model):
     skills_ids = fields.Many2many(
         'hrmsv3.skills',
         string="Skills",compute="get_skills")
-    
+
     @api.depends("job_id")
     def get_skills(self):
         self.update({
@@ -53,8 +53,7 @@ class Applicant(models.Model):
                                           'character_id',
                                           string="Character References")
 
-    candiddate_skills = fields.One2many('hr.candidate.skill',
-                                        'candidate_skill_id',
+    candiddate_skills = fields.One2many('hrmsv3.skills','candidate_sourcing_id',
                                         string="Candidate Skill")
 
     candiddate_education = fields.One2many('hr.candidate.education',
@@ -168,23 +167,23 @@ class CharacterReference(models.Model):
                 raise ValidationError("Email is in Incorrect format \n e.g. example@company.com")
 
 
-class CandidateSkill(models.Model):
-    _name = "hr.candidate.skill"
-    _rec_name = "candidate_skill"
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
+# class CandidateSkill(models.Model):
+#     _name = "hr.candidate.skill"
+#     _rec_name = "candidate_skill"
+#     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
+#
+#     candidate_skill_id = fields.Many2one('hr.applicant')
+#     candidate_skill = fields.Many2one('hr.candidate.skill.type', "Skill Name",
+#                                       required=True)
+#     candidate_skill_desc = fields.Text("Description", required=True)
 
-    candidate_skill_id = fields.Many2one('hr.applicant')
-    candidate_skill = fields.Many2one('hr.candidate.skill.type', "Skill Name",
-                                      required=True)
-    candidate_skill_desc = fields.Text("Description", required=True)
 
-
-class CandidateSkillType(models.Model):
-    _name = "hr.candidate.skill.type"
-    _rec_name = "candidate_skill"
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
-
-    candidate_skill = fields.Char("Skill Name", required=True)
+# class CandidateSkillType(models.Model):
+#     _name = "hr.candidate.skill.type"
+#     _rec_name = "candidate_skill"
+#     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
+#
+#     candidate_skill = fields.Char("Skill Name", required=True)
 
 
 class CandidateWorkHistory(models.Model):
@@ -196,7 +195,7 @@ class CandidateWorkHistory(models.Model):
     company_name = fields.Char("Company Name", required=True)
     line_of_business = fields.Many2one('hr.candidate.work.history.company',
                                        "Line Of Business")
-    position = fields.Many2one('hr.candidate.work.history.position', "Position")
+    position = fields.Many2one('hr.job', "Position")
     address = fields.Char("Address")
     start_date = fields.Date("Date of Start", required=True)
     end_date = fields.Date("Date of End", required=True)
@@ -205,14 +204,17 @@ class CandidateWorkHistory(models.Model):
     @api.depends('start_date','end_date')
     def get_year_services(self):
         for rec in self:
-            years_services = (str(int(int((rec.end_date - rec.start_date).days)
-                                      / 365)) + " Years")
-            month = int(int((rec.end_date - rec.start_date).days) * 0.0328767)
-            if month > 12:
-                month_services = str(month % 12) + " Months"
-            else:
-                month_services = str(month) + " Months"
-            rec.years = years_services + " , " + month_services
+            if rec.start_date and rec.end_date:
+                years_services = str(int((rec.end_date
+                                          - rec.start_date).days
+                                         / 365)) + " Year(s)"
+                month = int((rec.end_date
+                             - rec.start_date).days * 0.0328767)
+                if month > 12:
+                    month_services = str(month % 12) + " Month(s)"
+                else:
+                    month_services = str(month) + " Month(s)"
+                rec.years = years_services + " , " + month_services
 
 
 class CandidateCompanyLine(models.Model):
@@ -223,12 +225,12 @@ class CandidateCompanyLine(models.Model):
     line_of_business = fields.Char("Line Of Business", required=True)
 
 
-class CandidateCompanyPosition(models.Model):
-    _name = "hr.candidate.work.history.position"
-    _rec_name = "position"
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
-
-    position = fields.Char("Position", required=True)
+# class CandidateCompanyPosition(models.Model):
+#     _name = "hr.candidate.work.history.position"
+#     _rec_name = "position"
+#     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
+#
+#     position = fields.Char("Position", required=True)
 
 
 class CandidateEducation(models.Model):
