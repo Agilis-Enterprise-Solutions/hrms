@@ -87,7 +87,7 @@
                        attrs="{'invisible': [('replacement_for_id_check_box','=', False)]}">
                       <tree>
                        <field name="name"/>
-                       <field name="contract_id"/>      
+                       <field name="contract_id"/>
                       </tree>
                 </field> -->
 
