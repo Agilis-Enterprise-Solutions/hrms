@@ -42,7 +42,7 @@
                     <sheet>
                         <group>
                             <group>
-                                <field name="stage" required="1" />
+                                <field name="stage" required="1" attrs="{'readonly': [('infraction_state','in',('for_closure','closed'))]}"/>
                                 <field name="user_id"/>
                                 <field name="emp_id" groups="base.group_no_one"/>
                                 <field name="infraction_id" readonly="1" groups="base.group_no_one"/>
@@ -53,44 +53,53 @@
                                 <field name="number_of_days" attrs="{'invisible': ['|',('stage','not in',('corrective_action')),('action','not in',['Suspension'])]}"/>
                                 <field name="violation_id" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}" force_save="1" readonly="1"/>
                                 <field name="attachment" attrs="{'invisible': [('stage','not in',('incident_report', 'inv_nte_issuance', 'collaboration'))]}" />
+                                <field name="infraction_state" base="group_no_one"/>
                                 <label for="submit_nte" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
                                 <div class="o_row" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}">
                                     <field name="submit_nte" attrs="{'invisible': [('stage','not in',('inv_nte_issuance'))]}"/>
                                     <span>
-                                        <button name="send_nte_email" 
-                                                type="object" 
-                                                class="btn-primary" 
-                                                string="Send NTE" 
-                                                attrs="{'invisible': [('submit_nte','!=',True)]}"
-                                                />
+                                        <button name="send_nte_email" type="object" class="btn-primary" string="Send NTE" attrs="{'invisible': [('submit_nte','!=',True)]}" />
                                     </span>
                                 </div>
-                                <label for="staggered" attrs="{'invisible': [('action','not in',['Suspension'], ), ('stage','not in',['corrective_action'])]}"/>
-                                <div class="o_row" attrs="{'invisible': [('action','not in',['Suspension'], ), ('stage','not in',['corrective_action'])], 'readonly': [('action','not in',['Suspension']),('stage','not in',['corrective_action'])]}">
-                                    <field name="staggered" attrs="{'invisible': [('action','not in',['Suspension']), ('stage','not in',['corrective_action'])], 'readonly': [('action','not in',['Suspension']),('stage','not in',['corrective_action'])]}" nolabel="1"/>
+                                <label for="staggered" attrs="{'invisible': ['|',('action','not in',['Suspension'], ), ('stage','not in',['corrective_action'])]}"/>
+                                <div class="o_row" attrs="{'invisible': ['|',('action','not in',['Suspension'], ), ('stage','not in',['corrective_action'])], 'readonly': [('action','not in',['Suspension']),('stage','not in',['corrective_action'])]}">
+                                    <field name="staggered" attrs="{'invisible': ['|',('action','not in',['Suspension']), ('stage','not in',['corrective_action'])], 'readonly': [('action','not in',['Suspension']),('stage','not in',['corrective_action'])]}" nolabel="1"/>
                                     <span>
-                                        <button name="%(hrms_compliance.create_suspension_wizard)d" 
-                                                string="Use Suspension" 
-                                                type="action" 
-                                                class="btn-primary" 
-                                                attrs="{'invisible': ['|',('staggered','=',False), ('action','not in',['Suspension'])], 'readonly':[('staggered','=',False)]}" 
-                                                context="{'default_suspension_days': number_of_days, 'default_emp_id':emp_id, 'default_infraction_id': infraction_id}" 
-                                                />
+                                        <button name="%(hrms_compliance.create_suspension_wizard)d" string="Use Suspension" type="action" class="btn-primary" attrs="{'invisible': ['|',('staggered','=',False), ('action','not in',['Suspension'])], 'readonly':[('staggered','=',False)]}" context="{'default_suspension_days': number_of_days, 'default_emp_id':emp_id, 'default_infraction_id': infraction_id}" />
                                     </span>
                                 </div>
                             </group>
                             <group>
-                                <field name="start_date"/>
-                                <field name="end_date"/>
+                                <field name="start_date" attrs="{'readonly': [('infraction_state','in',('for_closure','closed'))]}"/>
+                                <field name="end_date" attrs="{'readonly': [('infraction_state','in',('for_closure','closed'))]}"/>
                             </group>
                         </group>
                         <group>
-                            <field name="notes"/>
+                            <field name="notes" attrs="{'readonly': [('infraction_state','in',('for_closure','closed'))]}"/>
                         </group>
                     </sheet>
                 </form>
 
             </field>
+        </record>
+
+        
+        <record id="action_history_access" model="res.groups">
+            <field name="name">Action History Access</field>
+        </record>
+        
+
+        <record id="action_history_uneditable_on_forclosure" model="ir.rule">
+            <field name="name">Action History Uneditable on For Closure</field>
+            <field name="model_id" ref="hrms_compliance.model_hr_infraction_action_history"/>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="perm_read" eval="0"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <!-- <field name="domain_force">
+                ['|',('infraction_state','in',['for_closure']),('infraction_state','in',['closed'])]
+            </field> -->
         </record>
     </data>
 </odoo>

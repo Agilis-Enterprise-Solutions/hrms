@@ -58,7 +58,7 @@ class Infractions(models.Model):
                                     )
 
     violation_id = fields.Many2one(
-        "hr.company.violation", string="Violation", track_visibility="onchange"
+        "hr.company.violation", string="Violation", track_visibility="onchange",required=True, 
     )
 
     policy_violated_ids = fields.Many2many("hr.company.policy", string="Policies Violated",
@@ -75,7 +75,7 @@ class Infractions(models.Model):
         string="Policies Violated",
         track_visibility="onchange",
         domain="[('id', 'in', policy_violated_ids)]",
-
+        required=True, 
     )
 
     frequency = fields.Char(
@@ -211,16 +211,17 @@ class Infractions(models.Model):
                 for i in self.offense_code_id.corrective_action_ids:
                     frequency = i.frequencies
                 if self.offense_code_id and self.offense_code_id.corrective_action_ids:
-                    _logger.info("\n\n\nCASE 1\n\n\n")
+                    getLogger().info("\n\n\nCASE 1 {} {}\n\n\n".format(self.offense_code_id, self.offense_code_id.corrective_action_ids))
+                    log(offense_code_id = self.offense_code_id, corrective_action = self.offense_code_id.corrective_action_ids)
                     self.frequency = frequency[counter -
                                                1 if counter > 0 else counter][1]
-                    _logger.info("\n\n\nCounter{}\nFrequency{}\n\n\n".format(
+                    getLogger().info("\n\n\nCounter{}\nFrequency{}\n\n\n".format(
                         counter-1, frequency))
                 elif counter < 0:
-                    _logger.info("\n\n\nCASE 2\n\n\n")
+                    getLogger().info("\n\n\nCASE 2\n\n\n")
                     self.frequency = frequency[0][1]
                 else:
-                    _logger.info("\n\n\nCASE 3\n\n\n")
+                    getLogger().info("\n\n\nCASE 3\n\n\n")
                     self.frequency = ""
 
                     return frequency
@@ -512,6 +513,7 @@ class ActionHistory(models.Model):
     staggered = fields.Boolean(string="Staggered")
     user_id = fields.Many2one(
         'res.users', string="Current User", compute="get_current_user")
+    infraction_state = fields.Selection(string='Infraction State',related="infraction_id.state")
 
     """ Checks if there are 2 or more instances of incident reports and NTE issuances """
     @api.constrains('stage')
