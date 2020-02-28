@@ -81,13 +81,13 @@
                 <field name="proposed_salary" attrs="{ 'readonly': [('state','not in',['draft'])] }"/>
                 <field name="replacement_for_id_check_box" class="oe_inline" attrs="{ 'readonly': [('state','not in',['draft'])] }"/>
                 <field name="replacement_for_id" class="oe_inline" widget="many2many_tags"
-                       attrs="{'invisible': [('replacement_for_id_check_box','=', False)], 'readonly': [('state','not in',['draft'])]}"
+                       attrs="{'invisible': [('replacement_for_id_check_box','=', False)], 'readonly': [('state','not in',['draft'])], 'required': [('replacement_for_id_check_box','=',True)]}"
                        domain="[('job_id','=',job_position_id)]" />
                 <!-- <field name="replacement_for_id"
                        attrs="{'invisible': [('replacement_for_id_check_box','=', False)]}">
                       <tree>
                        <field name="name"/>
-                       <field name="contract_id"/>
+                       <field name="contract_id"/>      
                       </tree>
                 </field> -->
 
