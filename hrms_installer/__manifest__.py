@@ -13,10 +13,11 @@
         'hrms_compliance',
         'hrms_employee_201',
         'hrms_employee_exit',
+        'hrms_employee_movement',
         'hrms_recruitment',
         'hrms_separation_management',
-        'hrms_employee_movement',
-        'hrms_training'
+        'hrms_training',
+        'hrms_work_history'
     ],
     'name': "HRMS Installer Module",
     'description': '''Installs the necessary modules for HRv3''',
