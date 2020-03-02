@@ -12,7 +12,6 @@ def log(**to_output):
 
 class PersonnelRequisition(models.Model):
     _name = "hrmsv3.personnel_requisition"
-    _rec_name = "job_req_id_seq"
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     job_req_id_seq = fields.Char(string="Job Requisition Number.",
@@ -105,14 +104,27 @@ class PersonnelRequisition(models.Model):
                 'job.requisition.sequence') or _('New')
         result = super(PersonnelRequisition, self).create(vals)
         self.env['hr.job'].browse(vals.get('job_position_id')).write({
-            'description': result.job_description})
+            'description': result.job_description,
+            # 'job_qualification': result.job_qualification,
+            })
+            
         return result
+
+    @api.multi
+    def name_get(self):
+        data = []
+        for rec in self:
+            display_value = "{} - {}".format(rec.job_req_id_seq,
+                                             rec.job_position_id.name)
+            data.append((rec.id, display_value))
+        return data
 
     @api.onchange('job_position_id')
     def reset_replacement_id(self):
         for rec in self:
             if rec.job_position_id:
                 rec.replacement_for_id = False
+                rec.job_description = rec.job_position_id.description
 
     @api.multi
     def write(self, vals):
@@ -130,6 +142,8 @@ class PersonnelRequisition(models.Model):
         data = {}
         if vals.get("job_description"):
             data['description'] = vals.get("job_description")
+        # if vals.get("job_qualification"):
+        #     data['job_qualification'] = vals.get("job_qualification")
         self.job_position_id.write(data)
         return result
 
@@ -181,7 +195,7 @@ class PersonnelRequisition(models.Model):
                     rec.skills_ids = skills_ids
                 rec.write({
                     'user_id': user_id,
-                    'no_of_recruitment': expected_new_employee,
+                    'no_of_recruitment': self.job_position_id.no_of_recruitment + expected_new_employee,
                     'job_qualification': job_qualification,
                     'proposed_salary': proposed_salary
                 })

@@ -106,7 +106,7 @@
 
               <page string="Skills And Qualification">
                 <label for="skills_ids"/>
-                <field name="skills_ids">
+                <field name="skills_ids" attrs="{'readonly': [('state','not in',('draft'))]}">
                   <tree editable="bottom">
                     <field name="skill_name"/>
                     <field name="skill_type_id"/>
@@ -115,7 +115,7 @@
                 </field>
 
                 <label for="job_qualification">Qualification</label>
-                <field name="job_qualification"/>
+                <field name="job_qualification" attrs="{'readonly': [('state','not in',('draft'))]}"/>
               </page>
             </notebook>
           </sheet>
