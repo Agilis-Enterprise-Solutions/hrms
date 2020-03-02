@@ -92,7 +92,7 @@ class Employee(models.Model):
     diploma = fields.Binary()
 
     """======================SKILLS AND TRAINING======================"""
-    skill_ids = fields.One2many('hrmsv3.skills', 'employee_id',
+    skill_ids = fields.One2many('hr.employee.skills', 'employee_id',
                                 string="Skills")
 
     """======================HEALTH INFORMATION======================"""

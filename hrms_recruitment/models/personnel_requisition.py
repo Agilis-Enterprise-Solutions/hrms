@@ -11,7 +11,8 @@ def log(**to_output):
 
 
 class PersonnelRequisition(models.Model):
-    _name = "hrmsv3.personnel_requisition"
+    _name = "hr.personnel.requisition"
+    _rec_name = "job_req_id_seq"
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     job_req_id_seq = fields.Char(string="Job Requisition Number.",
@@ -32,13 +33,13 @@ class PersonnelRequisition(models.Model):
     website_id = fields.Char(string="Website",
                              related='job_position_id.address_id.website',
                              readonly=True, store=True)
-    skills_ids = fields.One2many('hrmsv3.skills',
+    skills_ids = fields.One2many('hr.employee.skills',
                                  'personnel_requisition_id',
                                  string="Skills",
                                  track_visibility='onchange'
                                  )
 
-    skill_name_ids = fields.One2many('hrmsv3.skills_name',
+    skill_name_ids = fields.One2many('hr.employee.skills.name',
                                      'requisition_id',
                                      string="Skills",
                                      track_visibility='onchange'
@@ -107,7 +108,7 @@ class PersonnelRequisition(models.Model):
             'description': result.job_description,
             # 'job_qualification': result.job_qualification,
             })
-            
+
         return result
 
     @api.multi
@@ -240,24 +241,24 @@ class PersonnelRequisition(models.Model):
 
 
 class Skills(models.Model):
-    _name = 'hrmsv3.skills'
+    _name = 'hr.employee.skills'
     _rec_name = 'skill_name'
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     employee_id = fields.Many2one('hr.employee')
 
-    personnel_requisition_id = fields.Many2one('hrmsv3.personnel_requisition',
+    personnel_requisition_id = fields.Many2one('hr.personnel.requisition',
                                                string="Personnel Requisition ID")
 
     candidate_sourcing_id = fields.Many2one('hr.applicant')
-    skill_name = fields.Many2one('hrmsv3.skills_name', string="Skill Name",
+    skill_name = fields.Many2one('hr.employee.skills.name', string="Skill Name",
                                  required=True)
-    skill_type_id = fields.Many2one('hrmsv3.skills_type',
+    skill_type_id = fields.Many2one('hr.employee.skills.type',
                                     related='skill_name.skill_type_id',
                                     string="Skill Type")
     skill_description = fields.Text(
         string="Skill Description", related="skill_name.skill_description")
-    skill_level_id = fields.Many2one('hrmsv3.skills_level',
+    skill_level_id = fields.Many2one('hr.employee.skills.level',
                                      domain="[('skill_name_id', '=',skill_name)]",
                                      string="Skill Level")
 
@@ -272,31 +273,31 @@ class Skills(models.Model):
 
 
 class SkillName(models.Model):
-    _name = 'hrmsv3.skills_name'
+    _name = 'hr.employee.skills.name'
     _rec_name = 'skill_name'
 
-    requisition_id = fields.Many2one('hrmsv3.personnel_requisition')
+    requisition_id = fields.Many2one('hr.personnel.requisition')
 
     skill_name = fields.Char(string="Skill Name", required=True)
-    skill_type_id = fields.Many2one('hrmsv3.skills_type', string="Skill Type")
+    skill_type_id = fields.Many2one('hr.employee.skills.type', string="Skill Type")
     skill_description = fields.Text()
 
-    skill_level_ids = fields.One2many('hrmsv3.skills_level', 'skill_name_id',
+    skill_level_ids = fields.One2many('hr.employee.skills.level', 'skill_name_id',
                                       string="Skill Levels")
 
 
 class SkillsType(models.Model):
-    _name = 'hrmsv3.skills_type'
+    _name = 'hr.employee.skills.type'
     _rec_name = 'skill_type'
 
     skill_type = fields.Char(string="Skill Type")
 
 
 class SkillsLevel(models.Model):
-    _name = 'hrmsv3.skills_level'
+    _name = 'hr.employee.skills.level'
     _rec_name = 'skill_level'
 
-    skill_name_id = fields.Many2one('hrmsv3.skills_name')
+    skill_name_id = fields.Many2one('hr.employee.skills.name')
 
     skill_level = fields.Char(string="Skill Level")
     skill_level_description = fields.Char(string="Skill Level Description")

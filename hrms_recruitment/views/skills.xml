@@ -5,14 +5,14 @@
     <!-- Skills action window -->
     <record model="ir.actions.act_window" id="hrmsv3_skills_action_window">
       <field name="name">Skills</field>
-      <field name="res_model">hrmsv3.skills</field>
+      <field name="res_model">hr.employee.skills</field>
       <field name="view_mode">form</field>
     </record>
 
-    <!-- hrmsv3.skills_name Form View -->
+    <!-- hr.employee.skills.name Form View -->
     <record id="hrmsv3_skills_name_view_form" model="ir.ui.view">
-      <field name="name">hrmsv3.skills_name.form</field>
-      <field name="model">hrmsv3.skills_name</field>
+      <field name="name">hr.employee.skills.name.form</field>
+      <field name="model">hr.employee.skills.name</field>
       <field name="arch" type="xml">
         <form>
           <sheet>
@@ -37,55 +37,9 @@
       </field>
     </record>
 
-    <!-- <record model="ir.actions.act_window" id="hrmsv3_skill_name_action_window"> -->
-    <!--   <field name="name">Skills Name</field> -->
-    <!--   <field name="res_model">hrmsv3.skills_name</field> -->
-    <!--   <field name="view_mode">tree,form</field> -->
-    <!-- </record> -->
-
-    <!-- <record model="ir.actions.act_window" id="hrmsv3_skill_level_action_window"> -->
-    <!--   <field name="name">Skills Type</field> -->
-    <!--   <field name="res_model">hrmsv3.skills_level</field> -->
-    <!--   <field name="view_mode">tree,form</field> -->
-    <!-- </record> -->
-
-    <!-- <record model="ir.actions.act_window" id="hrmsv3_skill_type_action_window"> -->
-    <!--   <field name="name">Skills Level</field> -->
-    <!--   <field name="res_model">hrmsv3.skills_type</field> -->
-    <!--   <field name="view_mode">tree,form</field> -->
-    <!-- </record> -->
-
-    <!-- <record model="ir.ui.view" id="hrmsv3_skills_level_form"> -->
-    <!--   <field name="name">hrmsv3_skills_level_form</field> -->
-    <!--   <field name="model">hrmsv3.skills_level</field> -->
-    <!--   <field name="arch" type="xml"> -->
-    <!--     <form> -->
-    <!--       <sheet> -->
-    <!--         <group> -->
-    <!--           <field name="skill_id" invisible="1"/> -->
-    <!--           <field name="skill_level"/> -->
-    <!--           <field name="skill_level_description"/> -->
-    <!--         </group> -->
-    <!--       </sheet> -->
-    <!--     </form> -->
-    <!--   </field> -->
-    <!-- </record> -->
-
-    <!-- <record model="ir.ui.view" id="hrms_v3_skills_list"> -->
-    <!--   <field name="name">hrms_v3_skills_list</field> -->
-    <!--   <field name="model">hrmsv3.skills</field> -->
-    <!--   <field name="arch" type="xml"> -->
-    <!--     <tree> -->
-    <!--       <field name="skill_name"/> -->
-    <!--       <field name="skill_type_id"/> -->
-    <!--       <field name="skill_level_ids"/> -->
-    <!--     </tree> -->
-    <!--   </field> -->
-    <!-- </record> -->
-
     <record model="ir.ui.view" id="hrms_v3_skills_form">
       <field name="name">hrms_v3_skills_form</field>
-      <field name="model">hrmsv3.skills</field>
+      <field name="model">hr.employee.skills</field>
       <field name="arch" type="xml">
         <form>
           <sheet>
