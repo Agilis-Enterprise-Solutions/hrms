@@ -303,21 +303,6 @@
             </group>
           </page>
 
-          <page name="work_history" string="Work History">
-            <group string="Work History">
-              <field name="work_history_ids" nolabel="1">
-                <tree>
-                  <field name="company_name"/>
-                  <field name="address"/>
-                  <field name="line_of_business"/>
-                  <field name="job_id"/>
-                  <field name="date_started"/>
-                  <field name="date_exited"/>
-                </tree>
-              </field>
-            </group>
-          </page>
-
           <page name="contract_history" string="Contract History">
             <group string="Contract History">
               <field name="contract_history_ids" nolabel="1">
@@ -333,77 +318,6 @@
             </group>
           </page>
         </page>
-      </field>
-    </record>
-
-    <record id="WorkHistory_view_form" model="ir.ui.view">
-      <field name="name">WorkHistory.form</field>
-      <field name="model">hr.work.history</field>
-      <field name="arch" type="xml">
-        <form string="Work History">
-          <sheet>
-            <group name="employee_information">
-              <group name="employee_information_first_group">
-                <field name="employee_id" invisible="1"/>
-                <field name="job_id"/>
-                <field name="company_name" required="1"/>
-                <field name="line_of_business"/>
-              </group>
-              <group name="employee_information_second_group">
-                <label for="date_started" string="Duration"/>
-                <div>
-                  <field name="date_started" class="oe_inline"/>
-                  <string> - </string>
-                  <field name="date_exited" class="oe_inline"/>
-                </div>
-                <field name="years_of_service"/>
-              </group>
-            </group>
-            <group name="work_information" string="2316 DETAILS">
-                <div class="oe_left">
-                  <group name="nontaxable" string="Nontaxable" class="oe_subtotal_footer">
-                      <field name="statutory_requirements"/>
-                      <field name="nontax_other_benefits"/>
-                      <field name="deminimis"/>
-                      <field name="holiday"/>
-                      <field name="overtime"/>
-                      <field name="night_diff"/>
-                      <field name="hazard"/>
-                      <field name="nontax_salaries_other_comp"/>
-                      <field name="total_nontax" class="oe_subtotal_footer_separator" />
-                  </group>
-                </div>
-                <div class="oe_right">
-                  <group name="taxable" string="Taxable" class="oe_subtotal_footer">
-                      <field name="night_diff"/>
-                      <field name="tax_other_benefits"/>
-                      <field name="tax_salaries_other_comp"/>
-                      <field name="total_tax" class="oe_subtotal_footer_separator" />
-                  </group>
-                </div>
-            </group>
-            <group name="nontaxabe_and_taxable_section">
-                <div class="oe_left">
-                  <group name="nontaxable_section" class="oe_subtotal_footer">
-                      <field name="premium_paid"/>
-                      <field name="exempt_amount"/>
-                      <field name="tax_withheld"/>
-                  </group>
-                </div>
-                <div class="oe_right">
-                  <group name="taxable_section" class="oe_subtotal_footer">
-                      <field name="gross"/>
-                      <field name="net_tax"/>
-                      <field name="tax_due"/>
-                      <field name="amount_withheld"/>
-                      <field name="over_withheld"/>
-                      <field name="tax_withheld_adjusted"/>
-                      <field name="substitute_filing"/>
-                  </group>
-                </div>
-            </group>
-          </sheet>
-        </form>
       </field>
     </record>
   </data>
