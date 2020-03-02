@@ -78,7 +78,11 @@ class Applicant(models.Model):
             'type': 'ir.actions.act_window',
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'hr.contract'
+            'res_model': 'hr.contract',
+            'context': {
+                'default_department_id': self.department_id.id,
+                'default_job_id': self.job_id.id
+            }
         }
 
     @api.multi
