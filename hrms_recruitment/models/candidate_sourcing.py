@@ -143,8 +143,13 @@ class Applicant(models.Model):
                 ('id', '!=' , self.id)
             ])
 
-            if duplicate_archived or duplicate_active:
-                raise ValidationError("Application Not saved. Application has duplicate entry, please review other application")
+            if duplicate_active:
+                raise ValidationError('''Application has duplicate entry!
+                                      Applicant has an active application''')
+
+            if duplicate_archived:
+                raise ValidationError('''Applicanr is in Archived Status!
+                                      Please reopen application to manage applicant''')
 
 
 class CharacterReference(models.Model):
