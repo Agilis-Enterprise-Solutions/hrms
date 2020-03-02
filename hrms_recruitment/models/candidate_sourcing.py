@@ -8,7 +8,6 @@ from logging import getLogger
 _logger = logging.getLogger("_name_")
 
 
-
 def log(**to_output):
     for key, value in to_output.items():
         getLogger().info("\n\n\n{0}: {1}\n\n".format(key, value))
@@ -38,12 +37,12 @@ class Applicant(models.Model):
 
     skills_ids = fields.Many2many(
         'hrmsv3.skills',
-        string="Skills",compute="get_skills")
+        string="Skills", compute="get_skills")
 
     @api.depends("job_id")
     def get_skills(self):
         self.update({
-            'skills_ids':[(6,0,self.job_id.skills_ids.ids)],
+            'skills_ids': [(6, 0, self.job_id.skills_ids.ids)],
         })
         return True
 
@@ -53,7 +52,7 @@ class Applicant(models.Model):
                                           'character_id',
                                           string="Character References")
 
-    candiddate_skills = fields.One2many('hrmsv3.skills','candidate_sourcing_id',
+    candiddate_skills = fields.One2many('hrmsv3.skills', 'candidate_sourcing_id',
                                         string="Candidate Skill")
 
     candiddate_education = fields.One2many('hr.candidate.education',
@@ -64,8 +63,14 @@ class Applicant(models.Model):
                                               'work_history_id',
                                               string="Candidate Work History")
 
-    assessment_ids = fields.One2many('hr.assessment','job_id',
-                                     string="Assessments")
+    assessment_ids = fields.Many2many('hr.assessment',
+                                    #   'job_id',
+                                      string="Assessments"
+                                      )
+
+    requisition_id = fields.Many2one('hrmsv3.personnel_requisition',
+                                     string="Job Requisition",
+                                     )
 
     @api.multi
     def create_contract(self):
@@ -134,13 +139,13 @@ class Applicant(models.Model):
                 ('partner_name', '=', self.partner_name),
                 ('active', '=', False),
                 ('job_id', '=', self.job_id.id),
-                ('id', '!=' , self.id)
+                ('id', '!=', self.id)
             ])
             duplicate_active = self.env['hr.applicant'].search([
                 ('partner_name', '=', self.partner_name),
                 ('active', '=', True),
                 ('job_id', '=', self.job_id.id),
-                ('id', '!=' , self.id)
+                ('id', '!=', self.id)
             ])
 
             if duplicate_active:
@@ -168,8 +173,9 @@ class CharacterReference(models.Model):
         emailPattern = re.compile(r'[\w.-]+@[\w-]+[.]+[\w.-]')
         if self.character_email:
             if (self.character_email
-                and not emailPattern.match(self.character_email)):
-                raise ValidationError("Email is in Incorrect format \n e.g. example@company.com")
+                    and not emailPattern.match(self.character_email)):
+                raise ValidationError(
+                    "Email is in Incorrect format \n e.g. example@company.com")
 
 
 # class CandidateSkill(models.Model):
@@ -206,7 +212,7 @@ class CandidateWorkHistory(models.Model):
     end_date = fields.Date("Date of End", required=True)
     years = fields.Char("Number of years", compute="get_year_services")
 
-    @api.depends('start_date','end_date')
+    @api.depends('start_date', 'end_date')
     def get_year_services(self):
         for rec in self:
             if rec.start_date and rec.end_date:

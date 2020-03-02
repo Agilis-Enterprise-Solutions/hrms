@@ -47,20 +47,20 @@ class Employee(models.Model):
     age = fields.Integer(compute="_compute_age_years")
 
     """======================PRE-EMPLOYMENT INFORMATION======================"""
-    sss_checkbox = fields.Boolean('SSS', compute="_auto_tick")
-    hdmf_checkbox = fields.Boolean(compute="_auto_tick")
-    philhealth_checkbox = fields.Boolean(compute="_auto_tick")
-    gsis_checkbox = fields.Boolean(compute="_auto_tick")
-    tin_checkbox = fields.Boolean(compute="_auto_tick")
-    medical_transaction_number_checkbox = fields.Boolean(compute="_auto_tick")
+    sss_checkbox = fields.Boolean('SSS')
+    hdmf_checkbox = fields.Boolean()
+    philhealth_checkbox = fields.Boolean()
+    gsis_checkbox = fields.Boolean()
+    tin_checkbox = fields.Boolean()
+    medical_transaction_number_checkbox = fields.Boolean()
 
-    nbi_checkbox = fields.Boolean(compute="_auto_tick")
-    police_checkbox = fields.Boolean(compute="_auto_tick")
-    barangay_checkbox = fields.Boolean(compute="_auto_tick")
+    nbi_checkbox = fields.Boolean()
+    police_checkbox = fields.Boolean()
+    barangay_checkbox = fields.Boolean()
 
-    birth_checkbox = fields.Boolean(compute="_auto_tick")
-    tor_checkbox = fields.Boolean(compute="_auto_tick")
-    diploma_checkbox = fields.Boolean(compute="_auto_tick")
+    birth_checkbox = fields.Boolean()
+    tor_checkbox = fields.Boolean()
+    diploma_checkbox = fields.Boolean()
 
     sss = fields.Integer('SSS')
     hdmf = fields.Integer('HDMF')
@@ -152,50 +152,7 @@ class Employee(models.Model):
         self.update({
             'contract_history_ids': [(6, 0, record.ids)],
         })
-        
-    """================PRE-EMPLOYMENT REQUIREMENTS FUNCTIONS==============="""
 
-    @api.depends('sss', 'hdmf', 'philhealth', 'gsis', 'nbi_clearance',
-                 'nbi_expiration', 'nbi_issued_at', 'nbi_date_issued',
-                 'nbi_clearance_photo', 'birth_certificate',
-                 'transcript_of_records', 'diploma', 'police_clearance',
-                 'police_expiration', 'police_issued_at', 'police_date_issued',
-                 'police_clearance_photo', 'barangay_clearance',
-                 'barangay_expiration', 'barangay_issued_at',
-                 'barangay_date_issued', 'barangay_clearance_photo', 'tin',
-                 'medical_transaction_number')
-    def _auto_tick(self):
-        for rec in self:
-            rec.sss_checkbox = True if rec.sss else False
-            rec.hdmf_checkbox = True if rec.hdmf else False
-            rec.philhealth_checkbox = True if rec.philhealth else False
-            rec.gsis_checkbox = True if rec.gsis else False
-            rec.tin_checkbox = True if rec.tin else False
-            rec.medical_transaction_number_checkbox = (True if
-                                                       rec.medical_transaction_number
-                                                       else False)
-
-            rec.nbi_checkbox = True if (rec.nbi_clearance
-                                        and rec.nbi_expiration
-                                        and rec.nbi_issued_at
-                                        and rec.nbi_date_issued
-                                        and rec.nbi_clearance_photo) else False
-            rec.police_checkbox = True if (rec.police_clearance
-                                           and rec.police_expiration
-                                           and rec.police_issued_at
-                                           and rec.police_date_issued
-                                           and rec.police_clearance_photo) else False
-            rec.barangay_checkbox = True if (rec.barangay_clearance
-                                             and rec.barangay_expiration
-                                             and rec.barangay_issued_at
-                                             and rec.barangay_date_issued
-                                             and rec.barangay_clearance_photo) else False
-
-            rec.birth_checkbox = True if rec.birth_certificate else False
-            rec.tor_checkbox = True if rec.transcript_of_records else False
-            rec.diploma_checkbox = True if rec.diploma else False
-
-    """======================PRIVATE INFORMATION FUNCTIONS======================"""
     @api.depends('birthday')
     def _compute_age_years(self):
         today = date.today()
