@@ -13,30 +13,11 @@ def log(**to_output):
         getLogger().info("\n\n\n{0}: {1}\n\n".format(key, value))
 
 
-class Contract(models.Model):
-    _inherit = 'hr.contract'
-
-    allowance_ids = fields.One2many('hr.allowance', 'contract_id')
-
-
-class Allowance(models.Model):
-    _name = 'hr.allowance'
-
-    contract_id = fields.Many2one('hr.contract')
-    allowance_description = fields.Char(required=True)
-    amount_per_cut_off = fields.Float(required=True)
-    allowance_type = fields.Selection([
-        ('Recurring', 'Recurring'),
-        ('Until Validity Date', 'Until Validity Date')
-    ])
-    until_validity_date = fields.Date()
-
-
 class Applicant(models.Model):
     _inherit = "hr.applicant"
 
     skills_ids = fields.Many2many(
-        'hrmsv3.skills',
+        'hr.employee.skills',
         string="Skills", compute="get_skills")
 
     @api.depends("job_id")
@@ -52,7 +33,7 @@ class Applicant(models.Model):
                                           'character_id',
                                           string="Character References")
 
-    candiddate_skills = fields.One2many('hrmsv3.skills', 'candidate_sourcing_id',
+    candiddate_skills = fields.One2many('hr.employee.skills', 'candidate_sourcing_id',
                                         string="Candidate Skill")
 
     candiddate_education = fields.One2many('hr.candidate.education',
@@ -68,7 +49,7 @@ class Applicant(models.Model):
                                       string="Assessments"
                                       )
 
-    requisition_id = fields.Many2one('hrmsv3.personnel_requisition',
+    requisition_id = fields.Many2one('hr.personnel.requisition',
                                      string="Job Requisition",
                                      )
 

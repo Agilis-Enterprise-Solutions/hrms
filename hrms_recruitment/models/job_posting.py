@@ -5,7 +5,7 @@ from odoo import models, fields, api
 class JobPosting(models.Model):
     _inherit = 'hr.job'
 
-    personnel_requisition_id = fields.Many2one('hrmsv3.personnel_requisition')
+    personnel_requisition_id = fields.Many2one('hr.personnel.requisition')
     proposed_salary = fields.Float(
         string="Proposed Salary",
         related='personnel_requisition_id.proposed_salary',
@@ -14,7 +14,7 @@ class JobPosting(models.Model):
     )
 
     skills_ids = fields.Many2many(
-        'hrmsv3.skills',
+        'hr.employee.skills',
         string="Skills")
 
     job_qualification = fields.Text(string="Qualification")

@@ -6,7 +6,7 @@
             id="hrmsv3_personnel_requisition_action_window">
 
       <field name="name">Personnel Requisition</field>
-      <field name="res_model">hrmsv3.personnel_requisition</field>
+      <field name="res_model">hr.personnel.requisition</field>
       <field name="type">ir.actions.act_window</field>
       <field name="view_mode">tree,form</field>
       <field name="help" type="html">
@@ -19,7 +19,7 @@
     <!-- Personnel Requisition List View  -->
     <record model="ir.ui.view" id="hrms_v3_personnel_requisition_list">
       <field name="name">hrms_v3_personnel_requisition_list</field>
-      <field name="model">hrmsv3.personnel_requisition</field>
+      <field name="model">hr.personnel.requisition</field>
       <field name="arch" type="xml">
         <tree>
           <field name="company_id"/>
@@ -34,7 +34,7 @@
     <!-- Personnel Requisition Form View -->
     <record model="ir.ui.view" id="hrms_v3_personnel_requisition_form">
       <field name="name">hrms_v3_personnel_requisition_form</field>
-      <field name="model">hrmsv3.personnel_requisition</field>
+      <field name="model">hr.personnel.requisition</field>
       <field name="arch" type="xml">
         <form string="Job Requisition">
           <header>
@@ -87,7 +87,7 @@
                        attrs="{'invisible': [('replacement_for_id_check_box','=', False)]}">
                       <tree>
                        <field name="name"/>
-                       <field name="contract_id"/>      
+                       <field name="contract_id"/>
                       </tree>
                 </field> -->
 
@@ -125,6 +125,26 @@
             <field name="activity_ids" widget="mail_activity"/>
             <field name="message_ids" widget="mail_thread" />
           </div>
+        </form>
+      </field>
+    </record>
+
+    <record id="EmployeeSkillLevel_view_form" model="ir.ui.view">
+      <field name="name">EmployeeSkillLevel.form</field>
+      <field name="model">hr.employee.skills.level</field>
+      <field name="arch" type="xml">
+        <form string="Skill Level">
+          <sheet>
+            <group name="skill_level">
+              <group>
+                <field name="skill_name_id" invisible="1"/>
+                <field name="skill_level"/>
+              </group>
+              <group>
+                <field name="skill_level_description"/>
+              </group>
+            </group>
+          </sheet>
         </form>
       </field>
     </record>

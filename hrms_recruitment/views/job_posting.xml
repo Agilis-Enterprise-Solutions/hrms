@@ -11,7 +11,7 @@
 
     <record model="ir.ui.view" id="_get_historical_requisition_view">
       <field name="name">Historical Requisition</field>
-      <field name="model">hrmsv3.personnel_requisition</field>
+      <field name="model">hr.personnel.requisition</field>
       <field name="arch" type="xml">
         <tree>
           <field name="job_req_id_seq"/>
@@ -27,7 +27,7 @@
     <record id="_get_historical_requisition" model="ir.actions.act_window">
       <field name="name">Historical Requisition</field>
       <field name="type">ir.actions.act_window</field>
-      <field name="res_model">hrmsv3.personnel_requisition</field>
+      <field name="res_model">hr.personnel.requisition</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
       <field name="view_id" eval="_get_historical_requisition_view"/>
@@ -72,12 +72,6 @@
         <xpath expr="//button[@name='action_get_attachment_tree_view']"
                position="after">
           <br/>
-          <!-- Launch Button Commented out due to redundancy. Please advise otherwise -->
-          <!-- <button class="oe_stat_button" icon="fa-book" type="object">
-            <div class="o_field_widget o_stat_info">
-              <span class="o_stat_text">Launch</span>
-            </div>
-          </button> -->
           <button class="oe_stat_button" name="%(_get_historical_requisition)d"
                   icon="fa-book" type="action">
             <div class="o_field_widget o_stat_info">

@@ -27,8 +27,8 @@
 
     'data': [
         'security/ir.model.access.csv',
-        'views/job_posting.xml',
         'views/personnel_requisition.xml',
+        'views/job_posting.xml',
         'views/skills.xml',
         'views/candidate_sourcing.xml',
         'views/candidate_assessment.xml',
