@@ -1,6 +1,6 @@
 # coding: utf-8
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 from datetime import date
 import re
 import logging
@@ -45,26 +45,81 @@ class Applicant(models.Model):
                                               string="Candidate Work History")
 
     assessment_ids = fields.Many2many('hr.assessment',
-                                    #   'job_id',
-                                      string="Assessments"
-                                      )
+                                      string="Assessments")
 
     requisition_id = fields.Many2one('hr.personnel.requisition',
-                                     string="Job Requisition",
-                                     )
+                                     string="Job Requisition")
+
+    contract_id = fields.Many2one('hr.contract', string="Contract",
+                                  track_visibility="onchange",
+                                  help="Contract linked to the applicant.")
+    contract_ref_name = fields.Char(related='contract_id.name',
+                                    string="Contract Reference")
+    stage_id_name = fields.Char(related='stage_id.name')
 
     @api.multi
-    def create_contract(self):
-        return {
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'hr.contract',
-            'context': {
-                'default_department_id': self.department_id.id,
-                'default_job_id': self.job_id.id
-            }
-        }
+    def create_employee_with_contract(self):
+        employee = False
+        for applicant in self:
+            contact_name = False
+            if applicant.partner_id:
+                address_id = applicant.partner_id.address_get(['contact'])['contact']
+                contact_name = applicant.partner_id.name_get()[0][1]
+            else :
+                new_partner_id = self.env['res.partner'].create({
+                    'is_company': False,
+                    'name': applicant.partner_name,
+                    'email': applicant.email_from,
+                    'phone': applicant.partner_phone,
+                    'mobile': applicant.partner_mobile
+                })
+                address_id = new_partner_id.address_get(['contact'])['contact']
+            if applicant.job_id and (applicant.partner_name or contact_name):
+                applicant.job_id.write({
+                    'no_of_hired_employee': applicant.job_id.no_of_hired_employee + 1
+                })
+                employee = self.env['hr.employee'].create({
+                    'name': applicant.partner_name or contact_name,
+                    'job_id': applicant.job_id.id,
+                    'address_home_id': address_id,
+                    'department_id': applicant.department_id.id or False,
+                    'address_id': (applicant.company_id
+                                   and applicant.company_id.partner_id
+                                   and applicant.company_id.partner_id.id
+                                   or False),
+                    'work_email': (applicant.department_id
+                                   and applicant.department_id.company_id
+                                   and applicant.department_id.company_id.email
+                                   or False),
+                    'work_phone': (applicant.department_id
+                                   and applicant.department_id.company_id
+                                   and applicant.department_id.company_id.phone
+                                   or False)
+                })
+                contract = self.env['hr.contract'].create({
+                    'name': '{0} – {1}'.format(applicant.partner_name,
+                                                 applicant.name),
+                    'wage': applicant.salary_proposed,
+                    'employee_id': employee.id
+                })
+                applicant.write({
+                    'emp_id': employee.id,
+                    'contract_id': contract.id
+                })
+                applicant.job_id.message_post(
+                    body=(_('New Employee %s Hired') % applicant.partner_name
+                          if applicant.partner_name else applicant.name),
+                    subtype="hr_recruitment.mt_job_applicant_hired")
+            else:
+                raise UserError(_('You must define an Applied Job and a Contact Name for this applicant.'))
+
+    @api.multi
+    def action_get_created_contract(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window'].for_xml_id('hrms_recruitment',
+                                                              'open_view_contract_list')
+        action['res_id'] = self.mapped('contract_id').ids[0]
+        return action
 
     @api.multi
     def action_get_assessment_tree_view(self):
