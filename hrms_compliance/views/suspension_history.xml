@@ -23,13 +23,14 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                         <field name="state" widget="statusbar" statusbar_visible="on_going,completed"/>
+                        <field name="state" widget="statusbar" statusbar_visible="on_going,completed"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
                                 <field name="infraction_id" readonly="1"/>
                                 <field name="emp_id" readonly="1"/>
+                                <field name="contract_id" groups="base.group_no_one" />
                             </group>
                             <group>
                                 <field name="used_days" readonly="1"/>

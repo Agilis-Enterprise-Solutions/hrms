@@ -36,6 +36,12 @@ class Suspension(models.TransientModel):
                                    compute="get_history"
                                    )
 
+    contract_id = fields.Many2one(
+        'hr.contract', string='Current Contract',
+        related='emp_id.contract_id',
+        readonly=True,
+    )
+
     @api.depends('use_suspension_days')
     def compute_remaining_days(self):
         for rec in self:
@@ -65,13 +71,15 @@ class Suspension(models.TransientModel):
             raise UserError(
                 _('Suspension days to be used must not be more than remaining suspension days.'))
         elif self.start_date == False and self.end_date == False:
-            raise UserError(_('Please set start date and end date before clicking on Submit'))
+            raise UserError(
+                _('Please set start date and end date before clicking on Submit'))
         elif self.start_date == False and self.end_date != False:
             raise UserError('Please set start date before clicking on Submit')
         elif self.start_date != False and self.end_date == False:
-            raise UserError('Please set end date before clicking on Submit')    
+            raise UserError('Please set end date before clicking on Submit')
         elif self.start_date < date.today():
-            raise UserError(_('You cannot set the start date before today\'s date.'))
+            raise UserError(
+                _('You cannot set the start date before today\'s date.'))
         elif self.start_date > self.end_date:
             raise UserError('Start Date must not be later than End Date')
         elif self.start_date == self.end_date and self.use_suspension_days == 0:

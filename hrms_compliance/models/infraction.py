@@ -58,7 +58,7 @@ class Infractions(models.Model):
                                     )
 
     violation_id = fields.Many2one(
-        "hr.company.violation", string="Violation", track_visibility="onchange",required=True, 
+        "hr.company.violation", string="Violation", track_visibility="onchange", required=True,
     )
 
     policy_violated_ids = fields.Many2many("hr.company.policy", string="Policies Violated",
@@ -75,7 +75,7 @@ class Infractions(models.Model):
         string="Policies Violated",
         track_visibility="onchange",
         domain="[('id', 'in', policy_violated_ids)]",
-        required=True, 
+        required=True,
     )
 
     frequency = fields.Char(
@@ -88,6 +88,31 @@ class Infractions(models.Model):
     violation_date = fields.Date(
         string="Date of Violation", track_visibility="onchange"
     )
+
+    parent_infraction_id = fields.Many2one(
+        'hr.infraction', string="Parent Infraction")
+    is_parent = fields.Boolean(string="Is Parent",
+                               readonly=True
+                               )
+    is_child = fields.Boolean(string="Is Child",
+                              readonly=True
+                              )
+
+    @api.onchange('parent_infraction_id')
+    def set_related_infraction(self):
+        for rec in self:
+            if rec.parent_infraction_id:
+                rec.emp_id = rec.parent_infraction_id.emp_id
+                rec.violation_id = rec.parent_infraction_id.violation_id
+                rec.violation_date = rec.parent_infraction_id.violation_date
+                rec.violation_details = rec.parent_infraction_id.violation_details
+
+    @api.constrains('parent_infraction_id')
+    def check_parent_infraction(self):
+        for rec in self:
+            if rec.parent_infraction_id.id == self.id:
+                raise UserError(_('Cannot assign record as its own parent'))
+
     case_status = fields.Char(string="Case Status")
     state = fields.Selection(
         string="status",
@@ -211,8 +236,10 @@ class Infractions(models.Model):
                 for i in self.offense_code_id.corrective_action_ids:
                     frequency = i.frequencies
                 if self.offense_code_id and self.offense_code_id.corrective_action_ids:
-                    getLogger().info("\n\n\nCASE 1 {} {}\n\n\n".format(self.offense_code_id, self.offense_code_id.corrective_action_ids))
-                    log(offense_code_id = self.offense_code_id, corrective_action = self.offense_code_id.corrective_action_ids)
+                    getLogger().info("\n\n\nCASE 1 {} {}\n\n\n".format(
+                        self.offense_code_id, self.offense_code_id.corrective_action_ids))
+                    log(offense_code_id=self.offense_code_id,
+                        corrective_action=self.offense_code_id.corrective_action_ids)
                     self.frequency = frequency[counter -
                                                1 if counter > 0 else counter][1]
                     getLogger().info("\n\n\nCounter{}\nFrequency{}\n\n\n".format(
@@ -254,13 +281,14 @@ class Infractions(models.Model):
         for i in self.history_ids:
             if i.stage == 'inv_nte_issuance':
                 self.write({
-                'state': 'in_progress',
-                'date_in_progress': datetime.now(),
-                'set_in_progress_by': self._uid
-                    })
+                    'state': 'in_progress',
+                    'date_in_progress': datetime.now(),
+                    'set_in_progress_by': self._uid
+                })
                 break
         else:
-            raise UserError(_('Investigation and NTE Issuance should be created in Action History before setting the record in progress'))
+            raise UserError(
+                _('Investigation and NTE Issuance should be created in Action History before setting the record in progress'))
 
     @api.multi
     def set_state_forclosure(self):
@@ -513,7 +541,8 @@ class ActionHistory(models.Model):
     staggered = fields.Boolean(string="Staggered")
     user_id = fields.Many2one(
         'res.users', string="Current User", compute="get_current_user")
-    infraction_state = fields.Selection(string='Infraction State',related="infraction_id.state")
+    infraction_state = fields.Selection(
+        string='Infraction State', related="infraction_id.state")
 
     """ Checks if there are 2 or more instances of incident reports and NTE issuances """
     @api.constrains('stage')
@@ -536,7 +565,8 @@ class ActionHistory(models.Model):
         for i in self:
             record_state = i.infraction_id.state
             if i.stage == 'collaboration' and record_state != 'in_progress':
-                raise UserError(_('Please click Submit button first before creating new Action record with stage Collaboration with IMC.'))
+                raise UserError(
+                    _('Please click Submit button first before creating new Action record with stage Collaboration with IMC.'))
 
     @api.constrains('start_date', 'end_date')
     def check_start_end_date(self):
@@ -659,6 +689,32 @@ class ActionHistory(models.Model):
             'target': 'new',
             'context': ctx,
         }
+    
+    
+    # @api.multi
+    # def write(self, vals):
+    #     """
+    #         Update all record(s) in recordset, with new value comes as {values}
+    #         return True on success, False otherwise
+    
+    #         @param values: dict of new values to be set
+    
+    #         @return: True on success, False otherwise
+    #     """
+        
+    #     result = super(ActionHistory, self).write(vals)
+
+    #     data = {}
+    #     if vals.get("action"):
+    #         if vals.get("action") == "Suspension":
+    #             data['emp_id'] = vals.get('emp_id')
+    #             data['date_from'] = vals.get("start_date")
+    #             data['date_to'] = vals.get("end_date")
+    #             data['infraction_id'] = vals.get("infraction_id")
+    #             data['state'] = 'on_going'
+    #             data['contract_id'] = vals.get('emp_id').contract_id.id
+    #             self.env['suspension.history'].create(data)
+    #     return result 
 
 
 """========================SUSPENSION HISTORY=======================
@@ -687,6 +743,13 @@ class SuspensionHistory(models.Model):
     state = fields.Selection(
         string='Status',
         selection=status
+    )
+
+    contract_id = fields.Many2one(
+        'hr.contract', string='Current Contract',
+        related='emp_id.contract_id',
+        readonly=True,
+        store=True
     )
 
     @api.onchange("date_from", "date_to")

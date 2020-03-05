@@ -9,6 +9,7 @@
                     <group>
                         <group>
                             <field name="emp_id" groups="base.group_no_one" readonly="1" />
+                            <field name="contract_id" groups="base.group_no_one"/>
                             <field name="infraction_id" groups="base.group_no_one" readonly="1" />
                             <field name="suspension_days" readonly="1"/>
                             <field name="remaining_days" readonly="1" />
@@ -29,7 +30,6 @@
                                 <field name="state"/>
                             </tree>
                         </field>
-
                     </group>
                     <footer>
                         <button name="create_suspension" string="Submit" type="object" class="btn-primary"/>
