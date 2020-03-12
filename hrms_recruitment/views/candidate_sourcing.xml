@@ -8,17 +8,29 @@
       <field name="inherit_id" ref="hr_recruitment.crm_case_form_view_job"/>
       <field name="arch" type="xml">
         <button name="action_get_created_employee" position="after">
-          <button name="action_get_created_contract"
+          <button name="act_hr_applicant_2_hr_contract"
                   class="oe_stat_button"
-                  icon="fa-user"
+                  icon="fa-book"
                   type="object"
-                  attrs="{'invisible': [('contract_id', '=', False)]}">
-            <field name="contract_ref_name" widget="statinfo"
-                   string="Contract"/>
+                  attrs="{'invisible': [('contracts_count', '=', 0)]}"
+                  context="{'default_applicant_id': active_id}">
+            <field name="contracts_count" widget="statinfo" string="Contracts"/>
           </button>
         </button>
         <field name="emp_id" position="after">
-          <field name="contract_id" invisible="1"/>
+          <field name="running_contract_id" groups="base.group_no_one"/>
+        </field>
+      </field>
+    </record>
+
+    <!-- Inherit Form view -->
+    <record id="contract_inherit_add_applicant_id" model="ir.ui.view">
+      <field name="name">hr.contract.form</field>
+      <field name="model">hr.contract</field>
+      <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+      <field name="arch" type="xml">
+        <field name="employee_id" position="after">
+          <field name="applicant_id" groups="base.group_no_one"/>
         </field>
       </field>
     </record>
@@ -39,11 +51,18 @@
         <xpath expr="//button[@name='create_employee_from_applicant']"
                position="after">
           <field name="stage_id_name" invisible="1"/>
-          <button string="Create Employee with Contract"
-                  name="create_employee_with_contract"
-                  type="object" class="oe_highlight"
-                  attrs="{'invisible': ['|', '|', '|', ('stage_id_name', '!=', 'Contract Signed'), ('emp_id', '!=', False), ('contract_id', '!=', False), ('active', '=', False)]}"/>
+          <button type="object" name="create_contract" string="Create Contract"
+                  class="oe_highlight"
+                  attrs="{'invisible': [('contracts_count', '!=', 0)]}"/>
         </xpath>
+
+        <xpath expr="//button[@name='create_employee_from_applicant']"
+               position="attributes">
+          <attribute name="attrs">
+            {'invisible': ['|', '|', ('emp_id', '!=', False), ('active', '=', False), ('running_contract_id', '=', False)]}
+          </attribute>
+        </xpath>
+
         <xpath expr="//div[@name='button_box']/button[@name='action_get_attachment_tree_view']"
                position="after">
           <button name="action_get_assessment_tree_view" class="oe_stat_button"
@@ -54,8 +73,8 @@
           <field name="skills_ids" widget="many2many_tags"
                  options="{'color_field': 'color', 'no_create_edit': True}"/>
           <field name="requisition_id"
-          domain="[('job_position_id', '=', job_id), ('state', 'in', ['approved'])]"
-          />
+                 domain="[('job_position_id', '=', job_id), ('state', 'in', ['approved'])]"
+                 />
         </xpath>
         <xpath expr="//field[@name='availability']" position="after">
           <field name="blacklisted"
@@ -113,7 +132,9 @@
         </xpath>
 
         <button name="create_employee_from_applicant"
-                position="replace"/>
+                position="attributes">
+          <attribute name="name">create_employee</attribute>
+        </button>
       </field>
     </record>
 

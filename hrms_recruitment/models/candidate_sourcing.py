@@ -8,9 +8,14 @@ from logging import getLogger
 _logger = logging.getLogger("_name_")
 
 
-def log(**to_output):
-    for key, value in to_output.items():
-        getLogger().info("\n\n\n{0}: {1}\n\n".format(key, value))
+def log(*to_output):
+    getLogger().info("\n\n\n{}\n\n".format(to_output))
+
+
+class InheritContract(models.Model):
+    _inherit = 'hr.contract'
+
+    applicant_id = fields.Many2one('hr.applicant')
 
 
 class Applicant(models.Model):
@@ -19,13 +24,6 @@ class Applicant(models.Model):
     skills_ids = fields.Many2many(
         'hr.employee.skills',
         string="Skills", compute="get_skills")
-
-    @api.depends("job_id")
-    def get_skills(self):
-        self.update({
-            'skills_ids': [(6, 0, self.job_id.skills_ids.ids)],
-        })
-        return True
 
     blacklisted = fields.Boolean(string="Blacklisted")
 
@@ -57,8 +55,63 @@ class Applicant(models.Model):
                                     string="Contract Reference")
     stage_id_name = fields.Char(related='stage_id.name')
 
+    contracts_count = fields.Integer(compute='_compute_contracts_count',
+                                     string='Contracts Count')
+
+    running_contract_id = fields.Many2one('hr.contract',
+                                          compute="_compute_contracts_count")
+
     @api.multi
-    def create_employee_with_contract(self):
+    def act_hr_applicant_2_hr_contract(self):
+        return {
+            'name': 'Contracts',
+            'type': 'ir.actions.act_window',
+            'res_model': 'hr.contract',
+            'view_type': 'form',
+            'view_mode': 'kanban,tree,form',
+            'domain': [('applicant_id', '=', self.id)],
+            'context': {
+                'search_default_group_by_state': 1,
+                'default_department_id': self.department_id.id,
+                'default_job_id': self.job_id.id
+            }
+        }
+
+    def _compute_contracts_count(self):
+        for applicant in self:
+            contracts = self.env['hr.contract'].search([
+                ('applicant_id', '=', applicant.id)
+            ])
+
+            applicant.contracts_count = len(contracts)
+
+            for contract in contracts:
+                if contract.state == 'open':
+                    applicant.running_contract_id = contract.id
+                    return
+
+    @api.multi
+    def create_contract(self):
+        self.ensure_one()
+
+        if not self.contracts_count:
+            self.env['hr.contract'].create({
+                'applicant_id': self.id,
+                'name': '{}'.format(self.partner_name),
+                'wage': self.salary_proposed,
+                'job_id': self.job_id.id,
+                'department_id': self.department_id.id
+            })
+
+    @api.depends("job_id")
+    def get_skills(self):
+        self.update({
+            'skills_ids': [(6, 0, self.job_id.skills_ids.ids)],
+        })
+        return True
+
+    @api.multi
+    def create_employee(self):
         employee = False
         for applicant in self:
             contact_name = False
@@ -96,15 +149,12 @@ class Applicant(models.Model):
                                    and applicant.department_id.company_id.phone
                                    or False)
                 })
-                contract = self.env['hr.contract'].create({
-                    'name': '{0} – {1}'.format(applicant.partner_name,
-                                                 applicant.name),
-                    'wage': applicant.salary_proposed,
+
+                applicant.running_contract_id.write({
                     'employee_id': employee.id
                 })
                 applicant.write({
-                    'emp_id': employee.id,
-                    'contract_id': contract.id
+                    'emp_id': employee.id
                 })
                 applicant.job_id.message_post(
                     body=(_('New Employee %s Hired') % applicant.partner_name
