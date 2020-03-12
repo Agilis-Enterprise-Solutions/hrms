@@ -62,7 +62,7 @@ class WorkHistory(models.Model):
 
     @api.depends('statutory_requirements','nontax_other_benefits',
                  'deminimis','holiday','overtime','night_diff','hazard',
-                 'nontax_salaries_other_comp','total_nontax')
+                 'nontax_salaries_other_comp')
     def _get_total_nontaxable(self):
         for rec in self:
             rec.total_nontax = (rec.statutory_requirements
