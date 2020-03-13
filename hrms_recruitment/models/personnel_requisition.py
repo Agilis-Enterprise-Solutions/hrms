@@ -20,7 +20,8 @@ class PersonnelRequisition(models.Model):
                                  copy=False,
                                  readonly=True,
                                  index=True,
-                                 default=lambda self: _('New'))
+                                 default=lambda self: _('New')
+                                 )
 
     company_id = fields.Many2one('res.company', string="Company")
     job_position_id = fields.Many2one('hr.job', string="Job Position")
@@ -47,6 +48,9 @@ class PersonnelRequisition(models.Model):
 
     responsible_id = fields.Many2one('res.users',
                                      string="Responsible",
+                                     related='job_position_id.user_id',
+                                     readonly=True,
+                                     store=True,
                                      track_visibility='onchange'
                                      )
     email_alias = fields.Char(string="Email Alias")
@@ -95,20 +99,26 @@ class PersonnelRequisition(models.Model):
         ('draft', 'Draft'),
         ('for_approval', 'Waiting for Approval'),
         ('approved', 'Approved'),
-        ('canceled', 'Canceled')
+        ('canceled', 'Canceled'),
+        ('closed', 'Closed')
     ], string="Status", default="draft", readonly=True, copy=False)
 
     @api.model
     def create(self, vals):
+        """
+            Sets up Job Requisition Sequence ID to "New" 
+            Commented Part is the old Create Function 
+            used to add sequence once a new record has been
+            created. New code only sets job_req_id_seq to
+            "New". Code that will add Sequence transferred 
+            to submit button.
+        """
+        # if vals.get('job_req_id_seq', _('New')) == ('New'):
+        #     vals['job_req_id_seq'] = self.env['ir.sequence'].next_by_code(
+        #         'job.requisition.sequence') or _('New')
         if vals.get('job_req_id_seq', _('New')) == ('New'):
-            vals['job_req_id_seq'] = self.env['ir.sequence'].next_by_code(
-                'job.requisition.sequence') or _('New')
+            vals['job_req_id_seq'] = _('New')
         result = super(PersonnelRequisition, self).create(vals)
-        self.env['hr.job'].browse(vals.get('job_position_id')).write({
-            'description': result.job_description,
-            # 'job_qualification': result.job_qualification,
-            })
-
         return result
 
     @api.multi
@@ -141,10 +151,6 @@ class PersonnelRequisition(models.Model):
         result = super(PersonnelRequisition, self).write(vals)
 
         data = {}
-        if vals.get("job_description"):
-            data['description'] = vals.get("job_description")
-        # if vals.get("job_qualification"):
-        #     data['job_qualification'] = vals.get("job_qualification")
         self.job_position_id.write(data)
         return result
 
@@ -179,23 +185,25 @@ class PersonnelRequisition(models.Model):
         self.write({
             'state': 'for_approval',
         })
+        self.job_req_id_seq = self.env['ir.sequence'].next_by_code(
+            'job.requisition.sequence') or _('New')
         return True
 
     # Approve Button Function
     @api.multi
     def approve_jobreq_form(self):
         for record in self:
-            user_id = record.responsible_id.id
             job_qualification = record.job_qualification
             expected_new_employee = record.expected_new_employee
             skills_ids = record.skills_ids
             job_position = record.job_position_id
             proposed_salary = record.proposed_salary
+            description = record.job_description
             for rec in job_position:
                 if skills_ids:
                     rec.skills_ids = skills_ids
                 rec.write({
-                    'user_id': user_id,
+                    'description': description,
                     'no_of_recruitment': self.job_position_id.no_of_recruitment + expected_new_employee,
                     'job_qualification': job_qualification,
                     'proposed_salary': proposed_salary
@@ -213,31 +221,20 @@ class PersonnelRequisition(models.Model):
         })
         return True
 
-    # Commented out function. Redundant
-    # Update Job Post Button Function
-    # @api.multi
-    # def action_hr_job_form(self):
-        # for record in self:
-        #     user_id = record.responsible_id.id
-        #     job_qualification = record.job_qualification
-        #     expected_new_employee = record.expected_new_employee
-        #     skills_ids = record.skills_ids
-        #     job_position = record.job_position_id
-        #     proposed_salary = record.proposed_salary
-        #     for rec in job_position:
-        #         if skills_ids:
-        #             rec.skills_ids = skills_ids
-        #         rec.write({
-        #             'user_id': user_id,
-        #             'no_of_recruitment': expected_new_employee,
-        #             'job_qualification': job_qualification,
-        #             'proposed_salary': proposed_salary
-        #         })
-        # self.write({
-        #     'state': 'approved',
-        # })
+    # Reset to Draft Function
+    @api.multi
+    def reset_to_draft(self):
+        self.write({
+            'state': 'draft',
+        })
+        return True
 
-    #     return True
+    @api.multi
+    def close_requisition(self):
+        self.write({
+            'state': 'closed'
+        })
+        return True
 
 
 class Skills(models.Model):
@@ -279,7 +276,8 @@ class SkillName(models.Model):
     requisition_id = fields.Many2one('hr.personnel.requisition')
 
     skill_name = fields.Char(string="Skill Name", required=True)
-    skill_type_id = fields.Many2one('hr.employee.skills.type', string="Skill Type")
+    skill_type_id = fields.Many2one(
+        'hr.employee.skills.type', string="Skill Type")
     skill_description = fields.Text()
 
     skill_level_ids = fields.One2many('hr.employee.skills.level', 'skill_name_id',
