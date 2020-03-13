@@ -55,7 +55,7 @@ class HRMSSeparation(models.Model):
     def _separation_letter(self):
         for rec in self:
             if rec.resignation_letter:
-                rec.relieved = rec.resignation_letter.relieved
+                rec.relieved = rec.resignation_letter.relieved_date
                 rec.reason = rec.resignation_letter.reason.id
 
     @api.onchange('name')
@@ -151,11 +151,6 @@ class HRMSSeparation(models.Model):
             rec.date_approved = date.today()
             user_id = self.env['res.users'].browse(self._context.get('uid'))
             rec.approved_by = user_id.id
-            if rec.resignation_letter:
-                rec.resignation_letter.state = 'approve'
-                rec.resignation_letter.separation_parent_id = rec.id
-                rec.resignation_letter.date_approved = date.today()
-                rec.resignation_letter.approved_by = user_id.id
         return self.write({'state': 'approve'})
 
     @api.multi
@@ -178,6 +173,7 @@ class HRMSSeparation(models.Model):
                 i.name.status = 'Terminated'
             i.name.date_exited = i.relieved
             i.name.exit_reason = i.note
+            i.name.separation_id = i.id
             i.name.active = False
 
             return self.write({'state':'claim'})

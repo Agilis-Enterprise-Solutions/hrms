@@ -65,6 +65,7 @@ class HRMSExitClearance(models.Model):
     @api.multi
     def submit(self):
         for rec in self:
+            data = []
             rec.date_submitted = date.today()
 
             user_id = self.env['res.users'].browse(self._context.get('uid'))
@@ -77,7 +78,21 @@ class HRMSExitClearance(models.Model):
                 raise UserError('''Duplicate Exit Clearance.
                                 Please Check the other records for Reference''')
 
-        return self.write({'state': 'pending'})
+
+            approver = self.env['hr.exit.clearance.approver'].search([
+                ('department_id','=',rec.department_id.id)])
+
+            if approver:
+                for i in approver.approve_ids:
+                    val= {
+                        'name' : i.name.id,
+                        'job_id' : i.job_id.id,
+                        'department_id' : i.department_id.id,
+                        }
+                    data.append([0, 0, val])
+
+        return self.write({'clearance_details': data,
+                           'state': 'pending'})
 
     @api.multi
     def clear(self):
@@ -133,3 +148,32 @@ class HRMSExitClearanceLines(models.Model):
         ('pending', 'Pending'),
         ('approved', 'Approved')
     ], string="Status",  default="pending")
+
+
+class HRMSExitClearanceApprover(models.Model):
+    _name = "hr.exit.clearance.approver"
+    _rec_name = "department_id"
+
+
+    department_id = fields.Many2one('hr.department', "Department")
+    approve_ids = fields.One2many('hr.exit.clearance.approver.lines',
+                                  'approver_id',
+                                  string="Clearance Approver")
+
+    @api.constrains('department_id')
+    def check_duplicate_true(self):
+        if self.department_id:
+            duplicate = self.search([('department_id', '=', self.department_id.id)])
+            if duplicate:
+                raise UserError('''One Department is allowed.
+                                Cannot Create with same Department Approver''')
+
+
+class HRMSExitClearanceApproverLines(models.Model):
+    _name = "hr.exit.clearance.approver.lines"
+
+    approver_id = fields.Many2one('hr.exit.clearance.approver', ondelete="cascade")
+    name = fields.Many2one('hr.employee', "Name")
+    job_id = fields.Many2one('hr.job', "Job Position", related="name.job_id")
+    department_id = fields.Many2one('hr.department', "Department",
+                                    related="name.department_id")

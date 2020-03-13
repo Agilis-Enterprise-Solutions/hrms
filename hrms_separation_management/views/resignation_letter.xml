@@ -10,8 +10,10 @@
           <header>
             <button name="submit" string="SUBMIT"
                     class="oe_highlight" states="draft" type="object"/>
-            <button name="confirm" string="Confirm"
+            <button name="confirm" string="CONFIRM"
                     class="oe_highlight" states="submit" type="object"/>
+            <button name="approved" string="APPROVE"
+                    class="oe_highlight" states="confirm" type="object"/>
             <field name="state" widget="statusbar"/>
           </header>
           <sheet>
@@ -23,8 +25,14 @@
                   attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
               </group>
               <group name="relived_date">
-                <field name="relieved"
+                <field name="resignation_date"
                   attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
+                <field name="effective_date"
+                  attrs="{'readonly': [('state', 'not in', ('draft'))],
+                          'invisible': [('state', 'not in', ('confirm','approve'))] }"/>
+                <field name="relieved_date"
+                  attrs="{'readonly': [('state', 'not in', ('draft'))],
+                          'invisible': [('state', '!=', 'approve')] }"/>
               </group>
               <field name="separation_parent_id"/>
             </group>
@@ -67,7 +75,7 @@
         <tree string="Resignation Letter">
           <field name="name"/>
           <field name="reason"/>
-          <field name="relieved"/>
+          <field name="relieved_date"/>
           <field name="date_submitted"/>
           <field name="state"/>
         </tree>

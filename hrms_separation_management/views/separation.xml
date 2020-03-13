@@ -47,7 +47,7 @@
                   attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
                 <field name="resignation_letter"
                   domain="[('name','=',name),
-                           ('state','=','confirm')]"
+                           ('state','=','approve')]"
                   attrs="{'readonly': [('state', 'not in', ('draft'))],
                           'invisible': [('separation_type', '!=',
                                                             'resignation')],

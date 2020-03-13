@@ -35,6 +35,12 @@
               action="HRMSResignationReason_action_form"
               sequence="0"/>
 
+    <menuitem name="Exit Clerance Approver"
+              id="menu_item_configuration_exit_clearance_approver"
+              parent="menu_item_separation_management_configuration"
+              action="HRMSExitClearanceApprover_action_form"
+              sequence="1"/>
+
 
   </data>
 </odoo>

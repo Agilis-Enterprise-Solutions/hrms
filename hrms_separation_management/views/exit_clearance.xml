@@ -43,7 +43,7 @@
             <group name='clearance_details'>
               <field name="clearance_details" nolabel="1"
                 attrs="{'readonly': [('state', '=', 'cleared')]}">
-                <tree string="Clerance Details" editable="bottom">
+                <tree string="Clerance Details" editable="bottom" create="false">
                   <field name="clearance_id" invisible="1"/>
                   <field name="name"/>
                   <field name="job_id"/>
@@ -73,6 +73,45 @@
           </sheet>
         </form>
       </field>
+    </record>
+
+
+    <record id="HRMSExitClearanceApprover_view_form" model="ir.ui.view">
+      <field name="name">HRMSExitClearanceApprover.form</field>
+      <field name="model">hr.exit.clearance.approver</field>
+      <field name="arch" type="xml">
+        <form string="Clearance Approver">
+          <sheet>
+            <group>
+              <field name="department_id"/>
+            </group>
+            <field name="approve_ids" nolabel="1">
+              <tree string="Clerance Approver" editable="bottom">
+                <field name="approver_id" invisible="1"/>
+                <field name="name"/>
+                <field name="job_id"/>
+                <field name="department_id"/>
+              </tree>
+            </field>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="HRMSExitClearanceApprover_view_tree" model="ir.ui.view">
+      <field name="name">HRMSExitClearanceApprover.tree</field>
+      <field name="model">hr.exit.clearance.approver</field>
+      <field name="arch" type="xml">
+        <tree string="Exit Clerance Approver">
+          <field name="department_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="HRMSExitClearanceApprover_action_form" model="ir.actions.act_window">
+      <field name="name">Exit Clerance Approver</field>
+      <field name="res_model">hr.exit.clearance.approver</field>
+      <field name="view_mode">tree,form</field>
     </record>
 
 

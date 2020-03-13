@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from datetime import date
+from datetime import date, timedelta
 from odoo.exceptions import UserError
 import logging
 
@@ -12,7 +12,9 @@ class HRMSResignationLetter(models.Model):
 
 
     name = fields.Many2one('hr.employee', "Employee Name", required=True)
-    relieved = fields.Date("Relieved Date Request", required=True)
+    resignation_date = fields.Date("Resignation Date Request", required=True)
+    effective_date = fields.Date("Effective Date")
+    relieved_date = fields.Date("Relieved Date")
     reason = fields.Many2one('hr.resignation.reason', "Reason", required=True)
     # reason = fields.Selection([
     #     ('underappreciated', 'Underappreciated (resignation)'),
@@ -68,7 +70,17 @@ class HRMSResignationLetter(models.Model):
         self.date_confirm = date.today()
         user_id = self.env['res.users'].browse(self._context.get('uid'))
         self.confirm_by = user_id.id
-        return self.write({'state': 'confirm'})
+        return self.write({'state': 'confirm',
+                           'effective_date': date.today()})
+
+    @api.multi
+    def approved(self):
+        self.date_approved = date.today()
+        user_id = self.env['res.users'].browse(self._context.get('uid'))
+        self.approved_by = user_id.id
+        relieved = self.effective_date + timedelta(days=30)
+        return self.write({'state': 'approve',
+                           'relieved_date':relieved})
 
     @api.onchange('name')
     def _duplicate_employee_entry(self):
