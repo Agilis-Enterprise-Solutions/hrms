@@ -153,7 +153,9 @@ class Applicant(models.Model):
                     'mobile': applicant.partner_mobile
                 })
                 address_id = new_partner_id.address_get(['contact'])['contact']
-            if applicant.job_id and (applicant.partner_name or contact_name):
+            if (applicant.job_id
+                and (applicant.partner_name or contact_name)
+                    and applicant.running_contract_id):
                 applicant.job_id.write({
                     'no_of_hired_employee': applicant.job_id.no_of_hired_employee + 1
                 })
@@ -179,16 +181,18 @@ class Applicant(models.Model):
                 applicant.running_contract_id.write({
                     'employee_id': employee.id
                 })
+
                 applicant.write({
                     'emp_id': employee.id
                 })
+
                 applicant.job_id.message_post(
                     body=(_('New Employee %s Hired') % applicant.partner_name
                           if applicant.partner_name else applicant.name),
                     subtype="hr_recruitment.mt_job_applicant_hired")
             else:
                 raise UserError(
-                    _('You must define an Applied Job and a Contact Name for this applicant.'))
+                    _('You must define an Applied Job, Contact Name, and a Running contract for this applicant.'))
 
     @api.multi
     def action_get_created_contract(self):
