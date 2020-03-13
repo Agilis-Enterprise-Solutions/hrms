@@ -81,6 +81,15 @@
                  attrs="{'invisible': [('blacklisted', '!=', True)]}"/>
         </xpath>
         <xpath expr="//group[1]" position="after">
+          <notebook attrs="{'invisible': [('requisition_id', '=', False)]}">
+            <page string="Job Description">
+              <field name="job_description"/>
+            </page>
+            <page string="Job Qualification">
+              <field name="job_qualification"/>
+            </page>
+          </notebook>
+          
           <notebook>
             <page string="Character Reference">
               <field name="assessment_ids" invisible="1"/>

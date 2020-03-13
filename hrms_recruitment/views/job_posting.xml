@@ -46,7 +46,7 @@
 
         <xpath expr="//sheet/div[3]" position="replace">
           <notebook name="job_desc_skills">
-            <page string="Job Description">
+            <page string="Job Description" invisible="1">
               <field name="description"/>
             </page>
             <page string="Skills and Qualification">
@@ -57,8 +57,8 @@
                   <field name="skill_level_id"/>
                 </tree>
               </field>
-              <label for="job_qualification">Job Qualification</label>
-              <field name="job_qualification" readonly="1" />
+              <label for="job_qualification" invisible="1">Job Qualification</label>
+              <field name="job_qualification" readonly="1" invisible="1"/>
             </page>
           </notebook>
         </xpath>
@@ -70,11 +70,9 @@
       <field name="model">hr.job</field>
       <field name="inherit_id" ref="hr_recruitment.hr_job_survey"/>
       <field name="arch" type="xml">
-        <xpath expr="//button[@name='action_get_attachment_tree_view']"
-               position="after">
+        <xpath expr="//button[@name='action_get_attachment_tree_view']" position="after">
           <br/>
-          <button class="oe_stat_button" name="%(_get_historical_requisition)d"
-                  icon="fa-book" type="action">
+          <button class="oe_stat_button" name="%(_get_historical_requisition)d" icon="fa-book" type="action">
             <div class="o_field_widget o_stat_info">
               <span class="o_stat_text">Historical <br/>
               Requisition</span>

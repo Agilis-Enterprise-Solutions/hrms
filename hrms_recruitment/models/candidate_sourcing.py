@@ -25,7 +25,8 @@ class InheritContract(models.Model):
         ])
 
         if len(sibling_contracts) > 1:
-            raise UserError('There can only be one Running contract per application!')
+            raise UserError(
+                'There can only be one Running contract per application!')
 
 
 class Applicant(models.Model):
@@ -70,6 +71,20 @@ class Applicant(models.Model):
 
     running_contract_id = fields.Many2one('hr.contract',
                                           compute="_compute_contracts_count")
+
+    job_qualification = fields.Text(string="Job Qualification",
+                                    track_visibility='onchange',
+                                    related='requisition_id.job_qualification',
+                                    readonly=True,
+                                    # store=True
+                                    )
+
+    job_description = fields.Text(string="Job Description",
+                                  track_visibility='onchange',
+                                  related='requisition_id.job_description',
+                                  readonly=True,
+                                #   store=True
+                                  )
 
     @api.multi
     def act_hr_applicant_2_hr_contract(self):
@@ -126,9 +141,10 @@ class Applicant(models.Model):
         for applicant in self:
             contact_name = False
             if applicant.partner_id:
-                address_id = applicant.partner_id.address_get(['contact'])['contact']
+                address_id = applicant.partner_id.address_get(['contact'])[
+                    'contact']
                 contact_name = applicant.partner_id.name_get()[0][1]
-            else :
+            else:
                 new_partner_id = self.env['res.partner'].create({
                     'is_company': False,
                     'name': applicant.partner_name,
@@ -171,7 +187,8 @@ class Applicant(models.Model):
                           if applicant.partner_name else applicant.name),
                     subtype="hr_recruitment.mt_job_applicant_hired")
             else:
-                raise UserError(_('You must define an Applied Job and a Contact Name for this applicant.'))
+                raise UserError(
+                    _('You must define an Applied Job and a Contact Name for this applicant.'))
 
     @api.multi
     def action_get_created_contract(self):
