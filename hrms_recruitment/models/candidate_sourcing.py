@@ -17,6 +17,16 @@ class InheritContract(models.Model):
 
     applicant_id = fields.Many2one('hr.applicant')
 
+    @api.constrains('state')
+    def restrict_running(self):
+        sibling_contracts = self.env['hr.contract'].search([
+            ('applicant_id', '=', self.applicant_id.id),
+            ('state', '=', 'open')
+        ])
+
+        if len(sibling_contracts) > 1:
+            raise UserError('There can only be one Running contract per application!')
+
 
 class Applicant(models.Model):
     _inherit = "hr.applicant"
