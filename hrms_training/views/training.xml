@@ -61,6 +61,7 @@
               <group>
                 <field name="duration"/>
                 <field name="start_date"/>
+                <field name="end_date"/>
                 <field name="cost"/>
                 <field name="acquire_certificate"
                        attrs="{'invisible': [('status', '!=', 'Completed')]}"/>

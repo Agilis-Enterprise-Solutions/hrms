@@ -33,6 +33,7 @@ class Training(models.Model):
     organizer = fields.Char()
     duration = fields.Integer('Duration (hr/s)')
     start_date = fields.Date(required=True)
+    end_date = fields.Date(required=True)
     acquire_certificate = fields.Boolean()
     description = fields.Text()
     venue = fields.Text()
