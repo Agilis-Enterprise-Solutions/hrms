@@ -19,6 +19,8 @@
                      attrs="{'invisible': [('status', '=', 'Active')]}"/>
               <field name="exit_reason"
                      attrs="{'invisible': [('status', '=', 'Active')]}"/>
+             <field name="separation_id" readnly="1"
+                    attrs="{'invisible': [('status', '=', 'Active')]}"/>
             </group>
           </group>
         </page>
