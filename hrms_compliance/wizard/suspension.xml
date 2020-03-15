@@ -11,7 +11,9 @@
                             <field name="emp_id" groups="base.group_no_one" readonly="1" />
                             <field name="contract_id" groups="base.group_no_one"/>
                             <field name="infraction_id" groups="base.group_no_one" readonly="1" />
+                            <field name="action_history_id" groups="base.group_no_one"/>
                             <field name="suspension_days" readonly="1"/>
+                            <!-- <field name="used_days" readonly="1"/> -->
                             <field name="remaining_days" readonly="1" />
                         </group>
                         <group>

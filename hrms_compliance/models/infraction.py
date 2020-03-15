@@ -1,4 +1,11 @@
 # coding: utf-8
+"""
+    Module Name: HR Infraction
+    Author: John Christian Ardosa
+    Company: Agilis Enterprise Solutions
+    Date Created: January, 2020
+"""
+
 from odoo import models, fields, api, _
 from logging import getLogger
 from odoo.exceptions import UserError
@@ -15,7 +22,9 @@ class InheritEmployeeInfractions(models.Model):
     infraction_ids = fields.One2many(
         'hr.infraction', 'emp_id',
         string="Infractions",
-        compute='_compute_infraction_record'
+        compute='_compute_infraction_record',
+        track_visibility='onchange'
+
     )
 
     @api.depends('children')
@@ -39,10 +48,18 @@ class Infractions(models.Model):
                                          index=True, default=lambda self: _('New'))
 
     emp_id = fields.Many2one(
-        "hr.employee", string="Employee", track_visibility="onchange"
+        "hr.employee",
+        string="Employee",
+        track_visibility="onchange",
+        required=True,
+        help='Select employee who committed the violation'
     )
     job_id = fields.Many2one(
-        "hr.job", string="Job", related="emp_id.job_id", readonly=True, store=True
+        "hr.job",
+        string="Job",
+        related="emp_id.job_id",
+        readonly=True,
+        store=True,
     )
     manager_id = fields.Many2one("hr.employee",
                                  string="Manager",
@@ -57,9 +74,12 @@ class Infractions(models.Model):
                                     store=True
                                     )
 
-    violation_id = fields.Many2one(
-        "hr.company.violation", string="Violation", track_visibility="onchange", required=True,
-    )
+    violation_id = fields.Many2one("hr.company.violation",
+                                   string="Violation",
+                                   track_visibility="onchange",
+                                   required=True,
+                                   help='Choose a from past violations or create a new one.'
+                                   )
 
     policy_violated_ids = fields.Many2many("hr.company.policy", string="Policies Violated",
                                            compute='_compute_policy_violated_ids', help="FOR POLICY VIOLATED ID DOMAIN PURPOSES ONLY")
@@ -76,6 +96,7 @@ class Infractions(models.Model):
         track_visibility="onchange",
         domain="[('id', 'in', policy_violated_ids)]",
         required=True,
+        help='Field shows policies violated by the given violation'
     )
 
     frequency = fields.Char(
@@ -83,10 +104,15 @@ class Infractions(models.Model):
         track_visibility="onchange",
         compute='compute_policy_violation_instance',
         store=True,
+        help='Shows how many times an employee has violated a specific Policy. \
+        Helps with deciding what corrective action to use for offending employee'
     )
 
     violation_date = fields.Date(
-        string="Date of Violation", track_visibility="onchange"
+        string="Date of Violation",
+        track_visibility="onchange",
+        required=True,
+        default=fields.Date.today()
     )
 
     parent_infraction_id = fields.Many2one(
@@ -113,7 +139,6 @@ class Infractions(models.Model):
             if rec.parent_infraction_id.id == self.id:
                 raise UserError(_('Cannot assign record as its own parent'))
 
-    case_status = fields.Char(string="Case Status")
     state = fields.Selection(
         string="status",
         selection=[
@@ -140,7 +165,12 @@ class Infractions(models.Model):
         "infraction_id",
         string="Action History",
         track_visibility="onchange",
+        ondelete='cascade'
         # compute='_auto_fill_history'
+    )
+
+    suspension_history_ids = fields.One2many('suspension.history','infraction_id',string="Suspension History",
+    # domain=[('infraction_id','=',)]
     )
 
     @api.depends('history_ids')
@@ -153,16 +183,29 @@ class Infractions(models.Model):
             })
         return True
 
+    @api.multi
+    def unlink(self):
+        """
+        Deletes the action history records related to infraction upon the latter's deletion
+        """
+        action_history = self.env['hr.infraction.action_history'].search(
+            [('infraction_id', '=', self.id)])
+        action_history.unlink()
+        result = super(Infractions, self).unlink()
+
+        return result
+
     # @api.depends('history_ids')
+    # Function Used to auto update action history of all Infraction Records. No longer used
     # def _auto_fill_history(self):
     #     for rec in self:
     #         result = self.env['hr.infraction.action_history'].search(
     #             []).filtered(lambda x: x.infraction_id.id == rec.id).ids
     #         rec.update({'history_ids': [(6, 0, result)]})
 
-    # ============================================================================================
-    # STATE BUTTON FIELDS
-    # ============================================================================================
+    """============================================================================================
+        STATE BUTTON FIELDS
+       ============================================================================================"""
     date_opened = fields.Date(string="Date Opened",
                               track_visibility='onchange'
                               )
@@ -204,23 +247,29 @@ class Infractions(models.Model):
 
     @api.model
     def create(self, vals):
+        # Old Code for autosequence upon record creation
+        # if vals.get('infraction_sequence_id', _('New')) == _('New'):
+        #     vals['infraction_sequence_id'] = self.env['ir.sequence'].next_by_code(
+        #         'infraction.code.sequence') or _('New')
         if vals.get('infraction_sequence_id', _('New')) == _('New'):
-            vals['infraction_sequence_id'] = self.env['ir.sequence'].next_by_code(
-                'infraction.code.sequence') or _('New')
+            vals['infraction_sequence_id'] = _('New')
         result = super(Infractions, self).create(vals)
-        self.env['hr.infraction.action_history'].create({
-            'stage': 'incident_report',
-            'emp_id': result.emp_id.id,
-            'infraction_id': result.id,
-            'offense_code_id': result.offense_code_id.id,
-            'start_date': result.create_date,
-            'end_date': result.create_date,
-        })
+
+        # Old code auto creating action history upon creation of record
+        # self.env['hr.infraction.action_history'].create({
+        #     'stage': 'incident_report',
+        #     'emp_id': result.emp_id.id,
+        #     'infraction_id': result.id,
+        #     'offense_code_id': result.offense_code_id.id,
+        #     'start_date': result.create_date,
+        #     'end_date': result.create_date,
+        #     'action_date': result.create_date,
+        # })
         return result
 
-    # ============================================================================================
-    # COMPUTES FOR FREQUENCY DEPENDING ON NUMBER OF VIOLATION INSTANCES IN A GIVEN POLICY CODE
-    # ============================================================================================
+    """============================================================================================
+        COMPUTES FOR FREQUENCY DEPENDING ON NUMBER OF VIOLATION INSTANCES IN A GIVEN POLICY CODE
+       ============================================================================================"""
     @api.depends('emp_id', 'policy_violated_id', 'offense_code_id',)
     def compute_policy_violation_instance(self):
         data = []
@@ -252,43 +301,54 @@ class Infractions(models.Model):
                     self.frequency = ""
 
                     return frequency
-    # ============================================================================================
 
-    # =============================================================================================
-    # FOR POLICY VIOLATED ID DOMAIN PURPOSES ONLY
-    # ============================================================================================
+    """=============================================================================================
+        FOR POLICY VIOLATED ID DOMAIN PURPOSES ONLY
+       ============================================================================================"""
     @api.depends('violation_id')
     def _compute_policy_violated_ids(self):
         for record in self:
             record.policy_violated_ids = record.violation_id.policy_violated_ids.ids
-    # =============================================================================================
 
-    # ==============================================================================================
-    # STATE BUTTON FUNCTIONS
-    # ============================================================================================
-
-    # @api.multi
-    # def set_state_open(self):
-    #     self.write({
-    #         'state': 'open',
-    #         'date_opened': datetime.now(),
-    #         'set_open_by': self._uid
-    #     })
-    #     return True
+    """============================================================================================
+        STATE BUTTON FUNCTIONS
+       ============================================================================================"""
 
     @api.multi
     def set_state_inprogress(self):
-        for i in self.history_ids:
-            if i.stage == 'inv_nte_issuance':
-                self.write({
-                    'state': 'in_progress',
-                    'date_in_progress': datetime.now(),
-                    'set_in_progress_by': self._uid
-                })
-                break
-        else:
-            raise UserError(
-                _('Investigation and NTE Issuance should be created in Action History before setting the record in progress'))
+        self.write({
+            'state': 'in_progress',
+            'date_in_progress': datetime.now(),
+            'set_in_progress_by': self._uid,
+            'infraction_sequence_id': self.env['ir.sequence'].next_by_code(
+                'infraction.code.sequence') or _('New')
+        })
+        self.env['hr.infraction.action_history'].create({
+            'stage': 'incident_report',
+            'emp_id': self.emp_id.id,
+            'infraction_id': self.id,
+            'offense_code_id': self.offense_code_id.id,
+            'start_date': self.create_date,
+            'end_date': self.create_date,
+            'action_date': self.create_date,
+        })
+        return True
+        # self.infraction_sequence_id = self.env['ir.sequence'].next_by_code(
+        # 'infraction.code.sequence') or _('New')
+
+    # @api.multi
+    # def set_state_inprogress(self):
+    #     for i in self.history_ids:
+    #         if i.stage == 'inv_nte_issuance':
+    #             self.write({
+    #                 'state': 'in_progress',
+    #                 'date_in_progress': datetime.now(),
+    #                 'set_in_progress_by': self._uid
+    #             })
+    #             break
+    #     else:
+    #         raise UserError(
+    #             _('Investigation and NTE Issuance should be created in Action History before setting the record in progress'))
 
     @api.multi
     def set_state_forclosure(self):
@@ -307,10 +367,11 @@ class Infractions(models.Model):
             'set_closed_by': self._uid
         })
         return True
-    # ==============================================================================================
 
 
-"""Company Policy houses data of company policies with their corresponding offenses"""
+"""============================================================================================
+    Company Policy houses data of company policies with their corresponding offenses
+   ============================================================================================"""
 
 
 class PolicyCode(models.Model):
@@ -341,8 +402,9 @@ class OffenseCode(models.Model):
         string="Corrective Actions", readonly=True, compute="_get_frequency"
     )
 
-    # ============================================================================================
-    # COMPUTES FOR NUMBER OF CORRECTIVE ACTIONS
+    """============================================================================================
+        COMPUTES FOR NUMBER OF CORRECTIVE ACTIONS
+       ============================================================================================"""
     @api.depends("corrective_action_ids")
     def _get_frequency(self):
         counter = 0
@@ -353,10 +415,11 @@ class OffenseCode(models.Model):
                 counter += 1
                 list.append(j.action)
             i.frequency = len(i.corrective_action_ids.ids)
-    # ============================================================================================
 
 
-"""Corrective Action houses Offense Codes that are used for each Company Policy"""
+"""============================================================================================
+    Corrective Action houses Offense Codes that are used for each Company Policy
+   ============================================================================================"""
 
 
 class CorrectiveAction(models.Model):
@@ -483,6 +546,17 @@ class ActionHistory(models.Model):
     _name = "hr.infraction.action_history"
     _description = "Every corrective action applied to employee for specific violation is recorded here"
     _rec_name = 'corrective_action'
+    # _inherit = ["mail.thread", "mail.activity.mixin", "resource.mixin"]
+
+    state = fields.Selection(
+        string='State',
+        selection=[
+            ("draft", "Draft"),
+            ("approved", "Approved"),
+            ("canceled", "Canceled"),
+        ],
+        default='draft'
+    )
 
     infraction_id = fields.Many2one(
         "hr.infraction", string="Infraction Record")
@@ -525,8 +599,12 @@ class ActionHistory(models.Model):
         related='infraction_id.violation_id',
         store=True,
     )
-    start_date = fields.Date(string="Start Date")
-    end_date = fields.Date(string="End Date")
+    action_date = fields.Date(string="Action Date", default=fields.Date.today(),
+                              help='Date when the action (Incident Report, Investigation and NTE Issuance \
+    Collaboration With IMC, and Corrective Action took place'
+                              )
+    start_date = fields.Date(string="Start Date", default=fields.Date.today())
+    end_date = fields.Date(string="End Date", default=fields.Date.today())
     duration = fields.Integer(string="Duration")
     days_remaining = fields.Integer(
         string="Days Remaining",
@@ -537,6 +615,7 @@ class ActionHistory(models.Model):
     notes = fields.Text(string="Notes")
     number_of_days = fields.Integer(
         string="Number of Days",
+        compute='_get_number_of_days',
     )
     staggered = fields.Boolean(string="Staggered")
     user_id = fields.Many2one(
@@ -575,19 +654,19 @@ class ActionHistory(models.Model):
                 [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)]).start_date
             incident_report_end_date = rec.infraction_id.history_ids.search(
                 [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)]).end_date
-            if rec.stage == 'inv_nte_issuance':
-                if rec.start_date:
-                    if rec.end_date:
-                        if rec.start_date < incident_report_end_date:
-                            raise UserError(
-                                _('Start Date of investigation must be after Incident Report End Date'))
-                        elif rec.start_date > rec.end_date:
-                            raise UserError(
-                                _('End Date must be later than Start Date'))
-                    else:
-                        raise UserError(_('End Date must be set.'))
+            # if rec.stage == 'inv_nte_issuance':
+            if rec.start_date:
+                if rec.end_date:
+                    # if rec.start_date < incident_report_end_date:
+                    #     raise UserError(
+                    #         _('Start Date of investigation must be after Incident Report End Date'))
+                    if rec.start_date > rec.end_date:
+                        raise UserError(
+                            _('End Date must be later than Start Date'))
                 else:
-                    raise UserError(_('Start Date must be set.'))
+                    raise UserError(_('End Date must be set.'))
+            else:
+                raise UserError(_('Start Date must be set.'))
 
     # """Checks if Infraction has went through Collaboration with IMC stage before creating Corrective Action"""
     # @api.constrains('stage')
@@ -639,7 +718,18 @@ class ActionHistory(models.Model):
                 else duration
             )
         return True
-
+    
+    @api.depends("start_date","end_date")
+    def _get_number_of_days(self):
+        for line in self:
+                duration = (
+                abs((line.end_date - line.start_date)).days
+                if line.end_date
+                and line.start_date
+                and (line.end_date - line.start_date).days > 0
+                else 0
+            )
+        self.number_of_days = duration
     @api.multi
     def send_nte_email(self):
         """
@@ -689,32 +779,58 @@ class ActionHistory(models.Model):
             'target': 'new',
             'context': ctx,
         }
-    
-    
-    # @api.multi
-    # def write(self, vals):
-    #     """
-    #         Update all record(s) in recordset, with new value comes as {values}
-    #         return True on success, False otherwise
-    
-    #         @param values: dict of new values to be set
-    
-    #         @return: True on success, False otherwise
-    #     """
-        
-    #     result = super(ActionHistory, self).write(vals)
 
-    #     data = {}
-    #     if vals.get("action"):
-    #         if vals.get("action") == "Suspension":
-    #             data['emp_id'] = vals.get('emp_id')
-    #             data['date_from'] = vals.get("start_date")
-    #             data['date_to'] = vals.get("end_date")
-    #             data['infraction_id'] = vals.get("infraction_id")
-    #             data['state'] = 'on_going'
-    #             data['contract_id'] = vals.get('emp_id').contract_id.id
-    #             self.env['suspension.history'].create(data)
-    #     return result 
+    @api.multi
+    def approve_record(self):
+        self.write(
+            {
+                'state': 'approved'
+            }
+        )
+        return True
+
+    @api.multi
+    def cancel_record(self):
+        self.write(
+            {
+                'state': 'canceled'
+            }
+        )
+        return True
+
+    
+    @api.multi
+    def create(self, vals):
+        """This method will create a suspension history record 
+        when an action history suspension record with staggered being False gets created"""
+        result = super(ActionHistory, self).create(vals)
+        suspension = self.env['suspension.history']
+        if result.stage == 'corrective_action' and result.staggered == False:
+            suspension.create({
+                'state': 'on_going',
+                'emp_id': result.emp_id.id,
+                'infraction_id': result.infraction_id.id,
+                'date_from': result.start_date,
+                'date_to': result.end_date,
+            })
+        
+        return result
+    
+    
+    
+    @api.multi
+    def unlink(self):
+        """This method will unlink/delete suspension history record associated with the action history.
+        So when an action history with a normal/staggered suspension gets deleted, its respective suspension history
+        will get deleted as well"""
+        suspension_history = self.env['suspension.history'].search([('action_history_id','=',self.id)])
+        suspension_history.unlink()
+        result = super(ActionHistory, self).unlink()
+        
+    
+        return result
+    
+    
 
 
 """========================SUSPENSION HISTORY=======================
@@ -733,6 +849,8 @@ class SuspensionHistory(models.Model):
         ('on_going', 'On Going'),
         ('completed', 'Completed')
     ]
+
+    action_history_id = fields.Many2one('hr.infraction.action_history',string="Action History")
     emp_id = fields.Many2one('hr.employee', string="Offending Employee")
     infraction_id = fields.Many2one(
         'hr.infraction', string="Infraction Record")
