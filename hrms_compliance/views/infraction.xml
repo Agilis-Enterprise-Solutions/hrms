@@ -96,15 +96,17 @@
                       <field name="stage"/>
                       <field name="state"/>
                       <field name="corrective_action"/>
+                      <field name="action_date"/>
                       <field name="start_date"/>
                       <field name="end_date"/>
                       <field name="duration"/>
                       <field name="days_remaining"/>
+                      <field name="attachment" class="fa fa-paperclip"/>
                     </tree>
                   </field>
                 </page>
-                <page string="Suspension History">
-                  <field name="suspension_history_ids" options="{'no_create': True, 'no_create_editc': True}">
+                <page string="Suspension History" attrs="{'invisible': [('suspension_history_ids','=',None)]}">
+                  <field name="suspension_history_ids" options="{'no_create': True, 'no_create_edit': True}">
                     <tree delete="false">
                       <field name="date_from" string="Start Date"/>
                       <field name="date_to" string="End Date"/>

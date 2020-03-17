@@ -75,10 +75,7 @@
                                     <field name="staggered" attrs="{'invisible': ['|',('action','not in',['Suspension']), ('stage','not in',['corrective_action'])], 
                                                                     'readonly': [('action','not in',['Suspension']),('stage','not in',['corrective_action'])]}" nolabel="1"/>
                                     <span>
-                                        <button name="%(hrms_compliance.create_suspension_wizard)d" string="Use Suspension" type="action" class="btn-primary" 
-                                        attrs="{'invisible': ['|',('staggered','=',False), ('action','not in',['Suspension'])], 
-                                        'readonly':[('staggered','=',False)]}" 
-                                        context="{'default_suspension_days': number_of_days, 'default_emp_id':emp_id, 'default_infraction_id': infraction_id}" />
+                                        <button name="%(hrms_compliance.create_suspension_wizard)d" string="Use Suspension" type="action" class="btn-primary" attrs="{'invisible': ['|',('staggered','=',False), ('action','not in',['Suspension'])], 'readonly':[('staggered','=',False)]}" context="{'default_suspension_days': number_of_days, 'default_emp_id':emp_id, 'default_infraction_id': infraction_id}" />
                                     </span>
                                 </div>
                             </group>
@@ -104,7 +101,6 @@
             </field>
         </record>
 
-
         <record id="action_history_access" model="res.groups">
             <field name="name">Action History Access</field>
         </record>
@@ -118,9 +114,6 @@
             <field name="perm_write" eval="1"/>
             <field name="perm_create" eval="1"/>
             <field name="perm_unlink" eval="1"/>
-            <!-- <field name="domain_force">
-                ['|',('infraction_state','in',['for_closure']),('infraction_state','in',['closed'])]
-            </field> -->
         </record>
     </data>
 </odoo>

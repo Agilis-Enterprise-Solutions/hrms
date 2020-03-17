@@ -30,7 +30,7 @@
                             <group>
                                 <field name="infraction_id" readonly="1"/>
                                 <field name="emp_id" readonly="1"/>
-                                <field name="action_history_id" groups="base.group_no_one"/>
+                                <field name="action_history_id" readonly="1" invisible="1" groups="base.group_no_one"/>
                                 <field name="contract_id" groups="base.group_no_one" />
                             </group>
                             <group>

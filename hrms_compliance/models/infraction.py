@@ -190,7 +190,11 @@ class Infractions(models.Model):
         """
         action_history = self.env['hr.infraction.action_history'].search(
             [('infraction_id', '=', self.id)])
-        action_history.unlink()
+        for i in action_history:
+            i.unlink()
+        # action_history.unlink()
+        for i in self.env['hr.infraction.action_history'].browse(self.ids):
+            i.unlink()
         result = super(Infractions, self).unlink()
 
         return result
@@ -323,15 +327,16 @@ class Infractions(models.Model):
             'infraction_sequence_id': self.env['ir.sequence'].next_by_code(
                 'infraction.code.sequence') or _('New')
         })
-        self.env['hr.infraction.action_history'].create({
-            'stage': 'incident_report',
-            'emp_id': self.emp_id.id,
-            'infraction_id': self.id,
-            'offense_code_id': self.offense_code_id.id,
-            'start_date': self.create_date,
-            'end_date': self.create_date,
-            'action_date': self.create_date,
-        })
+        if self.infraction_sequence_id != _('New'):
+            self.env['hr.infraction.action_history'].create({
+                'stage': 'incident_report',
+                'emp_id': self.emp_id.id,
+                'infraction_id': self.id,
+                'offense_code_id': self.offense_code_id.id,
+                'start_date': self.create_date,
+                'end_date': self.create_date,
+                'action_date': self.create_date,
+            })
         return True
         # self.infraction_sequence_id = self.env['ir.sequence'].next_by_code(
         # 'infraction.code.sequence') or _('New')
@@ -623,20 +628,20 @@ class ActionHistory(models.Model):
     infraction_state = fields.Selection(
         string='Infraction State', related="infraction_id.state")
 
-    """ Checks if there are 2 or more instances of incident reports and NTE issuances """
-    @api.constrains('stage')
-    def check_stage_count(self):
-        for rec in self:
-            incident_report_count = rec.infraction_id.history_ids.search_count(
-                [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)])
-            inv_nte_count = rec.infraction_id.history_ids.search_count(
-                [('stage', 'in', ['inv_nte_issuance']), ('infraction_id.id', '=', rec.infraction_id.id)])
-            if incident_report_count > 1:
-                raise UserError(
-                    _('Cannot create more than one instance of Incident Report per Record'))
-            if inv_nte_count > 1:
-                raise UserError(
-                    _('Cannot create more than one instance of Investigation and NTE issuance per Record'))
+    # """ Checks if there are 2 or more instances of incident reports and NTE issuances """
+    # @api.constrains('stage')
+    # def check_stage_count(self):
+    #     for rec in self:
+    #         incident_report_count = rec.infraction_id.history_ids.search_count(
+    #             [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id),('infraction_sequence_id','!=',['draft'])])
+    #         inv_nte_count = rec.infraction_id.history_ids.search_count(
+    #             [('stage', 'in', ['inv_nte_issuance']), ('infraction_id.id', '=', rec.infraction_id.id)])
+    #         if incident_report_count > 1:
+    #             raise UserError(
+    #                 _('Cannot create more than one instance of Incident Report per Record'))
+    #         if inv_nte_count > 1:
+    #             raise UserError(
+    #                 _('Cannot create more than one instance of Investigation and NTE issuance per Record'))
 
     """Checks if record state is set to In progress before creating Collaboration with IMC stage"""
     @api.constrains('stage')
@@ -809,6 +814,7 @@ class ActionHistory(models.Model):
             suspension.create({
                 'state': 'on_going',
                 'emp_id': result.emp_id.id,
+                'action_history_id': result.id,
                 'infraction_id': result.infraction_id.id,
                 'date_from': result.start_date,
                 'date_to': result.end_date,
@@ -816,22 +822,22 @@ class ActionHistory(models.Model):
         
         return result
     
-    
-    
     @api.multi
     def unlink(self):
         """This method will unlink/delete suspension history record associated with the action history.
         So when an action history with a normal/staggered suspension gets deleted, its respective suspension history
-        will get deleted as well"""
-        suspension_history = self.env['suspension.history'].search([('action_history_id','=',self.id)])
-        suspension_history.unlink()
-        result = super(ActionHistory, self).unlink()
+        will get deleted as well
         
-    
-        return result
-    
-    
+        
+        
+        """
+        for rec in self.env['hr.infraction.action_history'].browse(self.ids):
+            for recs in self.env['suspension.history'].search([('action_history_id','=',rec.id)]):
+                rec.unlink()
+            recs.unlink()
 
+        result = super(ActionHistory, self).unlink()
+        return result
 
 """========================SUSPENSION HISTORY=======================
         ALL INSTANCES OF EMPLOYEE SUSPENSION IS RECORDED HERE
