@@ -40,13 +40,12 @@
               </group>
               <group name="start_end">
                 <field name="new_job_id"
-                  attrs="{'readonly': [('state', 'not in', ('draft'))],
-                          'invisible': [('movement_type', 'not in', ('promition','demotion'))]}"/>
+                  attrs="{'readonly': [('state', 'not in', ('draft'))], 'invisible': [('movement_type', 'not in', ('promition','demotion'))], 'required': [('movement_type', 'in', ('promition','demotion'))]}"/>
                 <field name="new_department_id"
-                  attrs="{'readonly': [('state', 'not in', ('draft'))],'invisible': [('movement_type', '!=', 'lateral')]}"/>
+                  attrs="{'readonly': [('state', 'not in', ('draft'))],'invisible': [('movement_type', '!=', 'lateral')],'required': [('movement_type', '=', 'lateral')]}"/>
                 <field name="new_contract"
                   attrs="{'readonly': [('state', 'not in', ('draft'))],'invisible': [('new_contract', '=', False)]}"/>
-                <field name="contract" widget="radio" attrs="{'invisible': [('movement_type', '!=', 'lateral')]}"/>
+                <field name="contract" widget="radio" attrs="{'invisible': [('movement_type', '!=', 'lateral')],'required': [('movement_type', '=', 'lateral')]}"/>
               </group>
             </group>
             <group string="Contract History">

@@ -1,5 +1,6 @@
 from odoo import models, fields, api, _
 from datetime import date
+from odoo.exceptions import ValidationError, UserError
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -69,93 +70,74 @@ class HRMSEmployeeMovement(models.Model):
             rec.date_review = date.today()
             user_id = self.env['res.users'].browse(self._context.get('uid'))
             rec.review_by = user_id.id
-
         return self.write({'state': 'review'})
+
 
     @api.multi
     def approve(self):
         for rec in self:
-            if rec.new_job_id and rec.contract_history_ids and (rec.contract == "new_contract"):
-                previous_contract = self.env['hr.contract'].search([('employee_id','=',rec.name.id)])[0]
+            if rec.new_job_id:
+                previous_contract = self.env['hr.contract'].search([('employee_id','=',rec.name.id)])
 
-                previous_contract.write({
-                    'date_end': date.today(),
-                    'state': 'close',
-                    'reason_changing': dict(rec._fields['movement_type'].selection).get(rec.movement_type)
+                if previous_contract:
+                    previous_contract = previous_contract[0]
+
+                    previous_contract.write({
+                        'date_end': date.today(),
+                        'state': 'close',
+                        'reason_changing': dict(rec._fields['movement_type'].selection).get(rec.movement_type)
+                        })
+
+                    contract = self.env['hr.contract'].create({
+                        'name': rec.name.name,
+                        'employee_id': rec.name.id,
+                        'job_id': rec.new_job_id.id,
+                        'department_id': rec.department_id.id,
+                        'date_start': date.today(),
+                        'date_created': date.today(),
+                        'wage': previous_contract.wage,
+                        'state': 'open',
+                        'active': True
                     })
 
-                contract = self.env['hr.contract'].create({
-                    'name': rec.name.name,
-                    'employee_id': rec.name.id,
-                    'job_id': rec.new_job_id.id,
-                    'department_id': rec.department_id.id,
-                    'date_start': date.today(),
-                    'date_created': date.today(),
-                    'wage': previous_contract.wage,
-                    'state': 'open',
-                    'active': True
-                })
-
-                rec.new_contract = contract.id
-            else:
+                    rec.new_contract = contract.id
+                else:
+                    raise ValidationError('Employee Has no contract')
+            elif rec.new_department_id:
                 previous_contract = self.env['hr.contract'].search([('employee_id','=',rec.name.id),
-                                                                    ('state', '=', 'open')])[0]
-                previous_contract.write({
-                    'department_id': rec.new_department_id.id,
-                })
+                                                                    ('state', '=', 'open')])
+                if previous_contract:
+                    previous_contract = previous_contract[0]
+                    if rec.contract == 'update_contract':
+                        previous_contract.write({
+                            'department_id': rec.new_department_id.id,
+                        })
+                    else:
+                        previous_contract.write({
+                            'date_end': date.today(),
+                            'state': 'close',
+                            'reason_changing': dict(rec._fields['movement_type'].selection).get(rec.movement_type)
+                            })
+
+                        contract = self.env['hr.contract'].create({
+                            'name': rec.name.name,
+                            'employee_id': rec.name.id,
+                            'job_id': rec.new_job_id.id,
+                            'department_id': rec.department_id.id,
+                            'date_start': date.today(),
+                            'date_created': date.today(),
+                            'wage': previous_contract.wage,
+                            'state': 'open',
+                            'active': True
+                        })
+
+                        rec.new_contract = contract.id
+
+                else:
+                    raise ValidationError('Employee Has no contract')
+
             rec.date_approved = date.today()
             user_id = self.env['res.users'].browse(self._context.get('uid'))
             rec.approved_by = user_id.id
 
         return self.write({'state': 'approve'})
-
-
-                # if i.attribute == 'contract':
-                #     contract = self.env['hr.contract'].search([
-                #         ('employee_id','=',rec.name.id)])[0]
-                #     contract.write({
-                #         'date_end': date.today(),
-                #         'state': 'close'
-                #     })
-                #     contract_false = self.env['hr.contract'].search([
-                #         ('id','=',i.new_contract.id),
-                #         ('active','=',False)])
-                #     contract_false.write({
-                #         'state': 'open',
-                #         'active': True
-                #     })
-
-        #     rec.date_approved = date.today()
-        #     user_id = self.env['res.users'].browse(self._context.get('uid'))
-        #     rec.approved_by = user_id.id
-        #
-        # return self.write({'state': 'approve'})
-
-# class HRMSEmployeeMovementLines(models.Model):
-#     _name = "hr.employee.movement_lines"
-#     _description = "Employee Management Lines"
-#
-#     movement_id = fields.Many2one('hr.employee.movement')
-#     attribute = fields.Selection([
-#         ('position', 'Position'),
-#         ('department', 'Department'),
-#         ('contract', 'Contract')
-#         ], string="Attribute", required=True)
-#     current = fields.Char("Current", compute="_get_attribute_current", store=True)
-#     new_position = fields.Many2one('hr.job', "New Position")
-#     new_department = fields.Many2one('hr.department', "New Department")
-#     new_contract = fields.Many2one('hr.contract', "New Contract")
-#
-#
-#     @api.depends('attribute')
-#     def _get_attribute_current(self):
-#         for rec in self:
-#             if rec.attribute and rec.attribute == "position" and rec.movement_id.name:
-#                 rec.current = rec.movement_id.name.job_id.name
-#             if rec.attribute and rec.attribute == "department" and rec.movement_id.name:
-#                 rec.current = rec.movement_id.name.department_id.name
-#             if rec.attribute and rec.attribute == "contract" and rec.movement_id.name:
-#                 contract = self.env['hr.contract'].search([
-#                     ('employee_id','=',rec.movement_id.name.id),
-#                     ('active','=',True)])
-#                 rec.current = contract.name
