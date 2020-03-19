@@ -20,8 +20,8 @@ class HRMSExitClearance(models.Model):
                                   compute="_get_separation_request",
                                   store=True)
     name = fields.Many2one('hr.employee', "Employee Name", required=True)
-    department_id = fields.Many2one('hr.department', "Department",
-                                    related="name.department_id")
+    job_id = fields.Many2one('hr.job', "Position",
+                                    related="name.job_id")
     separation_type = fields.Selection([
         ('resignation', 'Resignation'),
         ('terminated_company', 'Termination(Company Initiated)'),
@@ -80,7 +80,7 @@ class HRMSExitClearance(models.Model):
 
 
             approver = self.env['hr.exit.clearance.approver'].search([
-                ('department_id','=',rec.department_id.id)])
+                ('job_id','=',rec.job_id.id)])
 
             if approver:
                 for i in approver.approve_ids:
@@ -152,21 +152,23 @@ class HRMSExitClearanceLines(models.Model):
 
 class HRMSExitClearanceApprover(models.Model):
     _name = "hr.exit.clearance.approver"
-    _rec_name = "department_id"
+    _rec_name = "job_id"
 
 
-    department_id = fields.Many2one('hr.department', "Department")
+    job_id = fields.Many2one('hr.job', "Job Position", required=True)
     approve_ids = fields.One2many('hr.exit.clearance.approver.lines',
                                   'approver_id',
                                   string="Clearance Approver")
 
-    @api.constrains('department_id')
+    @api.constrains('job_id')
     def check_duplicate_true(self):
-        if self.department_id:
-            duplicate = self.search([('department_id', '=', self.department_id.id)])
-            if duplicate:
-                raise UserError('''One Department is allowed.
-                                Cannot Create with same Department Approver''')
+        for i in self:
+            if i.job_id:
+                duplicate = self.search([('job_id', '=', i.job_id.id),
+                                         ('id', '!=', i.id)])
+                if duplicate:
+                    raise UserError('''One Department is allowed.
+                                    Cannot Create with same Department Approver''')
 
 
 class HRMSExitClearanceApproverLines(models.Model):

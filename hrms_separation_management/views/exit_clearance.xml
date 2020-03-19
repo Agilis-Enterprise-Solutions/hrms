@@ -30,7 +30,7 @@
               <group name='decision'>
                 <field name="name"
                   attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
-                <field name="department_id" />
+                <field name="job_id" />
                 <field name="joined" />
                 <field name="separation_parent_id" invisible="1"/>
               </group>
@@ -83,7 +83,7 @@
         <form string="Clearance Approver">
           <sheet>
             <group>
-              <field name="department_id"/>
+              <field name="job_id"/>
             </group>
             <field name="approve_ids" nolabel="1">
               <tree string="Clerance Approver" editable="bottom">
@@ -103,7 +103,7 @@
       <field name="model">hr.exit.clearance.approver</field>
       <field name="arch" type="xml">
         <tree string="Exit Clerance Approver">
-          <field name="department_id"/>
+          <field name="job_id"/>
         </tree>
       </field>
     </record>
