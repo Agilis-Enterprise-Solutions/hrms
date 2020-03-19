@@ -274,7 +274,7 @@ class Applicant(models.Model):
                                       Applicant has an active application''')
 
             if duplicate_archived:
-                raise ValidationError('''Applicanr is in Archived Status!
+                raise ValidationError('''Applicant is in Archived Status!
                                       Please reopen application to manage applicant''')
 
 
