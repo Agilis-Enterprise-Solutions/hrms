@@ -280,8 +280,9 @@ class SkillName(models.Model):
         'hr.employee.skills.type', string="Skill Type")
     skill_description = fields.Text()
 
-    skill_level_ids = fields.One2many('hr.employee.skills.level', 'skill_name_id',
-                                      string="Skill Levels")
+    skill_level_ids = fields.Many2many('hr.employee.skills.level',
+                                    #    'skill_name_id',
+                                       string="Skill Levels")
 
 
 class SkillsType(models.Model):

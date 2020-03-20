@@ -87,7 +87,7 @@
                   <tree editable="bottom">
                     <field name="skill_name"/>
                     <field name="skill_type_id"/>
-                    <field name="skill_level_id"/>
+                    <field name="skill_level_id" context="{'default_skill_name_id': active_id}"/>
                   </tree>
                 </field>
 
@@ -114,7 +114,9 @@
           <sheet>
             <group name="skill_level">
               <group>
-                <field name="skill_name_id" invisible="1"/>
+                <field name="skill_name_id" 
+                readonly="1"
+                 groups="base.group_no_one"/>
                 <field name="skill_level"/>
               </group>
               <group>
