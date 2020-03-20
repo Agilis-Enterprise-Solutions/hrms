@@ -25,6 +25,7 @@
 
     'data': [
         'security/ir.model.access.csv',
+        # 'security/security.xml',    
         'wizard/suspension.xml',
         'views/infraction.xml',
         'views/policy.xml',

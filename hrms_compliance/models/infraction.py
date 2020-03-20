@@ -198,9 +198,9 @@ class Infractions(models.Model):
         result = super(Infractions, self).unlink()
 
         return result
-
+    
+    """ Function Used to auto update action history of all Infraction Records. No longer used """
     # @api.depends('history_ids')
-    # Function Used to auto update action history of all Infraction Records. No longer used
     # def _auto_fill_history(self):
     #     for rec in self:
     #         result = self.env['hr.infraction.action_history'].search(
@@ -251,7 +251,7 @@ class Infractions(models.Model):
 
     @api.model
     def create(self, vals):
-        # Old Code for autosequence upon record creation
+        """ Old Code for autosequence upon record creation"""
         # if vals.get('infraction_sequence_id', _('New')) == _('New'):
         #     vals['infraction_sequence_id'] = self.env['ir.sequence'].next_by_code(
         #         'infraction.code.sequence') or _('New')
@@ -259,7 +259,7 @@ class Infractions(models.Model):
             vals['infraction_sequence_id'] = _('New')
         result = super(Infractions, self).create(vals)
 
-        # Old code auto creating action history upon creation of record
+        """ Old code auto creating action history upon creation of record"""
         # self.env['hr.infraction.action_history'].create({
         #     'stage': 'incident_report',
         #     'emp_id': result.emp_id.id,
@@ -620,7 +620,7 @@ class ActionHistory(models.Model):
     notes = fields.Text(string="Notes")
     number_of_days = fields.Integer(
         string="Number of Days",
-        compute='_get_number_of_days',
+        # compute='_get_number_of_days',
     )
     staggered = fields.Boolean(string="Staggered")
     user_id = fields.Many2one(
@@ -628,7 +628,25 @@ class ActionHistory(models.Model):
     infraction_state = fields.Selection(
         string='Infraction State', related="infraction_id.state")
 
-    # """ Checks if there are 2 or more instances of incident reports and NTE issuances """
+    
+    # @api.model
+    # def create(self, vals):
+    #     """This method will create a suspension history record 
+    #     when an action history suspension record with staggered being False gets created"""
+    #     result = super(ActionHistory, self).create(vals)
+    #     suspension = self.env['suspension.history']
+    #     if result.stage == 'corrective_action' and result.staggered == False:
+    #         suspension.create({
+    #             'state': 'on_going',
+    #             'emp_id': result.emp_id.id,
+    #             'action_history_id': result.id,
+    #             'infraction_id': result.infraction_id.id,
+    #             'date_from': result.start_date,
+    #             'date_to': result.end_date,
+    #         })
+    #     return result
+
+    """ Checks if there are 2 or more instances of incident reports and NTE issuances """
     # @api.constrains('stage')
     # def check_stage_count(self):
     #     for rec in self:
@@ -652,28 +670,29 @@ class ActionHistory(models.Model):
                 raise UserError(
                     _('Please click Submit button first before creating new Action record with stage Collaboration with IMC.'))
 
-    @api.constrains('start_date', 'end_date')
-    def check_start_end_date(self):
-        for rec in self:
-            incident_report_start_date = rec.infraction_id.history_ids.search(
-                [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)]).start_date
-            incident_report_end_date = rec.infraction_id.history_ids.search(
-                [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)]).end_date
-            # if rec.stage == 'inv_nte_issuance':
-            if rec.start_date:
-                if rec.end_date:
-                    # if rec.start_date < incident_report_end_date:
-                    #     raise UserError(
-                    #         _('Start Date of investigation must be after Incident Report End Date'))
-                    if rec.start_date > rec.end_date:
-                        raise UserError(
-                            _('End Date must be later than Start Date'))
-                else:
-                    raise UserError(_('End Date must be set.'))
-            else:
-                raise UserError(_('Start Date must be set.'))
+    # """Checks start date and end data"""
+    # @api.constrains('start_date', 'end_date')
+    # def check_start_end_date(self):
+    #     for rec in self:
+    #         incident_report_start_date = rec.infraction_id.history_ids.search(
+    #             [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)]).start_date
+    #         incident_report_end_date = rec.infraction_id.history_ids.search(
+    #             [('stage', 'in', ['incident_report']), ('infraction_id.id', '=', rec.infraction_id.id)]).end_date
+    #         # if rec.stage == 'inv_nte_issuance':
+    #         if rec.start_date:
+    #             if rec.end_date:
+    #                 # if rec.start_date < incident_report_end_date:
+    #                 #     raise UserError(
+    #                 #         _('Start Date of investigation must be after Incident Report End Date'))
+    #                 if rec.start_date > rec.end_date:
+    #                     raise UserError(
+    #                         _('End Date must be later than Start Date'))
+    #             else:
+    #                 raise UserError(_('End Date must be set.'))
+    #         else:
+    #             raise UserError(_('Start Date must be set.'))
 
-    # """Checks if Infraction has went through Collaboration with IMC stage before creating Corrective Action"""
+    """Checks if Infraction has went through Collaboration with IMC stage before creating Corrective Action"""
     # @api.constrains('stage')
     # def check_collab_before_corrective_action(self):
     #     for rec in self.infraction_id.history_ids:
@@ -724,17 +743,18 @@ class ActionHistory(models.Model):
             )
         return True
     
-    @api.depends("start_date","end_date")
-    def _get_number_of_days(self):
-        for line in self:
-                duration = (
-                abs((line.end_date - line.start_date)).days
-                if line.end_date
-                and line.start_date
-                and (line.end_date - line.start_date).days > 0
-                else 0
-            )
-        self.number_of_days = duration
+    # @api.onchange("start_date","end_date")
+    # def _get_number_of_days(self):
+    #     for line in self:
+    #             duration = (
+    #             abs((line.end_date - line.start_date)).days
+    #             if line.end_date
+    #             and line.start_date
+    #             and (line.end_date - line.start_date).days > 0
+    #             else 0
+    #         )
+    #     self.number_of_days = duration
+
     @api.multi
     def send_nte_email(self):
         """
@@ -802,40 +822,15 @@ class ActionHistory(models.Model):
             }
         )
         return True
-
-    
-    @api.multi
-    def create(self, vals):
-        """This method will create a suspension history record 
-        when an action history suspension record with staggered being False gets created"""
-        result = super(ActionHistory, self).create(vals)
-        suspension = self.env['suspension.history']
-        if result.stage == 'corrective_action' and result.staggered == False:
-            suspension.create({
-                'state': 'on_going',
-                'emp_id': result.emp_id.id,
-                'action_history_id': result.id,
-                'infraction_id': result.infraction_id.id,
-                'date_from': result.start_date,
-                'date_to': result.end_date,
-            })
-        
-        return result
     
     @api.multi
     def unlink(self):
         """This method will unlink/delete suspension history record associated with the action history.
         So when an action history with a normal/staggered suspension gets deleted, its respective suspension history
         will get deleted as well
-        
-        
-        
         """
-        for rec in self.env['hr.infraction.action_history'].browse(self.ids):
-            for recs in self.env['suspension.history'].search([('action_history_id','=',rec.id)]):
-                rec.unlink()
+        for recs in self.env['suspension.history'].search([('action_history_id','=',self.id)]):
             recs.unlink()
-
         result = super(ActionHistory, self).unlink()
         return result
 
@@ -864,9 +859,11 @@ class SuspensionHistory(models.Model):
     date_from = fields.Date(string="Date From")
     date_to = fields.Date(string="Date To")
     duration = fields.Integer(string="Duration", compute="_get_duration")
+    remaining_days = fields.Integer(string="Remaining Days", compute="_get_remaining_days")
     state = fields.Selection(
         string='Status',
-        selection=status
+        selection=status,
+        compute='compute_state'
     )
 
     contract_id = fields.Many2one(
@@ -880,10 +877,27 @@ class SuspensionHistory(models.Model):
     def _get_duration(self):
         for rec in self:
             duration = (
-                abs((rec.date_from - rec.date_to)).days
+                abs((rec.date_from - rec.date_to)).days + 1
                 if rec.date_from
                 and rec.date_to
-                and (rec.date_to - rec.date_from).days > 0
+                # and (rec.date_to - rec.date_from).days > 0
                 else 0
             )
             rec.duration = duration
+    
+    @api.depends("date_from","date_to")
+    def _get_remaining_days(self):
+        for rec in self:
+            if rec.date_from and rec.date_to:
+                remaining_days = (rec.date_to - date.today()).days
+                getLogger().info('\n\n\n{}\n{}\n\n\n'.format(rec.date_to, rec.date_to - date.today()))
+                rec.remaining_days = remaining_days
+
+    @api.depends('date_from','date_to','remaining_days')
+    def compute_state(self):
+        for rec in self:
+            if rec.remaining_days <= 0:
+                rec.remaining_days = 0
+                rec.state = 'completed'
+            else:
+                rec.state = 'on_going'

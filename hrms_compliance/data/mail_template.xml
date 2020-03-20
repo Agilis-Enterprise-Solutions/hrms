@@ -9,6 +9,7 @@
             <!-- <field name="partner_to">${object.emp_id.id}</field> -->
             <!-- <field name="partner_ids">${object.emp_id}</field> -->
             <field name="email_to">${object.emp_id.work_email or object.emp_id.parent_id.work_email}</field>
+            <field name="email_cc">${object.emp_id.parent_id.work_email}</field>
             <field name="subject">Notice to Explain (Ref ${object.infraction_id.infraction_sequence_id})</field>
             <field name="body_html" type="html">
                 <div style="margin: 0px; padding: 0px;">
