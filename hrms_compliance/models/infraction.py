@@ -29,10 +29,11 @@ class InheritEmployeeInfractions(models.Model):
 
     @api.depends('children')
     def _compute_infraction_record(self):
-        record = self.env['hr.infraction'].search([('emp_id', '=', self.id)])
-        self.update({
-            'infraction_ids': [(6, 0, record.ids)],
-        })
+        for rec in self:
+            record = self.env['hr.infraction'].search([('emp_id', '=', rec.id)])
+            rec.update({
+                'infraction_ids': [(6, 0, record.ids)],
+            })
 
 
 class Infractions(models.Model):
@@ -188,10 +189,11 @@ class Infractions(models.Model):
         """
         Deletes the action history records related to infraction upon the latter's deletion
         """
-        action_history = self.env['hr.infraction.action_history'].search(
-            [('infraction_id', '=', self.id)])
-        for i in action_history:
-            i.unlink()
+        for rec in self:
+            action_history = self.env['hr.infraction.action_history'].search(
+                [('infraction_id', '=', rec.id)])
+            for i in action_history:
+                i.unlink()
         # action_history.unlink()
         for i in self.env['hr.infraction.action_history'].browse(self.ids):
             i.unlink()
@@ -278,33 +280,34 @@ class Infractions(models.Model):
     def compute_policy_violation_instance(self):
         data = []
         frequency = ""
-        active_emp_id = self.emp_id.id if self.emp_id.id else False
-        if active_emp_id:
-            record_set = self.env['hr.infraction'].search(
-                [('emp_id', '=', active_emp_id), ('state', '!=', 'closed')])
-            for i in record_set:
-                data.append(i.policy_violated_id.id)
-            counter = data.count(self.policy_violated_id.id)
-            if self.offense_code_id.corrective_action_ids:
-                for i in self.offense_code_id.corrective_action_ids:
-                    frequency = i.frequencies
-                if self.offense_code_id and self.offense_code_id.corrective_action_ids:
-                    getLogger().info("\n\n\nCASE 1 {} {}\n\n\n".format(
-                        self.offense_code_id, self.offense_code_id.corrective_action_ids))
-                    log(offense_code_id=self.offense_code_id,
-                        corrective_action=self.offense_code_id.corrective_action_ids)
-                    self.frequency = frequency[counter -
-                                               1 if counter > 0 else counter][1]
-                    getLogger().info("\n\n\nCounter{}\nFrequency{}\n\n\n".format(
-                        counter-1, frequency))
-                elif counter < 0:
-                    getLogger().info("\n\n\nCASE 2\n\n\n")
-                    self.frequency = frequency[0][1]
-                else:
-                    getLogger().info("\n\n\nCASE 3\n\n\n")
-                    self.frequency = ""
+        for rec in self:
+            active_emp_id = rec.emp_id.id if rec.emp_id.id else False
+            if active_emp_id:
+                record_set = self.env['hr.infraction'].search(
+                    [('emp_id', '=', active_emp_id), ('state', '!=', 'closed')])
+                for i in record_set:
+                    data.append(i.policy_violated_id.id)
+                counter = data.count(self.policy_violated_id.id)
+                if rec.offense_code_id.corrective_action_ids:
+                    for i in rec.offense_code_id.corrective_action_ids:
+                        frequency = i.frequencies
+                    if rec.offense_code_id and rec.offense_code_id.corrective_action_ids:
+                        # getLogger().info("\n\n\nCASE 1 {} {}\n\n\n".format(
+                        #     self.offense_code_id, self.offense_code_id.corrective_action_ids))
+                        # log(offense_code_id=self.offense_code_id,
+                        #     corrective_action=self.offense_code_id.corrective_action_ids)
+                        rec.frequency = frequency[counter - 
+                                                1 if counter > 0 else counter][1]
+                        getLogger().info("\n\n\nCounter{}\nFrequency{}\n\n\n".format(
+                            counter-1, frequency))
+                    elif counter < 0:
+                        getLogger().info("\n\n\nCASE 2\n\n\n")
+                        rec.frequency = frequency[0][1]
+                    else:
+                        getLogger().info("\n\n\nCASE 3\n\n\n")
+                        rec.frequency = ""
 
-                    return frequency
+                        return frequency
 
     """=============================================================================================
         FOR POLICY VIOLATED ID DOMAIN PURPOSES ONLY
@@ -341,6 +344,7 @@ class Infractions(models.Model):
         # self.infraction_sequence_id = self.env['ir.sequence'].next_by_code(
         # 'infraction.code.sequence') or _('New')
 
+    """old code for checking if action history already has stage 'Investigation and NTE Issuance' """
     # @api.multi
     # def set_state_inprogress(self):
     #     for i in self.history_ids:
@@ -551,8 +555,7 @@ class ActionHistory(models.Model):
     _name = "hr.infraction.action_history"
     _description = "Every corrective action applied to employee for specific violation is recorded here"
     _rec_name = 'corrective_action'
-    # _inherit = ["mail.thread", "mail.activity.mixin", "resource.mixin"]
-
+    # _inherit = ["mail.thread","mail.activity.mixin"]
     state = fields.Selection(
         string='State',
         selection=[
@@ -628,11 +631,10 @@ class ActionHistory(models.Model):
     infraction_state = fields.Selection(
         string='Infraction State', related="infraction_id.state")
 
-    
+    """This method will create a suspension history record 
+    #     when an action history suspension record with staggered being False gets created"""
     # @api.model
     # def create(self, vals):
-    #     """This method will create a suspension history record 
-    #     when an action history suspension record with staggered being False gets created"""
     #     result = super(ActionHistory, self).create(vals)
     #     suspension = self.env['suspension.history']
     #     if result.stage == 'corrective_action' and result.staggered == False:
@@ -670,7 +672,7 @@ class ActionHistory(models.Model):
                 raise UserError(
                     _('Please click Submit button first before creating new Action record with stage Collaboration with IMC.'))
 
-    # """Checks start date and end data"""
+    """Checks start date and end date"""
     # @api.constrains('start_date', 'end_date')
     # def check_start_end_date(self):
     #     for rec in self:
@@ -742,7 +744,8 @@ class ActionHistory(models.Model):
                 else duration
             )
         return True
-    
+
+    """gets number of days"""
     # @api.onchange("start_date","end_date")
     # def _get_number_of_days(self):
     #     for line in self:
@@ -845,6 +848,7 @@ class SuspensionHistory(models.Model):
     _name = 'suspension.history'
     _description = 'Staggered Suspension History Model'
     _rec_name = 'infraction_id'
+    _inherit = ["mail.thread", "mail.activity.mixin", "resource.mixin"]
 
     status = [
         ('on_going', 'On Going'),
