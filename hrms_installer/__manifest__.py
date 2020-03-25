@@ -4,6 +4,7 @@
     'depends': [
         'base',
         'hr',
+        'hrms_separation_management',
         'hr_appraisal',
         'hr_attendance',
         'hr_contract',
@@ -15,7 +16,6 @@
         'hrms_employee_exit',
         'hrms_employee_movement',
         'hrms_recruitment',
-        'hrms_separation_management',
         'hrms_training',
         'hrms_work_history'
     ],
