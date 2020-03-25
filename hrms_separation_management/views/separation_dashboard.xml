@@ -1,54 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- <record id="act_separation_graph_view" model="ir.actions.act_window">
-      <field name="name">Separation Graph</field>
-      <field name="res_model">hr.separation</field>
-      <field name="view_mode">graph</field>
-      <field name="view_id" ref="hrms_separation_management.separation_management_graph_view"/>
-    </record>
-
-    <record model="ir.actions.act_window" id="act_Separation_action_form">
-      <field name="name">Separation Request</field>
-      <field name="res_model">hr.separation</field>
-      <field name="view_mode">tree,form</field>
-    </record> -->
-
-    <!--My Dashboard-->
-    <!-- <record id="separation_management_board_my_dash_view" model="ir.ui.view">
-        <field name="name">Separation Management Dashboard</field>
-        <field name="model">board.board</field>
-        <field name="form">form</field>
-        <field name="arch" type="xml">
-            <form string="My Dashboard">
-                <board style="1-2">
-                    <column>
-                      <action
-                        string="Separation Request Graph"
-                        name="%(hrms_separation_management.act_separation_graph_view)d"/>
-                      <action
-                        string="Separation Request Records"
-                        name="%(act_Separation_action_form)d"/>
-                    </column>
-                    <column>
-                      <action
-                        string="Separation Request"
-                        name="%(hrms_separation_management.act_separation_graph_view)d"/>
-                    </column>
-                </board>
-            </form>
-        </field>
-    </record>
-
-    <record model="ir.actions.act_window" id="separation_dashboard_action">
-        <field name="name">Dashboard</field>
-        <field name="res_model">board.board</field>
-        <field name="view_mode">form</field>
-        <field name="usage">menu</field>
-        <field name="view_id" ref="board.board_my_dash_view"/>
-    </record> -->
-
-
     <record id="act_separation_graph_view" model="ir.actions.act_window">
       <field name="name">Separation Graph</field>
       <field name="res_model">hr.separation</field>
@@ -67,7 +19,6 @@
       <field name="res_model">hr.separation</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,form</field>
-      <!-- <field name="domain">[('responsible_id','=','uid')]</field> -->
     </record>
 
 
