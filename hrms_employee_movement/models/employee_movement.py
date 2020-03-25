@@ -77,7 +77,8 @@ class HRMSEmployeeMovement(models.Model):
     def approve(self):
         for rec in self:
             if rec.new_job_id:
-                previous_contract = self.env['hr.contract'].search([('employee_id','=',rec.name.id)])
+                previous_contract = self.env['hr.contract'].search([('employee_id','=',rec.name.id),
+                                                                    ('state', '=', 'open')])
 
                 if previous_contract:
                     previous_contract = previous_contract[0]
@@ -101,6 +102,7 @@ class HRMSEmployeeMovement(models.Model):
                     })
 
                     rec.new_contract = contract.id
+                    rec.name.job_id = rec.new_job_id.id
                 else:
                     raise ValidationError('Employee Has no contract')
             elif rec.new_department_id:
@@ -112,6 +114,7 @@ class HRMSEmployeeMovement(models.Model):
                         previous_contract.write({
                             'department_id': rec.new_department_id.id,
                         })
+                        rec.name.new_department_id = rec.new_department_id.id
                     else:
                         previous_contract.write({
                             'date_end': date.today(),
@@ -122,8 +125,8 @@ class HRMSEmployeeMovement(models.Model):
                         contract = self.env['hr.contract'].create({
                             'name': rec.name.name,
                             'employee_id': rec.name.id,
-                            'job_id': rec.new_job_id.id,
-                            'department_id': rec.department_id.id,
+                            'job_id': rec.job_id.id,
+                            'department_id': rec.new_department_id.id,
                             'date_start': date.today(),
                             'date_created': date.today(),
                             'wage': previous_contract.wage,
@@ -132,6 +135,7 @@ class HRMSEmployeeMovement(models.Model):
                         })
 
                         rec.new_contract = contract.id
+                        rec.name.new_department_id = rec.new_department_id.id
 
                 else:
                     raise ValidationError('Employee Has no contract')

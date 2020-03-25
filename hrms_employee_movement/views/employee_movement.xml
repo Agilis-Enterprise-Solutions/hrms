@@ -39,9 +39,10 @@
                   attrs="{'readonly': [('state', 'not in', ('draft'))]}"/>
               </group>
               <group name="start_end">
-                <field name="new_job_id"
+                <field name="new_job_id" domain="[('id','!=',job_id)]"
                   attrs="{'readonly': [('state', 'not in', ('draft'))], 'invisible': [('movement_type', 'not in', ('promition','demotion'))], 'required': [('movement_type', 'in', ('promition','demotion'))]}"/>
                 <field name="new_department_id"
+                  domain="[('id','!=',department_id)]"
                   attrs="{'readonly': [('state', 'not in', ('draft'))],'invisible': [('movement_type', '!=', 'lateral')],'required': [('movement_type', '=', 'lateral')]}"/>
                 <field name="new_contract"
                   attrs="{'readonly': [('state', 'not in', ('draft'))],'invisible': [('new_contract', '=', False)]}"/>
