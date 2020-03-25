@@ -32,6 +32,7 @@
           <field name="violation_id"/>
           <field name="policy_violated_ids" invisible="1" />
           <field name="parent_infraction_id"/>
+          <field name="state"/>
           <field name="violation_date"/>
           <field name="history_ids"/>
         </tree>
@@ -60,7 +61,7 @@
                 <field name="emp_id" string="Name" attrs="{'readonly': [('state','not in',['draft'])]}" options="{'no_create': True, 'no_create_edit': True}"/>
                 <field name="job_id" string="Job Description" readonly="1"/>
                 <field name="manager_id"/>
-                <field name="parent_infraction_id" options="{'no_create': True, 'no_open': True, 'no_create_edit': True}"/>
+                <field name="parent_infraction_id" options="{'no_create': True, 'no_open': True, 'no_create_edit': True}" attrs="{'readonly': [('state','not in','draft')]}"/>
                 <field name="is_parent" invisible="1" />
                 <field name="is_child" invisible="1" />
               </group>
@@ -86,7 +87,7 @@
             <group>
               <notebook>
                 <page string="Action History">
-                  <field name="history_ids" attrs="{'readonly': [('state','in',['closed'])]}" nolabel="1">
+                  <field name="history_ids" attrs="{'readonly': [('state','in',['for_closure','closed'])]}" nolabel="1">
                     <tree>
                       <control>
                         <create string="Add record" context="{'default_infraction_id': id,'default_emp_id':emp_id}" />
@@ -105,9 +106,7 @@
                   </field>
                 </page>
                 <page string="Suspension History" attrs="{'invisible': [('suspension_history_ids','=',None)]}">
-                  <field name="suspension_history_ids" options="{'no_create': True, 'no_create_edit': True}" 
-                  domain="[('infraction_id', '=', id)]"
-                  >
+                  <field name="suspension_history_ids" options="{'no_create': True, 'no_create_edit': True}" domain="[('infraction_id', '=', id)]" readonly="1">
                     <tree delete="false">
                       <field name="date_from" string="Start Date"/>
                       <field name="date_to" string="End Date"/>
