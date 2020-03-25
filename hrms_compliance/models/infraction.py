@@ -167,11 +167,9 @@ class Infractions(models.Model):
         string="Action History",
         track_visibility="onchange",
         ondelete='cascade'
-        # compute='_auto_fill_history'
     )
 
     suspension_history_ids = fields.One2many('suspension.history','infraction_id',string="Suspension History",
-    # domain=[('infraction_id','=',)]
     )
 
     @api.depends('history_ids')
@@ -194,7 +192,6 @@ class Infractions(models.Model):
                 [('infraction_id', '=', rec.id)])
             for i in action_history:
                 i.unlink()
-        # action_history.unlink()
         for i in self.env['hr.infraction.action_history'].browse(self.ids):
             i.unlink()
         result = super(Infractions, self).unlink()
@@ -306,8 +303,7 @@ class Infractions(models.Model):
                     else:
                         getLogger().info("\n\n\nCASE 3\n\n\n")
                         rec.frequency = ""
-
-                        return frequency
+                    return frequency
 
     """=============================================================================================
         FOR POLICY VIOLATED ID DOMAIN PURPOSES ONLY
@@ -757,7 +753,14 @@ class ActionHistory(models.Model):
     #             else 0
     #         )
     #     self.number_of_days = duration
+    
+    
 
+    """This function creates and email form window
+        Please note that in order to update the email template for any changes made in code below,
+        User must delete the old template located in email.template.tree view called 'Notice to Explain, Send by email'
+        Same goes when making changes in mail_template.xml in data folder.
+    """
     @api.multi
     def send_nte_email(self):
         """
@@ -810,6 +813,7 @@ class ActionHistory(models.Model):
 
     @api.multi
     def approve_record(self):
+        """Sets Action History State to Approved"""
         self.write(
             {
                 'state': 'approved'
@@ -819,6 +823,7 @@ class ActionHistory(models.Model):
 
     @api.multi
     def cancel_record(self):
+        """Sets Action History State to Canceled"""
         self.write(
             {
                 'state': 'canceled'
