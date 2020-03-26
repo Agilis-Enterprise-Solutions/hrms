@@ -58,6 +58,7 @@ class Employee(models.Model):
     police_checkbox = fields.Boolean()
     barangay_checkbox = fields.Boolean()
 
+    marriage_checkbox = fields.Boolean()
     birth_checkbox = fields.Boolean()
     tor_checkbox = fields.Boolean()
     diploma_checkbox = fields.Boolean()
@@ -87,6 +88,7 @@ class Employee(models.Model):
     barangay_date_issued = fields.Date()
     barangay_clearance_photo = fields.Binary()
 
+    marriage_certificate = fields.Binary()
     birth_certificate = fields.Binary()
     transcript_of_records = fields.Binary()
     diploma = fields.Binary()

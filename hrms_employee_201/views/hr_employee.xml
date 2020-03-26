@@ -111,6 +111,13 @@
                   </div>
 
                   <div class="col-sm-4">
+                    <div attrs="{'invisible': [('marital', '!=', 'Married')]}">
+                      <field name="marriage_checkbox"/>
+                      <label for="marriage_certificate"/>
+                      <field name="marriage_certificate"
+                             attrs="{'required': [('marriage_checkbox', '=', True)], 'invisible': [('marriage_checkbox', '!=', True)]}"/>
+                    </div>
+
                     <div>
                       <field name="birth_checkbox"/>
                       <label for="birth_certificate"/>
