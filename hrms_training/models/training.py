@@ -15,10 +15,11 @@ class Training(models.Model):
 
     employee_id = fields.Many2one('hr.employee')
     employee_ids = fields.Many2many('hr.employee',
-                                    string='Attendees')
+                                    string='Attendees',
+                                    required=True)
 
     training_name = fields.Char(required=True)
-    subject = fields.Char('Training Subject')
+    subject = fields.Char('Training Subject', required=True)
     training_type = fields.Selection([
         ('Online', 'Online'),
         ('Classroom', 'Classroom'),
@@ -27,7 +28,7 @@ class Training(models.Model):
     date_completed = fields.Date()
     date = fields.Date()
     venue = fields.Char()
-    trainor = fields.Char('Trainer')
+    trainor = fields.Char('Trainer', required=True)
     cost = fields.Float()
     sponsor = fields.Char()
     organizer = fields.Char()
