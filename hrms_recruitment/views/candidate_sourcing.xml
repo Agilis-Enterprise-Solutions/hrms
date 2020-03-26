@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
   <data>
+
     <!-- Inherit Form view -->
     <record id="inherit_hrms_applicant" model="ir.ui.view">
       <field name="name">hr.applicant.form</field>

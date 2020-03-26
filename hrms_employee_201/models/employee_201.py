@@ -4,7 +4,7 @@ from datetime import date
 from logging import getLogger
 
 
-def log(**to_output):
+def log(*to_output):
     getLogger().info("\n\n\n{0}\n\n".format(to_output))
 
 
@@ -147,6 +147,17 @@ class Employee(models.Model):
         string="Contract History",
         compute='_compute_contract_history_record'
     )
+
+    application_id = fields.Many2one('hr.applicant')
+    application_name = fields.Char(related='application_id.partner_name')
+
+    @api.multi
+    def get_reference_application(self):
+        self.ensure_one()
+        action = self.env['ir.actions.act_window'].for_xml_id('hrms_employee_201',
+                                                              'open_view_reference_application')
+        action['res_id'] = self.mapped('application_id').ids[0]
+        return action
 
     @api.depends('children')
     def _compute_contract_history_record(self):

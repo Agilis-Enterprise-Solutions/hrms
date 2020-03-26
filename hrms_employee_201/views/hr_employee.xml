@@ -2,12 +2,40 @@
 <odoo>
   <data>
 
+    <record id="open_view_reference_application" model="ir.actions.act_window">
+      <field name="name">Applications</field>
+      <field name="res_model">hr.applicant</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">form,tree</field>
+      <field name="view_id" eval="False"/>
+    </record>
+
+    <!-- Inherit Form view -->
+    <record id="add_application_smart_button_employee" model="ir.ui.view">
+      <field name="name">hr.employee.form</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.view_employee_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//button[@name='toggle_active']" position="before">
+          <button name="get_reference_application" class="oe_stat_button"
+                  icon="fa-book" type="object">
+            <field name="application_name" widget="statinfo"
+                   string="Application"/>
+          </button>
+        </xpath>
+      </field>
+    </record>
+
     <!-- Inherit Form view -->
     <record id="inherit_employee_form_view" model="ir.ui.view">
       <field name="name">hr.employee.form</field>
       <field name="model">hr.employee</field>
       <field name="inherit_id" ref="hr.view_employee_form"/>
       <field name="arch" type="xml">
+        <field name="user_id" position="after">
+          <field name="application_id"/>
+        </field>
+
         <field name="children" position="attributes">
           <attribute name="attrs">
             {'invisible': [('marital', '=', 'single')]}
@@ -103,8 +131,7 @@
                     <span>
                       <field name="tin" class="oe_inline"
                              placeholder="e.g. 000-123-456-001"
-                             attrs="{'required': [('tin_checkbox', '=', True)],
-'invisible': [('tin_checkbox', '!=', True)]}"/>
+                             attrs="{'required': [('tin_checkbox', '=', True)], 'invisible': [('tin_checkbox', '!=', True)]}"/>
                     </span>
                     <br/>
 
