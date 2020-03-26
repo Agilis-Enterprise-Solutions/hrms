@@ -17,10 +17,9 @@
 
     'depends': [
         'base',
+        'board',
         'hr',
-        'survey',
-        'hrms_employee_exit',
-        'board'
+        'survey'
     ],
 
     'data': [
