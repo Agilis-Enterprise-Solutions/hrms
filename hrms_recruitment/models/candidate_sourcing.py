@@ -301,31 +301,13 @@ class CharacterReference(models.Model):
                     "Email is in Incorrect format \n e.g. example@company.com")
 
 
-# class CandidateSkill(models.Model):
-#     _name = "hr.candidate.skill"
-#     _rec_name = "candidate_skill"
-#     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
-#
-#     candidate_skill_id = fields.Many2one('hr.applicant')
-#     candidate_skill = fields.Many2one('hr.candidate.skill.type', "Skill Name",
-#                                       required=True)
-#     candidate_skill_desc = fields.Text("Description", required=True)
-
-
-# class CandidateSkillType(models.Model):
-#     _name = "hr.candidate.skill.type"
-#     _rec_name = "candidate_skill"
-#     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
-#
-#     candidate_skill = fields.Char("Skill Name", required=True)
-
-
 class CandidateWorkHistory(models.Model):
     _name = "hr.candidate.work.history"
     _rec_name = "work_history_id"
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     work_history_id = fields.Many2one('hr.applicant')
+    employee_id = fields.Many2one('hr.employee')
     company_name = fields.Char("Company Name", required=True)
     line_of_business = fields.Many2one('hr.candidate.work.history.company',
                                        "Line Of Business")
@@ -357,14 +339,6 @@ class CandidateCompanyLine(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     line_of_business = fields.Char("Line Of Business", required=True)
-
-
-# class CandidateCompanyPosition(models.Model):
-#     _name = "hr.candidate.work.history.position"
-#     _rec_name = "position"
-#     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
-#
-#     position = fields.Char("Position", required=True)
 
 
 class CandidateEducation(models.Model):

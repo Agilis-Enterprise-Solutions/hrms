@@ -4,17 +4,16 @@ from datetime import date
 from logging import getLogger
 
 
-def log(**to_output):
+def log(*to_output):
     getLogger().info("\n\n\n{0}\n\n".format(to_output))
+
 
 class EmployeeWorkHistory(models.Model):
     _inherit = 'hr.employee'
 
-    """========================WORK HISTORY========================"""
-    work_history_ids = fields.One2many(
-        'hr.work.history', 'employee_id',
-        string="Work History"
-    )
+    work_history_ids = fields.One2many('hr.candidate.work.history',
+                                       'employee_id',
+                                       string="Work History")
 
 
 class WorkHistory(models.Model):

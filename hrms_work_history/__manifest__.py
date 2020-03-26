@@ -18,7 +18,8 @@
     'depends': [
         'base',
         'hr',
-        'hrms_employee_201'
+        'hrms_employee_201',
+        'hrms_recruitment'
     ],
 
     'data': [
