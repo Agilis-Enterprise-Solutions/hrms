@@ -53,7 +53,7 @@
           <field name="stage_id_name" invisible="1"/>
           <button type="object" name="create_contract" string="Create Contract"
                   class="oe_highlight"
-                  attrs="{'invisible': [('contracts_count', '!=', 0)]}"/>
+                  attrs="{'invisible': ['|', ('active', '=', False), ('contracts_count', '!=', 0)]}"/>
         </xpath>
 
         <xpath expr="//button[@name='create_employee_from_applicant']"
@@ -89,7 +89,7 @@
               <field name="job_qualification"/>
             </page>
           </notebook>
-          
+
           <notebook>
             <page string="Character Reference">
               <field name="assessment_ids" invisible="1"/>
