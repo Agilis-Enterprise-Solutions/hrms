@@ -8,6 +8,12 @@
       <field name="model">hr.employee</field>
       <field name="inherit_id" ref="hr.view_employee_form"/>
       <field name="arch" type="xml">
+        <field name="children" position="attributes">
+          <attribute name="attrs">
+            {'invisible': [('marital', '=', 'single')]}
+          </attribute>
+        </field>
+
         <field name="passport_id" position="after">
           <field name="passport_validity_date" groups="hr.group_hr_user"/>
           <field name="place_of_passport_issuance" groups="hr.group_hr_user"/>

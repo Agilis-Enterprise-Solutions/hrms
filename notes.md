@@ -1,8 +1,6 @@
 Notes
 -----
 
-- Hide number of children if marital status is single.
-
 - Carry over skills from applications into Employee 201 file.
 
 - Carry over work history from applications into Employee 201 file.
