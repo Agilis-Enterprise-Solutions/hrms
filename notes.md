@@ -11,7 +11,8 @@ Notes
 
 5. Carry over work history from applications into Employee 201 file. (Done)
 
-6. Fetch education from application then put it under Skills of Employee 201.
+6. Fetch education from application then put it under Skills of
+   Employee 201. (Done)
 
 7. Put link of employee’s application into 201 file. (Done)
 
