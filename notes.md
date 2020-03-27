@@ -20,23 +20,21 @@ Notes
 
 9. Certificate number <- Acquire certificate.
 
-10. Auto-create skills if training completed.
+10. Required new job position and new department.
 
-11. Required new job position and new department.
+11. Employee movement and separation management chatter.
 
-12. Employee movement and separation management chatter.
+12. Under employee movement, fix behavior of new contract field.
 
-13. Under employee movement, fix behavior of new contract field.
+13. Send email under Infractions
 
-14. Send email under Infractions
+14. Include manager’s email inside offender
 
-15. Include manager’s email inside offender
+15. Expected singleton upon infraction’s saving
 
-16. Expected singleton upon infraction’s saving
+16. Expected singleton upon saving after creation of action (of non-staggered?)
 
-17. Expected singleton upon saving after creation of action (of non-staggered?)
-
-18. Number of days under action history should be editable. Consider removing
+17. Number of days under action history should be editable. Consider removing
     start date and end date.
 
     Whether action history is staggered or not, there should be an initial pool of
