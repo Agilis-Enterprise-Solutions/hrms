@@ -42,16 +42,17 @@ class Applicant(models.Model):
                                           'character_id',
                                           string="Character References")
 
-    candiddate_skills = fields.One2many('hr.employee.skills', 'candidate_sourcing_id',
-                                        string="Candidate Skill")
+    candidate_skills = fields.One2many('hr.employee.skills',
+                                       'candidate_sourcing_id',
+                                       string="Candidate Skill")
 
-    candiddate_education = fields.One2many('hr.candidate.education',
-                                           'education_id',
-                                           string="Candidate Education")
+    candidate_education = fields.One2many('hr.candidate.education',
+                                          'education_id',
+                                          string="Candidate Education")
 
-    candiddate_work_history = fields.One2many('hr.candidate.work.history',
-                                              'work_history_id',
-                                              string="Candidate Work History")
+    candidate_work_history = fields.One2many('hr.candidate.work.history',
+                                             'work_history_id',
+                                             string="Candidate Work History")
 
     assessment_ids = fields.Many2many('hr.assessment',
                                       string="Assessments")
@@ -161,9 +162,9 @@ class Applicant(models.Model):
                 })
                 employee = self.env['hr.employee'].create({
                     'name': applicant.partner_name or contact_name,
-                    'skill_ids': [(6, 0, applicant.candiddate_skills.ids)],
+                    'skill_ids': [(6, 0, applicant.candidate_skills.ids)],
                     'work_history_ids': [(6, 0,
-                                          applicant.candiddate_work_history.ids)],
+                                          applicant.candidate_work_history.ids)],
                     'application_id': self.id,
                     'job_id': applicant.job_id.id,
                     'address_home_id': address_id,

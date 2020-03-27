@@ -104,7 +104,7 @@
               </field>
             </page>
             <page string="Skills">
-              <field name="candiddate_skills">
+              <field name="candidate_skills">
                 <tree editable="bottom">
                   <field name="skill_name"/>
                   <field name="skill_type_id"/>
@@ -113,7 +113,7 @@
               </field>
             </page>
             <page string="Education">
-              <field name="candiddate_education">
+              <field name="candidate_education">
                 <tree editable="bottom">
                   <field name="type_id"/>
                   <field name="course" />
@@ -126,7 +126,7 @@
               </field>
             </page>
             <page string="Work History">
-              <field name="candiddate_work_history">
+              <field name="candidate_work_history">
                 <tree editable="bottom">
                   <field name="company_name"/>
                   <field name="line_of_business" />
