@@ -265,6 +265,19 @@
           </page>
 
           <page string="Skills, Training, and Education" name="for_skills">
+            <label for="education_ids"/>
+            <field name="education_ids">
+              <tree editable="bottom">
+                <field name="type_id"/>
+                <field name="course"/>
+                <field name="standard"/>
+                <field name="year"/>
+                <field name="school_name"/>
+                <field name="address"/>
+                <field name="vital_info"/>
+              </tree>
+            </field>
+
             <label for="skill_ids"/>
             <field name="skill_ids">
               <tree editable="bottom">

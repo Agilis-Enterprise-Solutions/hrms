@@ -5,7 +5,7 @@ from datetime import date
 import re
 import logging
 from logging import getLogger
-_logger = logging.getLogger("_name_")
+_logger = logging.getLogger()
 
 
 def log(*to_output):
@@ -76,16 +76,12 @@ class Applicant(models.Model):
     job_qualification = fields.Text(string="Job Qualification",
                                     track_visibility='onchange',
                                     related='requisition_id.job_qualification',
-                                    readonly=True,
-                                    # store=True
-                                    )
+                                    readonly=True)
 
     job_description = fields.Text(string="Job Description",
                                   track_visibility='onchange',
                                   related='requisition_id.job_description',
-                                  readonly=True,
-                                #   store=True
-                                  )
+                                  readonly=True)
 
     @api.multi
     def act_hr_applicant_2_hr_contract(self):
@@ -163,8 +159,8 @@ class Applicant(models.Model):
                 employee = self.env['hr.employee'].create({
                     'name': applicant.partner_name or contact_name,
                     'skill_ids': [(6, 0, applicant.candidate_skills.ids)],
-                    'work_history_ids': [(6, 0,
-                                          applicant.candidate_work_history.ids)],
+                    'work_history_ids': [(6, 0, applicant.candidate_work_history.ids)],
+                    'education_ids': [(6, 0, applicant.candidate_education.ids)],
                     'application_id': self.id,
                     'job_id': applicant.job_id.id,
                     'address_home_id': address_id,
@@ -350,6 +346,7 @@ class CandidateEducation(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin', 'resource.mixin']
 
     education_id = fields.Many2one('hr.applicant')
+    employee_id = fields.Many2one('hr.employee')
     type_id = fields.Many2one('hr.recruitment.degree', "Level of Education",
                               required=True)
     course = fields.Many2one('hr.candidate.education.strand', "Course/Strand")
@@ -357,7 +354,7 @@ class CandidateEducation(models.Model):
     year = fields.Integer("Year")
     school_name = fields.Char("School Name")
     address = fields.Char("Address")
-    vital_info = fields.Char("Other vital Information")
+    vital_info = fields.Char("Other Vital Information")
 
 
 class CandidateEducationCourseStrand(models.Model):

@@ -151,6 +151,9 @@ class Employee(models.Model):
     application_id = fields.Many2one('hr.applicant')
     application_name = fields.Char(related='application_id.partner_name')
 
+    education_ids = fields.One2many('hr.candidate.education', 'employee_id',
+                                    string='Education')
+
     @api.multi
     def get_reference_application(self):
         self.ensure_one()
