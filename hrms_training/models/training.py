@@ -1,12 +1,10 @@
 # coding: utf-8
 from odoo import models, fields, api
 from logging import getLogger
-from datetime import date
 
 
-def log(**to_output):
-    for key, value in to_output.items():
-        getLogger().info("\n\n\n{0}: {1}\n\n".format(key, value))
+def log(*to_output):
+    getLogger().info("\n\n\n{0}\n\n".format(to_output))
 
 
 class Training(models.Model):
@@ -40,11 +38,10 @@ class Training(models.Model):
     venue = fields.Text()
     on_premises = fields.Boolean()
     status = fields.Selection([
-        ('Proposed', 'Proposed'),
         ('Scheduled', 'Scheduled'),
         ('Completed', 'Completed'),
         ('Cancelled', 'Cancelled')
-    ], default='Proposed', compute="_set_status", store=True)
+    ], default='Scheduled')
 
     @api.multi
     def done(self):
@@ -61,12 +58,6 @@ class Training(models.Model):
         })
 
         return True
-
-    @api.depends('start_date')
-    def _set_status(self):
-        for rec in self:
-            if rec.start_date and (rec.start_date > date.today()):
-                rec.status = 'Scheduled'
 
 
 class Employee(models.Model):
